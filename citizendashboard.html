@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="JanSetu Citizen Dashboard - Report, track and participate in civic improvement."
+    >
+
+    <title>JanSetu | Citizen Dashboard</title>
+
+    <link rel="stylesheet" href="dashboard.css">
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================
+     MOBILE OVERLAY
+========================================= -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+    onclick="closeSidebar()">
+</div>
+
+
+<!-- =========================================
+     SIDEBAR
+========================================= -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="brand">
+
+        <div class="brand-mark">
+            J
+        </div>
+
+        <div>
+
+            <h2>JanSetu</h2>
+
+            <span>
+                Civic Intelligence
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- Navigation -->
+
+    <nav class="sidebar-nav">
+
+        <p class="nav-title">
+            MAIN
+        </p>
+
+
+        <a
+            href="#"
+            class="nav-link active"
+            onclick="showSection('overview', this)"
+        >
+
+            <span class="nav-icon">⌂</span>
+
+            Dashboard
+
+        </a>
+
+
+        <a
+            href="report.html"
+            class="nav-link"
+        >
+
+            <span class="nav-icon">＋</span>
+
+            Report Issue
+
+        </a>
+
+
+        <a
+            href="#reports"
+            class="nav-link"
+            onclick="showSection('reports', this)"
+        >
+
+            <span class="nav-icon">▤</span>
+
+            My Reports
+
+        </a>
+
+
+        <a
+            href="#map"
+            class="nav-link"
+            onclick="showSection('map', this)"
+        >
+
+            <span class="nav-icon">⌖</span>
+
+            Civic Map
+
+        </a>
+
+
+        <p class="nav-title">
+            COMMUNITY
+        </p>
+
+
+        <a
+            href="#budget"
+            class="nav-link"
+            onclick="showSection('budget', this)"
+        >
+
+            <span class="nav-icon">₹</span>
+
+            Participatory Budget
+
+        </a>
+
+
+        <a
+            href="#impact"
+            class="nav-link"
+            onclick="showSection('impact', this)"
+        >
+
+            <span class="nav-icon">◈</span>
+
+            Community Impact
+
+        </a>
+
+
+        <a
+            href="#notifications"
+            class="nav-link"
+            onclick="showSection('notifications', this)"
+        >
+
+            <span class="nav-icon">♢</span>
+
+            Notifications
+
+            <span class="notification-count">
+                3
+            </span>
+
+        </a>
+
+
+        <p class="nav-title">
+            ACCOUNT
+        </p>
+
+
+        <a
+            href="#"
+            class="nav-link"
+            onclick="showToast('Profile settings coming soon.')"
+        >
+
+            <span class="nav-icon">◎</span>
+
+            My Profile
+
+        </a>
+
+
+        <a
+            href="#"
+            class="nav-link"
+            onclick="logout()"
+        >
+
+            <span class="nav-icon">↪</span>
+
+            Logout
+
+        </a>
+
+    </nav>
+
+
+    <!-- Sidebar bottom -->
+
+    <div class="sidebar-bottom">
+
+        <div class="help-card">
+
+            <div class="help-icon">
+                ?
+            </div>
+
+            <div>
+
+                <strong>
+                    Need help?
+                </strong>
+
+                <p>
+                    Learn how JanSetu works.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================================
+     MAIN CONTENT
+========================================= -->
+
+<div class="main-wrapper">
+
+
+    <!-- =====================================
+         TOPBAR
+    ====================================== -->
+
+    <header class="topbar">
+
+        <button
+            class="mobile-menu-btn"
+            onclick="toggleSidebar()"
+            aria-label="Open menu"
+        >
+            ☰
+        </button>
+
+
+        <div class="topbar-search">
+
+            <span>
+                ⌕
+            </span>
+
+            <input
+                type="search"
+                id="searchInput"
+                placeholder="Search your reports..."
+            >
+
+        </div>
+
+
+        <div class="topbar-actions">
+
+
+            <!-- Notification -->
+
+            <button
+                class="icon-btn notification-btn"
+                onclick="toggleNotifications()"
+                aria-label="Notifications"
+            >
+
+                ♢
+
+                <span class="notification-dot">
+                </span>
+
+            </button>
+
+
+            <!-- Profile -->
+
+            <div
+                class="user-profile"
+                onclick="toggleProfileMenu()"
+            >
+
+                <div class="avatar">
+                    C
+                </div>
+
+                <div class="user-info">
+
+                    <strong id="userName">
+                        Citizen
+                    </strong>
+
+                    <span>
+                        Citizen
+                    </span>
+
+                </div>
+
+                <span class="profile-arrow">
+                    ▾
+                </span>
+
+            </div>
+
+
+            <!-- Profile dropdown -->
+
+            <div
+                class="profile-menu"
+                id="profileMenu"
+            >
+
+                <div class="profile-menu-header">
+
+                    <div class="avatar large">
+                        C
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Citizen
+                        </strong>
+
+                        <span id="profileEmail">
+                            citizen@jansetu.in
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    onclick="showToast('Profile settings coming soon.')"
+                >
+                    ⚙ Settings
+                </button>
+
+
+                <button onclick="logout()">
+                    ↪ Logout
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================
+         CONTENT
+    ====================================== -->
+
+    <main class="content">
+
+
+        <!-- =================================
+             OVERVIEW
+        ================================== -->
+
+        <section
+            class="dashboard-section"
+            id="overview"
+        >
+
+
+            <!-- Welcome -->
+
+            <div class="welcome-row">
+
+                <div>
+
+                    <span class="eyebrow">
+                        CITIZEN PORTAL
+                    </span>
+
+                    <h1>
+                        Good morning, <span id="welcomeName">
+                            Citizen
+                        </span> 👋
+                    </h1>
+
+                    <p>
+                        Here's what's happening with your community.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="report.html"
+                    class="primary-btn"
+                >
+
+                    <span>＋</span>
+
+                    Report an Issue
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================
+                 STATS
+            ================================== -->
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <div class="stat-icon blue">
+                            ▤
+                        </div>
+
+                        <span class="trend positive">
+                            ↑ 12%
+                        </span>
+
+                    </div>
+
+                    <h2>
+                        08
+                    </h2>
+
+                    <p>
+                        Reports Submitted
+                    </p>
+
+                    <span class="stat-description">
+                        Since joining JanSetu
+                    </span>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <div class="stat-icon orange">
+                            ◷
+                        </div>
+
+                        <span class="trend">
+                            Active
+                        </span>
+
+                    </div>
+
+                    <h2>
+                        03
+                    </h2>
+
+                    <p>
+                        In Progress
+                    </p>
+
+                    <span class="stat-description">
+                        Being handled by authorities
+                    </span>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <div class="stat-icon green">
+                            ✓
+                        </div>
+
+                        <span class="trend positive">
+                            85%
+                        </span>
+
+                    </div>
+
+                    <h2>
+                        04
+                    </h2>
+
+                    <p>
+                        Issues Resolved
+                    </p>
+
+                    <span class="stat-description">
+                        Successfully closed
+                    </span>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <div class="stat-icon purple">
+                            ◈
+                        </div>
+
+                        <span class="trend positive">
+                            +17
+                        </span>
+
+                    </div>
+
+                    <h2>
+                        17
+                    </h2>
+
+                    <p>
+                        Community Impact
+                    </p>
+
+                    <span class="stat-description">
+                        People benefited
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+                 MAIN GRID
+            ================================== -->
+
+            <div class="dashboard-grid">
+
+
+                <!-- Recent reports -->
+
+                <div
+                    class="card reports-card"
+                    id="reports"
+                >
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h2>
+                                Recent Reports
+                            </h2>
+
+                            <p>
+                                Track your latest civic issues
+                            </p>
+
+                        </div>
+
+                        <button
+                            class="text-btn"
+                            onclick="showSection('reports')"
+                        >
+                            View all →
+                        </button>
+
+                    </div>
+
+
+                    <div class="reports-list">
+
+
+                        <!-- Report 1 -->
+
+                        <div class="report-row">
+
+                            <div class="report-category road">
+                                🚧
+                            </div>
+
+                            <div class="report-details">
+
+                                <h3>
+                                    Road damage near Unit 4
+                                </h3>
+
+                                <p>
+                                    #JS-20481 • 2 days ago
+                                </p>
+
+                            </div>
+
+                            <div class="report-status">
+
+                                <span class="status in-progress">
+                                    In Progress
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="arrow-btn"
+                                onclick="viewReport('JS-20481')"
+                            >
+                                →
+                            </button>
+
+                        </div>
+
+
+                        <!-- Report 2 -->
+
+                        <div class="report-row">
+
+                            <div class="report-category light">
+                                💡
+                            </div>
+
+                            <div class="report-details">
+
+                                <h3>
+                                    Broken street light
+                                </h3>
+
+                                <p>
+                                    #JS-20462 • 5 days ago
+                                </p>
+
+                            </div>
+
+                            <div class="report-status">
+
+                                <span class="status resolved">
+                                    Resolved
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="arrow-btn"
+                                onclick="viewReport('JS-20462')"
+                            >
+                                →
+                            </button>
+
+                        </div>
+
+
+                        <!-- Report 3 -->
+
+                        <div class="report-row">
+
+                            <div class="report-category waste">
+                                🗑
+                            </div>
+
+                            <div class="report-details">
+
+                                <h3>
+                                    Garbage collection issue
+                                </h3>
+
+                                <p>
+                                    #JS-20431 • 1 week ago
+                                </p>
+
+                            </div>
+
+                            <div class="report-status">
+
+                                <span class="status pending">
+                                    Pending
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="arrow-btn"
+                                onclick="viewReport('JS-20431')"
+                            >
+                                →
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- Quick actions -->
+
+                <div class="card quick-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h2>
+                                Quick Actions
+                            </h2>
+
+                            <p>
+                                Get things done faster
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="quick-actions">
+
+
+                        <a
+                            href="report.html"
+                            class="quick-action"
+                        >
+
+                            <div class="quick-icon blue">
+                                ＋
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Report an issue
+                                </strong>
+
+                                <span>
+                                    Submit a new grievance
+                                </span>
+
+                            </div>
+
+                            <span>
+                                →
+                            </span>
+
+                        </a>
+
+
+                        <button
+                            class="quick-action"
+                            onclick="showSection('map')"
+                        >
+
+                            <div class="quick-icon green">
+                                ⌖
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Explore civic map
+                                </strong>
+
+                                <span>
+                                    See issues near you
+                                </span>
+
+                            </div>
+
+                            <span>
+                                →
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            class="quick-action"
+                            onclick="showSection('budget')"
+                        >
+
+                            <div class="quick-icon purple">
+                                ₹
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Vote on projects
+                                </strong>
+
+                                <span>
+                                    Participate in your ward
+                                </span>
+
+                            </div>
+
+                            <span>
+                                →
+                            </span>
+
+                        </button>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+                 IMPACT + MAP
+            ================================== -->
+
+            <div class="lower-grid">
+
+
+                <!-- Community impact -->
+
+                <div
+                    class="card impact-card"
+                    id="impact"
+                >
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h2>
+                                Community Impact
+                            </h2>
+
+                            <p>
+                                Your contribution matters
+                            </p>
+
+                        </div>
+
+                        <span class="impact-badge">
+                            This month
+                        </span>
+
+                    </div>
+
+
+                    <div class="impact-content">
+
+                        <div class="impact-number">
+
+                            <strong>
+                                17
+                            </strong>
+
+                            <span>
+                                citizens benefited
+                            </span>
+
+                        </div>
+
+
+                        <div class="impact-bar">
+
+                            <div class="bar-label">
+
+                                <span>
+                                    Your civic contribution
+                                </span>
+
+                                <strong>
+                                    72%
+                                </strong>
+
+                            </div>
+
+                            <div class="progress-bar">
+
+                                <div
+                                    class="progress-value"
+                                    style="width:72%"
+                                >
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <p class="impact-message">
+
+                            Together, citizens in your area have
+                            helped improve <strong>23 local issues</strong>
+                            this month.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Civic map -->
+
+                <div
+                    class="card map-card"
+                    id="map"
+                >
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h2>
+                                Civic Map
+                            </h2>
+
+                            <p>
+                                Issues around your area
+                            </p>
+
+                        </div>
+
+                        <button
+                            class="text-btn"
+                            onclick="showToast('Map module coming soon.')"
+                        >
+                            Explore →
+                        </button>
+
+                    </div>
+
+
+                    <div class="map-preview">
+
+                        <div class="map-grid"></div>
+
+
+                        <div class="map-road road-one"></div>
+
+                        <div class="map-road road-two"></div>
+
+                        <div class="map-road road-three"></div>
+
+
+                        <div
+                            class="map-pin pin-one"
+                            title="Road issue"
+                        >
+                            ●
+                        </div>
+
+                        <div
+                            class="map-pin pin-two"
+                            title="Waste issue"
+                        >
+                            ●
+                        </div>
+
+                        <div
+                            class="map-pin pin-three"
+                            title="Street light"
+                        >
+                            ●
+                        </div>
+
+
+                        <div class="map-label">
+                            12 issues near you
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+                 BUDGET
+            ================================== -->
+
+            <div
+                class="card budget-card"
+                id="budget"
+            >
+
+                <div class="budget-content">
+
+                    <div class="budget-icon">
+                        ₹
+                    </div>
+
+                    <div class="budget-info">
+
+                        <span class="eyebrow">
+                            PARTICIPATORY BUDGETING
+                        </span>
+
+                        <h2>
+                            Help decide what gets built in your ward.
+                        </h2>
+
+                        <p>
+                            Review community proposals and vote for
+                            projects that can make the biggest local impact.
+                        </p>
+
+                    </div>
+
+                    <button
+                        class="primary-btn"
+                        onclick="showBudget()"
+                    >
+                        Explore proposals →
+                    </button>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================
+             NOTIFICATIONS
+        ================================== -->
+
+        <section
+            class="dashboard-section hidden-section"
+            id="notifications"
+        >
+
+            <div class="page-heading">
+
+                <span class="eyebrow">
+                    UPDATES
+                </span>
+
+                <h1>
+                    Notifications
+                </h1>
+
+                <p>
+                    Stay updated about your civic reports.
+                </p>
+
+            </div>
+
+
+            <div class="card notifications-card">
+
+                <div class="notification-item unread">
+
+                    <div class="notification-icon green">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Your street light complaint was resolved.
+                        </strong>
+
+                        <p>
+                            Report #JS-20462 has been marked as resolved.
+                        </p>
+
+                        <small>
+                            2 hours ago
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="notification-item unread">
+
+                    <div class="notification-icon blue">
+                        ↻
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Your road complaint is being reviewed.
+                        </strong>
+
+                        <p>
+                            An officer has started working on #JS-20481.
+                        </p>
+
+                        <small>
+                            Yesterday
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="notification-item">
+
+                    <div class="notification-icon purple">
+                        ₹
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            New budget proposals are available.
+                        </strong>
+
+                        <p>
+                            Your ward has 5 proposals open for voting.
+                        </p>
+
+                        <small>
+                            2 days ago
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================
+             FULL REPORTS
+        ================================== -->
+
+        <section
+            class="dashboard-section hidden-section"
+            id="allReports"
+        >
+
+            <div class="page-heading">
+
+                <span class="eyebrow">
+                    MY ACTIVITY
+                </span>
+
+                <h1>
+                    My Reports
+                </h1>
+
+                <p>
+                    Track all your submitted civic grievances.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="filter-row">
+
+                    <button
+                        class="filter-btn active"
+                        onclick="filterReports('all', this)"
+                    >
+                        All
+                    </button>
+
+                    <button
+                        class="filter-btn"
+                        onclick="filterReports('pending', this)"
+                    >
+                        Pending
+                    </button>
+
+                    <button
+                        class="filter-btn"
+                        onclick="filterReports('progress', this)"
+                    >
+                        In Progress
+                    </button>
+
+                    <button
+                        class="filter-btn"
+                        onclick="filterReports('resolved', this)"
+                    >
+                        Resolved
+                    </button>
+
+                </div>
+
+
+                <div id="allReportsList">
+
+                    <div
+                        class="full-report"
+                        data-status="progress"
+                    >
+
+                        <div class="full-report-icon road">
+                            🚧
+                        </div>
+
+                        <div class="full-report-info">
+
+                            <h3>
+                                Road damage near Unit 4
+                            </h3>
+
+                            <p>
+                                #JS-20481 • Road & Infrastructure
+                            </p>
+
+                        </div>
+
+                        <span class="status in-progress">
+                            In Progress
+                        </span>
+
+                        <button
+                            class="outline-btn"
+                            onclick="viewReport('JS-20481')"
+                        >
+                            Track
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="full-report"
+                        data-status="resolved"
+                    >
+
+                        <div class="full-report-icon light">
+                            💡
+                        </div>
+
+                        <div class="full-report-info">
+
+                            <h3>
+                                Broken street light
+                            </h3>
+
+                            <p>
+                                #JS-20462 • Street Lighting
+                            </p>
+
+                        </div>
+
+                        <span class="status resolved">
+                            Resolved
+                        </span>
+
+                        <button
+                            class="outline-btn"
+                            onclick="viewReport('JS-20462')"
+                        >
+                            View
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="full-report"
+                        data-status="pending"
+                    >
+
+                        <div class="full-report-icon waste">
+                            🗑
+                        </div>
+
+                        <div class="full-report-info">
+
+                            <h3>
+                                Garbage collection issue
+                            </h3>
+
+                            <p>
+                                #JS-20431 • Waste Management
+                            </p>
+
+                        </div>
+
+                        <span class="status pending">
+                            Pending
+                        </span>
+
+                        <button
+                            class="outline-btn"
+                            onclick="viewReport('JS-20431')"
+                        >
+                            Track
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =========================================
+         REPORT DETAILS MODAL
+    ========================================== -->
+
+    <div
+        class="detail-modal"
+        id="detailModal"
+    >
+
+        <div class="detail-box">
+
+            <button
+                class="modal-close"
+                onclick="closeDetails()"
+            >
+                ×
+            </button>
+
+
+            <span class="eyebrow">
+                REPORT DETAILS
+            </span>
+
+            <h2 id="detailTitle">
+                Road damage near Unit 4
+            </h2>
+
+            <p
+                class="detail-id"
+                id="detailId"
+            >
+                #JS-20481
+            </p>
+
+
+            <div class="timeline">
+
+                <div class="timeline-item completed">
+
+                    <span>
+                        ✓
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Report Submitted
+                        </strong>
+
+                        <p>
+                            Your complaint was received.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-item completed">
+
+                    <span>
+                        ✓
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            AI Triage Completed
+                        </strong>
+
+                        <p>
+                            Issue classified and routed.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-item active">
+
+                    <span>
+                        ●
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Department Review
+                        </strong>
+
+                        <p>
+                            Assigned officer is reviewing the issue.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-item">
+
+                    <span>
+                        ○
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Resolution
+                        </strong>
+
+                        <p>
+                            Awaiting resolution evidence.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="primary-btn full-width"
+                onclick="closeDetails()"
+            >
+                Done
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         TOAST
+    ========================================== -->
+
+    <div
+        class="dashboard-toast"
+        id="dashboardToast"
+    >
+
+        <span>
+            ✓
+        </span>
+
+        <p id="dashboardToastMessage">
+            Success
+        </p>
+
+    </div>
+
+
+    <script src="dashboard.js"></script>
+
+</body>
+
+</html>

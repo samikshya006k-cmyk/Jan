@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="JanSetu - Multilingual Civic Grievance Reporting">
+
+    <title>JanSetu | Report Civic Issue</title>
+
+    <link rel="stylesheet" href="report.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Oriya:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     BACKGROUND DECORATION
+===================================================== -->
+
+<div class="background-decoration decoration-one"></div>
+
+<div class="background-decoration decoration-two"></div>
+
+<div class="background-decoration decoration-three"></div>
+
+
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+<header class="navbar">
+
+    <div class="navbar-inner">
+
+
+        <!-- LOGO -->
+
+        <a href="index.html"
+           class="brand">
+
+            <div class="brand-logo">
+
+                <span>JS</span>
+
+            </div>
+
+            <div class="brand-text">
+
+                <h2>JanSetu</h2>
+
+                <span data-i18n="citizenFirst">
+                    Citizen First
+                </span>
+
+            </div>
+
+        </a>
+
+
+
+        <!-- NAV RIGHT -->
+
+        <div class="nav-actions">
+
+
+            <!-- SECURE -->
+
+            <div class="secure-badge">
+
+                <span class="secure-icon">
+                    🔒
+                </span>
+
+                <span data-i18n="secure">
+                    Your report is secure
+                </span>
+
+            </div>
+
+
+
+            <!-- LANGUAGE -->
+
+            <div class="language-wrapper">
+
+                <span class="language-symbol">
+                    🌐
+                </span>
+
+                <select id="languageSelector"
+                        aria-label="Select language">
+
+                    <option value="en">
+                        English
+                    </option>
+
+                    <option value="hi">
+                        हिन्दी
+                    </option>
+
+                    <option value="or">
+                        ଓଡ଼ିଆ
+                    </option>
+
+                    <option value="bn">
+                        বাংলা
+                    </option>
+
+                    <option value="te">
+                        తెలుగు
+                    </option>
+
+                    <option value="ta">
+                        தமிழ்
+                    </option>
+
+                    <option value="mr">
+                        मराठी
+                    </option>
+
+                    <option value="gu">
+                        ગુજરાતી
+                    </option>
+
+                    <option value="kn">
+                        ಕನ್ನಡ
+                    </option>
+
+                    <option value="ml">
+                        മലയാളം
+                    </option>
+
+                    <option value="pa">
+                        ਪੰਜਾਬੀ
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- DASHBOARD -->
+
+            <a href="dashboard.html"
+               class="dashboard-btn">
+
+                <span>←</span>
+
+                <span data-i18n="dashboard">
+                    Dashboard
+                </span>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="main-container">
+
+
+    <!-- =================================================
+         TOP INFORMATION
+    ================================================== -->
+
+    <div class="top-info">
+
+        <div>
+
+            <div class="page-label">
+
+                <span class="label-dot"></span>
+
+                <span data-i18n="reportIssue">
+                    Report Civic Issue
+                </span>
+
+            </div>
+
+            <h1 data-i18n="pageTitle">
+                Help improve your community
+            </h1>
+
+            <p data-i18n="pageSubtitle">
+                Tell us about a civic problem and help your
+                local administration make your community better.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         STEPPER
+    ================================================== -->
+
+    <div class="stepper-container">
+
+        <div class="stepper-line"></div>
+
+
+        <!-- STEP 1 -->
+
+        <div class="step active">
+
+            <div class="step-circle">
+                1
+            </div>
+
+            <span data-i18n="describe">
+                Describe
+            </span>
+
+        </div>
+
+
+        <!-- STEP 2 -->
+
+        <div class="step">
+
+            <div class="step-circle">
+                2
+            </div>
+
+            <span data-i18n="evidence">
+                Evidence
+            </span>
+
+        </div>
+
+
+        <!-- STEP 3 -->
+
+        <div class="step">
+
+            <div class="step-circle">
+                3
+            </div>
+
+            <span data-i18n="location">
+                Location
+            </span>
+
+        </div>
+
+
+        <!-- STEP 4 -->
+
+        <div class="step">
+
+            <div class="step-circle">
+                4
+            </div>
+
+            <span data-i18n="aiAnalysis">
+                AI Analysis
+            </span>
+
+        </div>
+
+
+        <!-- STEP 5 -->
+
+        <div class="step">
+
+            <div class="step-circle">
+                5
+            </div>
+
+            <span data-i18n="review">
+                Review
+            </span>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         REPORT CARD
+    ================================================== -->
+
+    <section class="report-card">
+
+
+        <!-- CARD HEADER -->
+
+        <div class="card-header">
+
+            <div class="header-icon">
+                💬
+            </div>
+
+            <div>
+
+                <h2 data-i18n="problemTitle">
+                    What is the problem?
+                </h2>
+
+                <p data-i18n="problemDescription">
+                    Describe the issue in your own words.
+                    You can write in your preferred language.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             CATEGORY
+        ================================================== -->
+
+        <div class="form-section">
+
+            <div class="section-title">
+
+                <span data-i18n="issueCategory">
+                    Issue category
+                </span>
+
+                <span class="required">*</span>
+
+            </div>
+
+
+            <div class="category-grid">
+
+
+                <!-- HEALTH -->
+
+                <button class="category-card"
+                        type="button"
+                        data-category="health">
+
+                    <div class="category-icon health-icon">
+                        🏥
+                    </div>
+
+                    <span data-i18n="health">
+                        Health
+                    </span>
+
+                </button>
+
+
+
+                <!-- WATER -->
+
+                <button class="category-card"
+                        type="button"
+                        data-category="water">
+
+                    <div class="category-icon water-icon">
+                        💧
+                    </div>
+
+                    <span data-i18n="water">
+                        Water
+                    </span>
+
+                </button>
+
+
+
+                <!-- WASTE -->
+
+                <button class="category-card"
+                        type="button"
+                        data-category="waste">
+
+                    <div class="category-icon waste-icon">
+                        🗑️
+                    </div>
+
+                    <span data-i18n="waste">
+                        Waste
+                    </span>
+
+                </button>
+
+
+
+                <!-- STREET LIGHT -->
+
+                <button class="category-card"
+                        type="button"
+                        data-category="street">
+
+                    <div class="category-icon light-icon">
+                        💡
+                    </div>
+
+                    <span data-i18n="streetLights">
+                        Street Lights
+                    </span>
+
+                </button>
+
+
+
+                <!-- DRAINAGE -->
+
+                <button class="category-card"
+                        type="button"
+                        data-category="drainage">
+
+                    <div class="category-icon drainage-icon">
+                        ≋
+                    </div>
+
+                    <span data-i18n="drainage">
+                        Drainage
+                    </span>
+
+                </button>
+
+
+
+                <!-- OTHER -->
+
+                <button class="category-card"
+                        type="button"
+                        data-category="other">
+
+                    <div class="category-icon other-icon">
+                        •••
+                    </div>
+
+                    <span data-i18n="other">
+                        Other
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             DESCRIPTION
+        ================================================== -->
+
+        <div class="form-section">
+
+
+            <div class="section-title">
+
+                <span data-i18n="describeIssue">
+                    Describe the issue
+                </span>
+
+                <span class="required">*</span>
+
+            </div>
+
+
+            <div class="textarea-wrapper">
+
+                <textarea
+                    id="issueDescription"
+                    maxlength="500"
+                    data-placeholder="descriptionPlaceholder"
+                    placeholder="Example: There is a large pothole near the main entrance of Unit 4 Market..."
+                ></textarea>
+
+
+                <!-- VOICE -->
+
+                <button type="button"
+                        id="voiceButton"
+                        class="voice-btn">
+
+                    <span class="voice-icon">
+                        🎙
+                    </span>
+
+                    <span data-i18n="voice">
+                        Voice
+                    </span>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- COUNTER -->
+
+            <div class="textarea-footer">
+
+                <div class="language-support">
+
+                    <span>🌐</span>
+
+                    <span data-i18n="languageSupport">
+                        Supports multiple Indian languages
+                    </span>
+
+                </div>
+
+
+                <div class="character-counter">
+
+                    <span id="characterCount">
+                        0
+                    </span>
+
+                    /500
+
+                </div>
+
+            </div>
+
+
+
+            <!-- AI INFO -->
+
+            <div class="ai-info">
+
+                <div class="ai-info-icon">
+                    ✨
+                </div>
+
+                <div>
+
+                    <strong data-i18n="aiTitle">
+                        AI-powered assistance
+                    </strong>
+
+                    <p data-i18n="aiDescription">
+                        JanSetu AI will analyze your description,
+                        identify the issue type, detect similar
+                        complaints and suggest the appropriate
+                        department.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             PRIVACY MESSAGE
+        ================================================== -->
+
+        <div class="privacy-message">
+
+            <div class="privacy-icon">
+                🛡️
+            </div>
+
+            <div>
+
+                <strong data-i18n="privacyTitle">
+                    Your privacy matters
+                </strong>
+
+                <p data-i18n="privacyDescription">
+                    Your personal information will only be used
+                    for resolving this civic issue.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SUCCESS MESSAGE
+        ================================================== -->
+
+        <div id="successMessage"
+             class="success-message">
+
+            <span>✓</span>
+
+            <span data-i18n="saved">
+                Your report has been saved successfully.
+            </span>
+
+        </div>
+
+
+
+        <!-- =================================================
+             BOTTOM ACTION
+        ================================================== -->
+
+        <div class="card-footer">
+
+            <div class="required-note">
+
+                <span class="required">*</span>
+
+                <span data-i18n="requiredFields">
+                    Required fields
+                </span>
+
+            </div>
+
+
+            <button id="continueButton"
+                    class="continue-btn"
+                    type="button"
+                    disabled>
+
+                <span data-i18n="continue">
+                    Continue
+                </span>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         TRUST FEATURES
+    ================================================== -->
+
+    <div class="trust-grid">
+
+
+        <div class="trust-item">
+
+            <div class="trust-icon">
+                🔐
+            </div>
+
+            <div>
+
+                <strong data-i18n="privacy">
+                    Privacy protected
+                </strong>
+
+                <span data-i18n="privacySmall">
+                    Your data stays protected
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="trust-item">
+
+            <div class="trust-icon">
+                📁
+            </div>
+
+            <div>
+
+                <strong data-i18n="evidenceSafe">
+                    Evidence preserved
+                </strong>
+
+                <span data-i18n="evidenceSmall">
+                    Original evidence remains safe
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="trust-item">
+
+            <div class="trust-icon">
+                🧠
+            </div>
+
+            <div>
+
+                <strong data-i18n="smartRouting">
+                    Smart routing
+                </strong>
+
+                <span data-i18n="routingSmall">
+                    AI suggests the right department
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="trust-item">
+
+            <div class="trust-icon">
+                👁️
+            </div>
+
+            <div>
+
+                <strong data-i18n="transparent">
+                    Transparent tracking
+                </strong>
+
+                <span data-i18n="transparentSmall">
+                    Track your issue status
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script src="report.js"></script>
+
+</body>
+</html>

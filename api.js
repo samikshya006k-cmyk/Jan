@@ -1,0 +1,195 @@
+/**
+ * JanSetu Frontend API Client
+ * Connects frontend dashboard, reporting, and auth with the FastAPI backend.
+ */
+
+const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+
+const JanSetuAPI = {
+    // Helper to get auth token
+    getToken() {
+        return localStorage.getItem("jansetu_token");
+    },
+
+    // Set auth token
+    setToken(token) {
+        localStorage.setItem("jansetu_token", token);
+    },
+
+    // Helper for authenticated fetch
+    async fetchWithAuth(endpoint, options = {}) {
+        const token = this.getToken();
+        const headers = {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        };
+
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            ...options,
+            headers
+        });
+
+        if (response.status === 401) {
+            // Token expired or invalid
+            console.warn("Session expired. Please log in again.");
+        }
+
+        return response;
+    },
+
+    // --- AUTHENTICATION ---
+    async signup(fullName, email, password, role = "citizen", ward = "Ward 12") {
+        const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ full_name: fullName, email, password, role, ward })
+        });
+        const data = await res.json();
+        if (res.ok && data.access_token) {
+            this.setToken(data.access_token);
+        }
+        return { ok: res.ok, status: res.status, data };
+    },
+
+    async login(email, password) {
+        const res = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok && data.access_token) {
+            this.setToken(data.access_token);
+        }
+        return { ok: res.ok, status: res.status, data };
+    },
+
+    async getProfile() {
+        const res = await this.fetchWithAuth("/auth/me");
+        return res.json();
+    },
+
+    // --- AI TRIAGE & PREVIEW ---
+    async getAIPreview(description, language = "en") {
+        const res = await fetch(`${API_BASE_URL}/triage/preview`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ description, language })
+        });
+        return res.json();
+    },
+
+    async checkDuplicates(description, latitude = null, longitude = null) {
+        const res = await fetch(`${API_BASE_URL}/triage/check-duplicates`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ description, latitude, longitude })
+        });
+        return res.json();
+    },
+
+    // --- GRIEVANCES ---
+    async submitGrievance(grievanceData) {
+        const res = await this.fetchWithAuth("/grievances/", {
+            method: "POST",
+            body: JSON.stringify(grievanceData)
+        });
+        return { ok: res.ok, status: res.status, data: await res.json() };
+    },
+
+    async getGrievances(filters = {}) {
+        const queryParams = new URLSearchParams(filters).toString();
+        const res = await fetch(`${API_BASE_URL}/grievances/?${queryParams}`);
+        return res.json();
+    },
+
+    async getMyGrievances() {
+        const res = await this.fetchWithAuth("/grievances/my");
+        return res.json();
+    },
+
+    async getGrievanceDetail(idOrTicket) {
+        const res = await fetch(`${API_BASE_URL}/grievances/${idOrTicket}`);
+        return res.json();
+    },
+
+    async updateGrievanceStatus(id, updateData) {
+        const res = await this.fetchWithAuth(`/grievances/${id}/status`, {
+            method: "PATCH",
+            body: JSON.stringify(updateData)
+        });
+        return res.json();
+    },
+
+    async supportGrievance(id) {
+        const res = await this.fetchWithAuth(`/grievances/${id}/support`, {
+            method: "POST"
+        });
+        return res.json();
+    },
+
+    // --- PARTICIPATORY BUDGETING ---
+    async getBudgetProjects(ward = null) {
+        const query = ward ? `?ward=${encodeURIComponent(ward)}` : "";
+        const res = await this.fetchWithAuth(`/budget/projects${query}`);
+        return res.json();
+    },
+
+    async voteOnProject(projectId, voteType = "support") {
+        const res = await this.fetchWithAuth(`/budget/projects/${projectId}/vote`, {
+            method: "POST",
+            body: JSON.stringify({ vote_type: voteType })
+        });
+        return res.json();
+    },
+
+    async getBudgetSummary() {
+        const res = await fetch(`${API_BASE_URL}/budget/summary`);
+        return res.json();
+    },
+
+    // --- CIVIC MAP & GEO-INTELLIGENCE ---
+    async getMapPoints(category = null) {
+        const query = category ? `?category=${encodeURIComponent(category)}` : "";
+        const res = await fetch(`${API_BASE_URL}/map/points${query}`);
+        return res.json();
+    },
+
+    async getHotspots() {
+        const res = await fetch(`${API_BASE_URL}/map/hotspots`);
+        return res.json();
+    },
+
+    // --- ANALYTICS ---
+    async getCitizenAnalytics() {
+        const res = await this.fetchWithAuth("/analytics/citizen");
+        return res.json();
+    },
+
+    async getOfficerAnalytics() {
+        const res = await this.fetchWithAuth("/analytics/officer");
+        return res.json();
+    },
+
+    // --- NOTIFICATIONS ---
+    async getNotifications() {
+        const res = await this.fetchWithAuth("/notifications/");
+        return res.json();
+    },
+
+    async markNotificationRead(id) {
+        const res = await this.fetchWithAuth(`/notifications/${id}/read`, {
+            method: "PATCH"
+        });
+        return res.json();
+    }
+};
+
+// Export to window for vanilla JS access
+if (typeof window !== "undefined") {
+    window.JanSetuAPI = JanSetuAPI;
+}
