@@ -4,9 +4,22 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from app.core.database import get_db
+from app.core.config import settings
 from app.models.grievance import Grievance
 
 router = APIRouter()
+
+
+@router.get("/config")
+def get_map_config() -> Any:
+    """
+    Public configuration for frontend mapping integration.
+    """
+    return {
+        "google_maps_api_key": settings.GOOGLE_MAPS_API_KEY,
+        "default_center": {"lat": 20.2961, "lng": 85.8245},
+        "default_zoom": 13
+    }
 
 
 @router.get("/points")

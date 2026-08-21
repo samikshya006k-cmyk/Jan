@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 
 from app.core.config import settings
 from app.core.database import Base, engine, SessionLocal
@@ -55,8 +55,45 @@ app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads"
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
+FRONTEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+FRONTEND_FILES = {
+    "index.html", "citizendashboard.html", "officerdashboard.html", "report.html", "signup.html",
+    "api.js", "script.js", "dashboard.js", "officerdashboard.js", "report.js", "signup.js", "maps-adapter.js",
+    "style.css", "dashboard.css", "officerdashboard.css", "report.css", "signup.css"
+}
+
+
+ROUTE_ALIASES = {
+    "dashboard": "citizendashboard.html",
+    "dashboard.html": "citizendashboard.html",
+    "citizen": "citizendashboard.html",
+    "officer": "officerdashboard.html",
+    "report": "report.html",
+    "signup": "signup.html",
+    "index": "index.html"
+}
+
+
 @app.get("/")
-def root():
+def root(request: Request):
+    """
+    Serve index.html at the root URL for browser visitors, or JSON for API clients.
+    """
+    accept = request.headers.get("accept", "")
+    if "application/json" in accept and "text/html" not in accept:
+        return {
+            "app": settings.PROJECT_NAME,
+            "version": settings.VERSION,
+            "status": "healthy",
+            "documentation": "/docs",
+            "api_v1": settings.API_V1_STR
+        }
+
+    index_file = os.path.join(FRONTEND_DIR, "index.html")
+    if os.path.isfile(index_file):
+        return FileResponse(index_file)
+
     return {
         "app": settings.PROJECT_NAME,
         "version": settings.VERSION,
@@ -72,6 +109,22 @@ def health_check():
         "status": "online",
         "database": "connected"
     }
+
+
+@app.get("/{filename}")
+def serve_static_page(filename: str):
+    """
+    Serves static frontend HTML/JS/CSS files with alias fallbacks.
+    """
+    # Resolve aliases (e.g. /dashboard -> citizendashboard.html)
+    target_name = ROUTE_ALIASES.get(filename.lower(), filename)
+
+    if target_name in FRONTEND_FILES:
+        filepath = os.path.join(FRONTEND_DIR, target_name)
+        if os.path.isfile(filepath):
+            return FileResponse(filepath)
+
+    return JSONResponse(status_code=404, content={"detail": f"File '{filename}' not found."})
 
 
 if __name__ == "__main__":

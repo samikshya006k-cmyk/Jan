@@ -18,7 +18,8 @@
     <title>JanSetu | Citizen Dashboard</title>
 
     <link rel="stylesheet" href="dashboard.css">
-
+    <!-- Leaflet CSS for Interactive Civic Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 
 
@@ -923,60 +924,27 @@
                             </h2>
 
                             <p>
-                                Issues around your area
+                                Live geospatial complaints in your jurisdiction
                             </p>
 
                         </div>
 
-                        <button
-                            class="text-btn"
-                            onclick="showToast('Map module coming soon.')"
-                        >
-                            Explore →
-                        </button>
-
-                    </div>
-
-
-                    <div class="map-preview">
-
-                        <div class="map-grid"></div>
-
-
-                        <div class="map-road road-one"></div>
-
-                        <div class="map-road road-two"></div>
-
-                        <div class="map-road road-three"></div>
-
-
-                        <div
-                            class="map-pin pin-one"
-                            title="Road issue"
-                        >
-                            ●
-                        </div>
-
-                        <div
-                            class="map-pin pin-two"
-                            title="Waste issue"
-                        >
-                            ●
-                        </div>
-
-                        <div
-                            class="map-pin pin-three"
-                            title="Street light"
-                        >
-                            ●
-                        </div>
-
-
-                        <div class="map-label">
-                            12 issues near you
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span style="background: #eff6ff; color: #2563eb; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; border: 1px solid #bfdbfe; display: inline-flex; align-items: center; gap: 4px;">
+                                <span>🗺️</span> Google Maps
+                            </span>
+                            <button
+                                class="text-btn"
+                                onclick="if (citizenMapHandle && citizenMapHandle.engine === 'leaflet') { citizenMapHandle.map.setView([20.2961, 85.8245], 14); } else if (citizenMapHandle && citizenMapHandle.engine === 'google') { citizenMapHandle.map.setCenter({lat: 20.2961, lng: 85.8245}); citizenMapHandle.map.setZoom(14); }"
+                            >
+                                Reset View ⌖
+                            </button>
                         </div>
 
                     </div>
+
+                    <!-- Live Leaflet Map -->
+                    <div id="citizenLeafletMap" style="height: 320px; width: 100%; border-radius: 12px; margin-top: 12px; z-index: 1;"></div>
 
                 </div>
 
@@ -1026,6 +994,42 @@
 
             </div>
 
+
+        </section>
+
+
+        <!-- =================================
+             PARTICIPATORY BUDGETING SECTION
+        ================================== -->
+
+        <section
+            class="dashboard-section hidden-section"
+            id="budgetSection"
+        >
+
+            <div class="page-heading">
+
+                <span class="eyebrow">
+                    CIVIC PARTICIPATION
+                </span>
+
+                <h1>
+                    Participatory Budgeting
+                </h1>
+
+                <p>
+                    Vote on municipal fund allocations for local infrastructure projects in Ward 12.
+                </p>
+
+            </div>
+
+            <div
+                class="budget-grid"
+                id="budgetProjectsGrid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 20px;"
+            >
+                <!-- Dynamically filled with project cards and voting buttons -->
+            </div>
 
         </section>
 
@@ -1436,6 +1440,16 @@
 
             </div>
 
+            <!-- Modal Issue Voting & Community Impact -->
+            <div style="margin: 16px 0; padding: 12px 16px; background: #eff6ff; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #bfdbfe;">
+                <div>
+                    <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; display: block;">Community Corroboration</span>
+                    <strong id="modalImpactCount" style="font-size: 15px; color: #1e3a8a;">17 Votes</strong>
+                </div>
+                <button id="modalSupportBtn" class="primary-btn" onclick="supportCurrentModalGrievance()" style="padding: 8px 16px; font-size: 13px; font-weight: 700; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer;">
+                    ▲ Upvote Issue (+1)
+                </button>
+            </div>
 
             <button
                 class="primary-btn full-width"
@@ -1469,6 +1483,9 @@
     </div>
 
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="maps-adapter.js"></script>
+    <script src="api.js"></script>
     <script src="dashboard.js"></script>
 
 </body>

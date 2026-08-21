@@ -1,7 +1,7 @@
 import os
 import uuid
 import shutil
-from typing import Any, Optional
+from typing import Any, Optional, List
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
 from sqlalchemy.orm import Session
 
@@ -16,6 +16,23 @@ from app.api.deps import get_current_user, get_current_officer
 router = APIRouter()
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".pdf", ".mp4"}
+
+
+@router.get("/", response_model=List[EvidenceOut])
+def list_evidence(
+    grievance_id: Optional[int] = None,
+    is_verified: Optional[bool] = None,
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    List uploaded evidence records.
+    """
+    query = db.query(Evidence)
+    if grievance_id:
+        query = query.filter(Evidence.grievance_id == grievance_id)
+    if is_verified is not None:
+        query = query.filter(Evidence.is_verified == is_verified)
+    return query.order_by(Evidence.created_at.desc()).all()
 
 
 @router.post("/upload", response_model=EvidenceOut, status_code=status.HTTP_201_CREATED)

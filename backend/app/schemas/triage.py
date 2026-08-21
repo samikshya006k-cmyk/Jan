@@ -18,6 +18,8 @@ class TriagePreviewResponse(BaseModel):
     summary: str
     key_entities: List[str] = []
     urgency_reason: Optional[str] = None
+    estimated_sla_hours: Optional[int] = 48
+    ai_engine: Optional[str] = "JanSetu Multilingual NLP Engine"
 
 
 class DuplicateCheckRequest(BaseModel):

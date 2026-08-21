@@ -21,7 +21,8 @@
         rel="stylesheet"
         href="officerdashboard.css"
     >
-
+    <!-- Leaflet CSS for Interactive Civic Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 
 
@@ -471,16 +472,14 @@
                 </div>
 
 
-                <div class="date-box">
-
-                    <span>
-                        TODAY
-                    </span>
-
-                    <strong id="currentDate">
-                        --
-                    </strong>
-
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button class="pdf-export-btn" onclick="generateWardPDFReport()" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; padding: 10px 16px; border-radius: 10px; background: #2563eb; color: #fff; border: none; cursor: pointer; box-shadow: 0 2px 4px rgba(37,99,235,0.2);">
+                        <span>📄</span> Download Ward Report (PDF)
+                    </button>
+                    <div class="date-box">
+                        <span>TODAY</span>
+                        <strong id="currentDate">--</strong>
+                    </div>
                 </div>
 
             </div>
@@ -1141,99 +1140,35 @@
 
                         <button
                             class="map-filter active"
+                            onclick="filterOfficerMap('all', this)"
                         >
-                            All
+                            All Issues
                         </button>
 
                         <button
                             class="map-filter"
+                            onclick="filterOfficerMap('critical', this)"
                         >
-                            Critical
+                            Critical Hazards
                         </button>
 
                         <button
                             class="map-filter"
+                            onclick="filterOfficerMap('pending', this)"
                         >
                             Unresolved
                         </button>
 
-                    </div>
-
-                </div>
-
-
-                <div class="officer-map">
-
-
-                    <div class="map-grid">
-                    </div>
-
-
-                    <div class="map-road road-a">
-                    </div>
-
-                    <div class="map-road road-b">
-                    </div>
-
-                    <div class="map-road road-c">
-                    </div>
-
-                    <div class="map-road road-d">
-                    </div>
-
-
-                    <div class="issue-cluster cluster-one">
-
-                        <strong>
-                            18
-                        </strong>
-
-                        <span>
-                            issues
-                        </span>
-
-                    </div>
-
-
-                    <div class="issue-cluster cluster-two">
-
-                        <strong>
-                            7
-                        </strong>
-
-                        <span>
-                            issues
-                        </span>
-
-                    </div>
-
-
-                    <div class="issue-pin pin-a">
-                        ●
-                    </div>
-
-                    <div class="issue-pin pin-b">
-                        ●
-                    </div>
-
-                    <div class="issue-pin pin-c">
-                        ●
-                    </div>
-
-
-                    <div class="map-info">
-
-                        <strong>
-                            Ward 12
-                        </strong>
-
-                        <span>
-                            42 active grievances
+                        <span style="background: #eff6ff; color: #2563eb; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; border: 1px solid #bfdbfe; display: inline-flex; align-items: center; gap: 4px; margin-left: 4px;">
+                            <span>🗺️</span> Google Maps
                         </span>
 
                     </div>
 
                 </div>
+
+                <!-- Live Leaflet Jurisdiction Map -->
+                <div id="officerLeafletMap" style="height: 420px; width: 100%; border-radius: 12px; margin-top: 12px; z-index: 1;"></div>
 
             </div>
 
@@ -1757,7 +1692,7 @@
             </div>
 
 
-            <div class="evidence-grid">
+            <div class="evidence-grid" id="officerEvidenceGrid">
 
 
                 <div class="card evidence-item">
@@ -2358,6 +2293,9 @@
 </div>
 
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="maps-adapter.js"></script>
+<script src="api.js"></script>
 <script src="officerdashboard.js"></script>
 
 </body>

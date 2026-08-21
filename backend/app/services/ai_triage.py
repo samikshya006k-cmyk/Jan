@@ -1,12 +1,20 @@
+import json
+import logging
 import re
-from typing import Dict, Any, List, Tuple
+import httpx
+from typing import Dict, Any, List, Tuple, Optional
+
+from app.core.config import settings
+
+logger = logging.getLogger("jansetu.triage")
 
 
 class AITriageService:
     """
     AI-powered civic grievance triage engine.
-    Performs multilingual NLP keyword analysis, intent extraction, 
-    department routing, and severity scoring.
+    Performs Gemini LLM semantic analysis, multilingual translation, 
+    emergency hazard assessment, and department routing, with automated 
+    rule-based NLP fallback.
     """
 
     # Multilingual keywords dictionary for categories
@@ -57,7 +65,7 @@ class AITriageService:
             # Bengali
             "স্ট্রিট লাইট", "আলো", "অন্ধকার",
             # Telugu / Tamil
-            "వీధి దీపం", "తెரு விளக்கு"
+            "వీధి దీపం", "தெரு விளக்கு"
         ],
         "Drainage": [
             "drain", "drainage", "sewage", "gutter", "overflow", "choked", "clogged",
@@ -100,7 +108,7 @@ class AITriageService:
     CRITICAL_TRIGGERS = [
         "danger", "dangerous", "emergency", "accident", "child", "school", "hospital",
         "open manhole", "live wire", "fire", "flooding", "severe", "collapse", "burst pipe",
-        "खतरा", "दुर्घटना", "आपातकाल", "খোলা ম্যানহোল", "বিপদ", "ప్రమాదం"
+        "खतरा", "दुर्घटना", "आपातकाल", "खोला मैनहोल", "বিপদ", "ప్రమాదం"
     ]
 
     HIGH_TRIGGERS = [
@@ -109,10 +117,85 @@ class AITriageService:
     ]
 
     @classmethod
-    def classify_grievance(cls, text: str, user_category: str = None) -> Dict[str, Any]:
+    def _gemini_classify(cls, text: str, user_category: Optional[str] = None, language: str = "en") -> Optional[Dict[str, Any]]:
         """
-        Analyze text to return predicted category, suggested department, 
-        priority/severity, confidence score, and triage summary.
+        Uses Google Gemini API for semantic multilingual classification,
+        hazard assessment, and municipal routing.
+        """
+        if not settings.GEMINI_API_KEY:
+            return None
+
+        prompt = f"""
+You are the AI Civic Intelligence and Grievance Triage Engine for JanSetu, a municipal governance platform in India.
+Analyze the following citizen grievance complaint (which may be written in English, Hindi, Bengali, Odia, Marathi, Tamil, Telugu, Kannada, Gujarati, Malayalam, Punjabi, or Hinglish):
+
+Complaint Text: \"\"\"{text}\"\"\"
+User Selected Category (if any): \"{user_category or 'None'}\"
+
+Your task:
+1. Identify the most accurate Category strictly from: ["Road & Infrastructure", "Water Supply", "Waste Management", "Street Lighting", "Drainage", "Health", "Other"]
+2. Identify the Suggested Municipal Department from: ["Road & Infrastructure Division", "Public Water Works & Supply Division", "Solid Waste & Sanitation Department", "Electrical & Lighting Department", "Sewerage & Drainage Division", "Public Health & Vector Control Dept", "General Municipal Services"]
+3. Assess Priority strictly from: ["Critical", "High", "Medium", "Low"]
+4. Assess Severity strictly from: ["High", "Medium", "Low"]
+5. Provide Confidence Score (float between 0.0 and 1.0)
+6. Write a 1-sentence concise Executive Summary for the responding municipal officer.
+7. Extract up to 4 key entities / location / issue keywords.
+8. Explain the urgency reason in 1 brief phrase.
+9. Suggest estimated SLA resolution hours (integer: e.g. 12 for Critical, 24 for High, 48 for Medium, 72 for Low).
+
+Respond strictly in valid raw JSON with no markdown backticks, matching this exact structure:
+{{
+  "category": "Road & Infrastructure",
+  "suggested_department": "Road & Infrastructure Division",
+  "priority": "Critical",
+  "severity": "High",
+  "confidence": 0.95,
+  "summary": "...",
+  "key_entities": ["pothole", "Unit 4 Market"],
+  "urgency_reason": "Severe road accident risk during monsoon",
+  "estimated_sla_hours": 24
+}}
+"""
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.GEMINI_MODEL}:generateContent?key={settings.GEMINI_API_KEY}"
+        headers = {"Content-Type": "application/json"}
+        payload = {
+            "contents": [{
+                "parts": [{"text": prompt}]
+            }],
+            "generationConfig": {
+                "temperature": 0.2,
+                "maxOutputTokens": 500
+            }
+        }
+
+        try:
+            with httpx.Client(timeout=6.0) as client:
+                response = client.post(url, json=payload, headers=headers)
+                if response.status_code == 200:
+                    data = response.json()
+                    content = data["candidates"][0]["content"]["parts"][0]["text"]
+                    cleaned_json = content.strip()
+                    if cleaned_json.startswith("```json"):
+                        cleaned_json = cleaned_json[7:]
+                    if cleaned_json.startswith("```"):
+                        cleaned_json = cleaned_json[3:]
+                    if cleaned_json.endswith("```"):
+                        cleaned_json = cleaned_json[:-3]
+                    parsed = json.loads(cleaned_json.strip())
+                    if "category" in parsed and "suggested_department" in parsed:
+                        parsed["ai_engine"] = f"Google Gemini LLM ({settings.GEMINI_MODEL})"
+                        return parsed
+                else:
+                    logger.warning(f"Gemini API returned status {response.status_code}: {response.text}")
+        except Exception as e:
+            logger.warning(f"Gemini LLM triage failed or timed out, falling back to local NLP engine: {e}")
+
+        return None
+
+    @classmethod
+    def _rule_based_classify(cls, text: str, user_category: str = None) -> Dict[str, Any]:
+        """
+        Local multilingual NLP keyword and intent classifier.
         """
         if not text or not text.strip():
             return {
@@ -123,7 +206,9 @@ class AITriageService:
                 "confidence": 0.5,
                 "summary": "General civic grievance awaiting detailed description.",
                 "key_entities": [],
-                "urgency_reason": None
+                "urgency_reason": None,
+                "estimated_sla_hours": 48,
+                "ai_engine": "JanSetu Multilingual NLP Engine"
             }
 
         cleaned_text = text.lower()
@@ -168,14 +253,17 @@ class AITriageService:
             priority = "Critical"
             severity = "High"
             urgency_reason = "Safety hazard or high-risk emergency terms detected in complaint."
+            sla_hours = 12
         elif is_high or best_category in ["Drainage", "Water Supply"]:
             priority = "High"
             severity = "High" if is_high else "Medium"
             urgency_reason = "High disruption potential or critical utility issue."
+            sla_hours = 24
         else:
             priority = "Medium"
             severity = "Medium"
             urgency_reason = "Standard priority civic grievance."
+            sla_hours = 48
 
         # Extract potential key entities
         entities = []
@@ -194,5 +282,21 @@ class AITriageService:
             "confidence": round(confidence, 2),
             "summary": summary,
             "key_entities": list(set(entities)),
-            "urgency_reason": urgency_reason
+            "urgency_reason": urgency_reason,
+            "estimated_sla_hours": sla_hours,
+            "ai_engine": "JanSetu Multilingual NLP Engine"
         }
+
+    @classmethod
+    def classify_grievance(cls, text: str, user_category: str = None, language: str = "en") -> Dict[str, Any]:
+        """
+        Main entrypoint: analyzes text to return predicted category, suggested department, 
+        priority/severity, confidence score, and triage summary using Gemini LLM if configured, 
+        or local rule-based NLP fallback.
+        """
+        if settings.GEMINI_API_KEY and text and len(text.strip()) > 5:
+            gemini_result = cls._gemini_classify(text, user_category, language)
+            if gemini_result:
+                return gemini_result
+
+        return cls._rule_based_classify(text, user_category)

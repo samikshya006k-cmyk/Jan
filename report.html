@@ -13,6 +13,8 @@
     <title>JanSetu | Report Civic Issue</title>
 
     <link rel="stylesheet" href="report.css">
+    <!-- Leaflet CSS Fallback -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -157,7 +159,7 @@
 
             <!-- DASHBOARD -->
 
-            <a href="dashboard.html"
+            <a href="citizendashboard.html"
                class="dashboard-btn">
 
                 <span>←</span>
@@ -574,6 +576,69 @@
 
 
         <!-- =================================================
+             EVIDENCE / PHOTO ATTACHMENT
+        ================================================== -->
+
+        <div class="form-section">
+
+            <div class="section-title">
+                <span>Attach Photo Evidence</span>
+                <small style="color: #64748b; font-size: 0.85rem; font-weight: normal; margin-left: 8px;">(Optional — Accelerates resolution verification)</small>
+            </div>
+
+            <div id="evidenceDropZone" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 22px; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.2s ease;">
+                <input type="file" id="evidenceFileInput" accept="image/*,video/*,.pdf" capture="environment" style="display: none;">
+                <div id="uploadPrompt">
+                    <div style="font-size: 2rem; margin-bottom: 6px;">📸</div>
+                    <strong style="color: #1e293b; display: block; font-size: 0.95rem;">Click to upload or drag & drop photo</strong>
+                    <p style="color: #64748b; font-size: 0.82rem; margin-top: 4px;">Supports JPG, PNG, WEBP from camera or gallery</p>
+                </div>
+                <div id="evidencePreviewContainer" style="display: none; align-items: center; justify-content: center; gap: 16px;">
+                    <img id="evidencePreviewImg" src="" alt="Evidence Preview" style="max-height: 130px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                    <div style="text-align: left;">
+                        <span id="evidenceFileName" style="font-weight: 600; font-size: 0.9rem; color: #1e293b; display: block;"></span>
+                        <span id="evidenceFileSize" style="font-size: 0.8rem; color: #64748b; display: block; margin-top: 2px;"></span>
+                        <button type="button" id="removeEvidenceBtn" style="margin-top: 8px; background: #fee2e2; color: #dc2626; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">Remove Photo ×</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             LOCATION & MAP PINNING
+        ================================================== -->
+
+        <div class="form-section">
+
+            <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <span>Location & Landmark</span>
+                    <span class="required">*</span>
+                </div>
+                <button type="button" id="detectGpsBtn" style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                    <span>📍</span> Detect GPS Location
+                </button>
+            </div>
+
+            <div style="margin-top: 8px;">
+                <input type="text" id="issueLocation" placeholder="e.g. Near Unit 4 Market Gate, Saheed Nagar, Ward 12" style="width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; font-family: inherit;">
+                <div style="font-size: 0.78rem; color: #64748b; margin-top: 6px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px;">
+                    <span id="coordDisplay">Coordinates: 20.2961° N, 85.8245° E</span>
+                    <span>Click or drag pin on map to adjust exact spot</span>
+                </div>
+            </div>
+
+            <!-- Interactive Map Pin Dropper -->
+            <div id="reportLocationMap" style="height: 190px; width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid #e2e8f0; z-index: 1;"></div>
+
+        </div>
+
+
+
+        <!-- =================================================
              PRIVACY MESSAGE
         ================================================== -->
 
@@ -758,6 +823,9 @@
      JAVASCRIPT
 ===================================================== -->
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="maps-adapter.js"></script>
+<script src="api.js"></script>
 <script src="report.js"></script>
 
 </body>

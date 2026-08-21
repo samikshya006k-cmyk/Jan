@@ -153,6 +153,19 @@ const JanSetuAPI = {
     },
 
     // --- CIVIC MAP & GEO-INTELLIGENCE ---
+    async getMapConfig() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/map/config`);
+            const data = await res.json();
+            if (data && data.google_maps_api_key && typeof JanSetuMaps !== "undefined") {
+                JanSetuMaps.apiKey = data.google_maps_api_key;
+            }
+            return data;
+        } catch (e) {
+            return { google_maps_api_key: "" };
+        }
+    },
+
     async getMapPoints(category = null) {
         const query = category ? `?category=${encodeURIComponent(category)}` : "";
         const res = await fetch(`${API_BASE_URL}/map/points${query}`);
@@ -184,6 +197,48 @@ const JanSetuAPI = {
     async markNotificationRead(id) {
         const res = await this.fetchWithAuth(`/notifications/${id}/read`, {
             method: "PATCH"
+        });
+        return res.json();
+    },
+
+    // --- EVIDENCE & MEDIA ---
+    async uploadEvidence(file, grievanceId = null, evidenceType = "report_proof") {
+        const token = this.getToken();
+        const formData = new FormData();
+        formData.append("file", file);
+        if (grievanceId) formData.append("grievance_id", grievanceId);
+        formData.append("evidence_type", evidenceType);
+
+        const headers = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        const res = await fetch(`${API_BASE_URL}/evidence/upload`, {
+            method: "POST",
+            headers,
+            body: formData
+        });
+        return { ok: res.ok, status: res.status, data: await res.json() };
+    },
+
+    async getEvidenceList(filters = {}) {
+        const queryParams = new URLSearchParams(filters).toString();
+        const res = await fetch(`${API_BASE_URL}/evidence/?${queryParams}`);
+        return res.json();
+    },
+
+    async reviewEvidence(evidenceId, isVerified, notes = "") {
+        const token = this.getToken();
+        const formData = new FormData();
+        formData.append("is_verified", isVerified ? "true" : "false");
+        if (notes) formData.append("notes", notes);
+
+        const headers = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        const res = await fetch(`${API_BASE_URL}/evidence/${evidenceId}/review`, {
+            method: "PATCH",
+            headers,
+            body: formData
         });
         return res.json();
     }

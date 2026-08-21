@@ -46,9 +46,13 @@ def client():
 
 
 def test_root_and_health(client):
-    res = client.get("/")
+    res = client.get("/", headers={"Accept": "application/json"})
     assert res.status_code == 200
     assert "JanSetu" in res.json()["app"]
+
+    res_html = client.get("/")
+    assert res_html.status_code == 200
+    assert "JanSetu" in res_html.text
 
     res_health = client.get("/health")
     assert res_health.status_code == 200
@@ -112,6 +116,8 @@ def test_ai_triage_preview(client):
     assert res_water.status_code == 200
     data_water = res_water.json()
     assert data_water["category"] == "Water Supply"
+    assert "ai_engine" in data_water
+    assert "estimated_sla_hours" in data_water
 
 
 def test_grievance_workflow(client):
@@ -207,6 +213,11 @@ def test_participatory_budget_and_voting(client):
 
 
 def test_civic_map_and_hotspots(client):
+    # Map config
+    config_res = client.get("/api/v1/map/config")
+    assert config_res.status_code == 200
+    assert "google_maps_api_key" in config_res.json()
+
     # Map points
     res = client.get("/api/v1/map/points")
     assert res.status_code == 200
@@ -254,3 +265,57 @@ def test_notifications(client):
     patch_res = client.patch(f"/api/v1/notifications/{notif_id}/read", headers=headers)
     assert patch_res.status_code == 200
     assert patch_res.json()["is_read"] is True
+
+
+def test_frontend_static_serving(client):
+    res_index = client.get("/index.html")
+    assert res_index.status_code == 200
+    assert "JanSetu" in res_index.text
+
+    res_api = client.get("/api.js")
+    assert res_api.status_code == 200
+    assert "JanSetuAPI" in res_api.text
+
+    res_citizendash = client.get("/citizendashboard.html")
+    assert res_citizendash.status_code == 200
+    assert "Citizen Dashboard" in res_citizendash.text
+
+
+def test_evidence_workflow(client):
+    # 1. Login citizen
+    c_login = client.post("/api/v1/auth/login", json={"email": "citizen@jansetu.in", "password": "password123"})
+    c_token = c_login.json()["access_token"]
+    c_headers = {"Authorization": f"Bearer {c_token}"}
+
+    # 2. Upload evidence
+    file_payload = ("test_proof.jpg", b"fake image bytes content", "image/jpeg")
+    upload_res = client.post(
+        "/api/v1/evidence/upload",
+        files={"file": file_payload},
+        data={"evidence_type": "report_proof"},
+        headers=c_headers
+    )
+    assert upload_res.status_code == 201
+    ev_data = upload_res.json()
+    assert ev_data["file_name"] == "test_proof.jpg"
+    evidence_id = ev_data["id"]
+
+    # 3. List evidence
+    list_res = client.get("/api/v1/evidence/")
+    assert list_res.status_code == 200
+    assert len(list_res.json()) >= 1
+
+    # 4. Officer review evidence
+    o_login = client.post("/api/v1/auth/login", json={"email": "officer@jansetu.in", "password": "password123"})
+    o_token = o_login.json()["access_token"]
+    o_headers = {"Authorization": f"Bearer {o_token}"}
+
+    review_res = client.patch(
+        f"/api/v1/evidence/{evidence_id}/review",
+        data={"is_verified": "true", "notes": "Approved by testing officer"},
+        headers=o_headers
+    )
+    assert review_res.status_code == 200
+    assert review_res.json()["is_verified"] is True
+
+
