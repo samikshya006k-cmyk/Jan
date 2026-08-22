@@ -3,7 +3,9 @@
  * Connects frontend dashboard, reporting, and auth with the FastAPI backend.
  */
 
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+const API_BASE_URL = (typeof window !== "undefined" && window.location.origin && window.location.origin.startsWith("http"))
+    ? `${window.location.origin}/api/v1`
+    : "http://127.0.0.1:8000/api/v1";
 
 const JanSetuAPI = {
     // Helper to get auth token
