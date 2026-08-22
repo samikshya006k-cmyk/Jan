@@ -37,9 +37,15 @@ async function initOfficerSession() {
     // Auto-login to backend if no active token
     if (!JanSetuAPI.getToken()) {
         try {
-            await JanSetuAPI.login(userEmail, "password123");
+            const res = await JanSetuAPI.login(userEmail, "password123");
+            if (!res.ok) {
+                await JanSetuAPI.login("officer@jansetu.in", "password123");
+            }
         } catch (e) {
             console.warn("Backend offline or auth fallback:", e);
+            try {
+                await JanSetuAPI.login("officer@jansetu.in", "password123");
+            } catch (e2) {}
         }
     }
 
@@ -49,26 +55,38 @@ async function initOfficerSession() {
 }
 
 async function loadOfficerDashboardData() {
+    // 1. Fetch live officer analytics
     try {
-        // 1. Fetch live officer analytics
         const analytics = await JanSetuAPI.getOfficerAnalytics();
         updateOfficerStatsUI(analytics);
-
-        // 2. Fetch live grievances list
-        allOfficerGrievances = await JanSetuAPI.getGrievances();
-        renderOfficerGrievances(allOfficerGrievances);
-
-        // 3. Initialize Interactive Jurisdiction Map
-        await initOfficerMap();
-
-        // 4. Load dynamic evidence
-        await loadOfficerEvidence();
-
-        // 5. Render Assignments & Dispatch Workspace
-        renderAssignmentsWorkspace(allOfficerGrievances);
-
     } catch (err) {
-        console.warn("Error loading officer data:", err);
+        console.warn("Officer stats error:", err);
+    }
+
+    // 2. Fetch live grievances list
+    try {
+        const list = await JanSetuAPI.getGrievances();
+        if (Array.isArray(list)) {
+            allOfficerGrievances = list;
+            renderOfficerGrievances(allOfficerGrievances);
+            renderAssignmentsWorkspace(allOfficerGrievances);
+        }
+    } catch (err) {
+        console.warn("Error loading officer grievances:", err);
+    }
+
+    // 3. Initialize Interactive Jurisdiction Map
+    try {
+        await initOfficerMap();
+    } catch (err) {
+        console.warn("Officer map error:", err);
+    }
+
+    // 4. Load dynamic evidence
+    try {
+        await loadOfficerEvidence();
+    } catch (err) {
+        console.warn("Officer evidence error:", err);
     }
 }
 
@@ -460,6 +478,9 @@ function renderOfficerGrievances(grievances) {
                 </tr>
             `;
         }).join("");
+    }
+}
+
 let currentOfficerProofPhotoBase64 = null;
 
 async function openGrievance(idOrTicket) {

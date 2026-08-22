@@ -27,9 +27,15 @@ async function initCitizenSession() {
     // Auto-login to backend if no active token
     if (!JanSetuAPI.getToken()) {
         try {
-            await JanSetuAPI.login(userEmail, "password123");
+            const res = await JanSetuAPI.login(userEmail, "password123");
+            if (!res.ok) {
+                await JanSetuAPI.login("citizen@jansetu.in", "password123");
+            }
         } catch (e) {
-            console.warn("Backend connection offline, using cached credentials:", e);
+            console.warn("Backend connection offline, fallback login:", e);
+            try {
+                await JanSetuAPI.login("citizen@jansetu.in", "password123");
+            } catch (e2) {}
         }
     }
 
@@ -57,18 +63,33 @@ async function loadCitizenDashboardData() {
         console.warn("Analytics load:", e);
     }
 
-    // 2. Fetch my grievances
+    // 2. Fetch my grievances (fallback to all public grievances if empty or guest)
     try {
-        currentCitizenGrievances = await JanSetuAPI.getMyGrievances();
-        renderGrievanceLists(currentCitizenGrievances);
+        let grievances = await JanSetuAPI.getMyGrievances();
+        if (!Array.isArray(grievances) || grievances.length === 0) {
+            grievances = await JanSetuAPI.getGrievances();
+        }
+        if (Array.isArray(grievances)) {
+            currentCitizenGrievances = grievances;
+            renderGrievanceLists(currentCitizenGrievances);
+        }
     } catch (e) {
-        console.warn("Grievances load:", e);
+        console.warn("Grievances load fallback:", e);
+        try {
+            const fallbackG = await JanSetuAPI.getGrievances();
+            if (Array.isArray(fallbackG)) {
+                currentCitizenGrievances = fallbackG;
+                renderGrievanceLists(currentCitizenGrievances);
+            }
+        } catch (e2) {}
     }
 
     // 3. Fetch notifications
     try {
         currentNotifications = await JanSetuAPI.getNotifications();
-        renderNotifications(currentNotifications);
+        if (Array.isArray(currentNotifications)) {
+            renderNotifications(currentNotifications);
+        }
     } catch (e) {
         console.warn("Notifications load:", e);
     }
@@ -76,7 +97,9 @@ async function loadCitizenDashboardData() {
     // 4. Fetch budget projects & render
     try {
         currentBudgetProjects = await JanSetuAPI.getBudgetProjects();
-        renderBudgetSection(currentBudgetProjects);
+        if (Array.isArray(currentBudgetProjects)) {
+            renderBudgetSection(currentBudgetProjects);
+        }
     } catch (e) {
         console.warn("Budget load:", e);
     }

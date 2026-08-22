@@ -115,7 +115,8 @@ const JanSetuAPI = {
     },
 
     async getGrievanceDetail(idOrTicket) {
-        const res = await fetch(`${API_BASE_URL}/grievances/${idOrTicket}`);
+        const cleanId = String(idOrTicket || "").replace(/^#+/, "").trim();
+        const res = await fetch(`${API_BASE_URL}/grievances/${encodeURIComponent(cleanId)}`);
         return res.json();
     },
 
