@@ -57,6 +57,16 @@ class Grievance(Base):
     # Community impact count (auto-incremented on similar reports or citizen upvotes)
     community_impact_count = Column(Integer, default=1)
     
+    # Contractor & Authority Details
+    contractor_name = Column(String, default="Apex Civic Infra Ltd.", nullable=True)
+    contractor_contact = Column(String, default="+91 94370 55432", nullable=True)
+    work_order_id = Column(String, default="WO-2026-881", nullable=True)
+    target_sla_date = Column(String, default="24 Hours (SLA Target)", nullable=True)
+    assigned_officer_name = Column(String, default="Er. Rajesh Mohapatra (Executive Engineer)", nullable=True)
+    assigned_officer_contact = Column(String, default="0674-2548900", nullable=True)
+    ward_councillor_name = Column(String, default="Smt. Jayashree Das (Ward 12)", nullable=True)
+    resolution_proof_url = Column(String, nullable=True)
+
     # Foreign keys
     citizen_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     assigned_officer_id = Column(Integer, ForeignKey("users.id"), nullable=True)
@@ -72,6 +82,7 @@ class Grievance(Base):
     history = relationship("GrievanceStatusHistory", back_populates="grievance", cascade="all, delete-orphan", order_by="desc(GrievanceStatusHistory.created_at)")
     evidence = relationship("Evidence", back_populates="grievance", cascade="all, delete-orphan")
     supports = relationship("GrievanceSupport", back_populates="grievance", cascade="all, delete-orphan")
+    reviews = relationship("GrievanceReview", back_populates="grievance", cascade="all, delete-orphan", order_by="desc(GrievanceReview.created_at)")
 
 
 class GrievanceStatusHistory(Base):
@@ -99,3 +110,21 @@ class GrievanceSupport(Base):
 
     grievance = relationship("Grievance", back_populates="supports")
     user = relationship("User", back_populates="supports")
+
+
+class GrievanceReview(Base):
+    __tablename__ = "grievance_reviews"
+
+    id = Column(Integer, primary_key=True, index=True)
+    grievance_id = Column(Integer, ForeignKey("grievances.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user_name = Column(String, default="Resident Citizen", nullable=False)
+    user_role = Column(String, default="Verified Neighbor", nullable=True)
+    rating = Column(Integer, default=5, nullable=False)  # 1 to 5 Stars
+    is_verified_fixed = Column(Integer, default=1, nullable=False)  # 1 = Confirmed Fixed, 0 = Disputed / Still Broken
+    comment = Column(Text, nullable=False)
+    proof_image_url = Column(String, nullable=True)  # Citizen's photo proof URL
+    helpful_count = Column(Integer, default=0, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    grievance = relationship("Grievance", back_populates="reviews")

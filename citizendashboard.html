@@ -1430,7 +1430,7 @@
                             Resolution
                         </strong>
 
-                        <p>
+                        <p id="modalResolutionTimelineText">
                             Awaiting resolution evidence.
                         </p>
 
@@ -1438,6 +1438,93 @@
 
                 </div>
 
+            </div>
+
+            <!-- Concerned Authorities & Contractor Details -->
+            <div id="modalAuthoritySection" style="margin: 16px 0; padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;">
+                <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">
+                    <span>🏛️</span> Assigned Authorities & Contractor
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+                    <div>
+                        <span style="color: #64748b; font-size: 11px; display: block;">Nodal Officer:</span>
+                        <strong id="modalOfficerName" style="color: #0f172a;">Er. Rajesh Mohapatra (EE)</strong>
+                        <small id="modalOfficerContact" style="color: #2563eb; display: block;">📞 0674-2548900</small>
+                    </div>
+                    <div>
+                        <span style="color: #64748b; font-size: 11px; display: block;">Contractor / Agency:</span>
+                        <strong id="modalContractorName" style="color: #0f172a;">Apex Civic Infra Ltd.</strong>
+                        <small id="modalWorkOrderId" style="color: #16a34a; display: block;">Order #WO-2026-881</small>
+                    </div>
+                </div>
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cbd5e1; font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>🗳️ <strong>Ward Councillor:</strong> <span id="modalCouncillorName">Smt. Jayashree Das (Ward 12)</span></span>
+                    <span style="color: #ea580c; font-weight: 600;">SLA: <span id="modalSlaTarget">24 Hours</span></span>
+                </div>
+            </div>
+
+            <!-- Official Resolution Evidence (Before & After) -->
+            <div id="modalEvidenceProofSection" style="margin: 16px 0; padding: 14px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #166534; text-transform: uppercase;">📸 Resolution Proof Evidence</span>
+                    <span id="modalProofBadge" class="status resolved" style="font-size: 10px; padding: 2px 8px;">Official Proof Verified ✓</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <span style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px;">Before (Initial Report):</span>
+                        <img id="modalBeforeImg" src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=400" alt="Before" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1;">
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; color: #166534; font-weight: 600; display: block; margin-bottom: 4px;">After (Completed Fix):</span>
+                        <img id="modalAfterImg" src="https://images.unsplash.com/photo-1590496793929-36417d3117de?w=400" alt="After" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px; border: 1px solid #86efac;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Citizen Community Reviews & Verification (Amazon Style) -->
+            <div id="modalReviewsSection" style="margin: 16px 0; padding: 14px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div>
+                        <h4 style="font-size: 13px; font-weight: 700; color: #0f172a; margin: 0;">Citizen Reviews & Verification</h4>
+                        <span id="modalReviewStats" style="font-size: 11px; color: #64748b;">⭐⭐⭐⭐⭐ 4.8 / 5 Rating</span>
+                    </div>
+                    <button type="button" onclick="toggleCitizenReviewForm()" style="background: #2563eb; color: #fff; font-size: 11px; font-weight: 700; padding: 5px 12px; border: none; border-radius: 6px; cursor: pointer;">
+                        + Write Review
+                    </button>
+                </div>
+
+                <!-- Review Form -->
+                <div id="citizenReviewFormBox" style="display: none; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 12px;">
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
+                        <select id="citizenReviewRating" style="padding: 4px 8px; border-radius: 6px; font-size: 11px; border: 1px solid #cbd5e1;">
+                            <option value="5">⭐⭐⭐⭐⭐ (5 - Perfect Fix)</option>
+                            <option value="4">⭐⭐⭐⭐ (4 - Good)</option>
+                            <option value="3">⭐⭐⭐ (3 - Acceptable)</option>
+                            <option value="2">⭐⭐ (2 - Substandard)</option>
+                            <option value="1">⭐ (1 - Still Broken)</option>
+                        </select>
+                        <select id="citizenReviewVerified" style="padding: 4px 8px; border-radius: 6px; font-size: 11px; border: 1px solid #cbd5e1;">
+                            <option value="1">✅ Confirmed Fixed</option>
+                            <option value="0">❌ Still Broken / Dispute</option>
+                        </select>
+                    </div>
+                    <textarea id="citizenReviewComment" rows="2" placeholder="Share your on-ground feedback and verification details..." style="width: 100%; padding: 6px 10px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; margin-bottom: 8px; box-sizing: border-box;"></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label style="font-size: 11px; color: #2563eb; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                            <span>📸 Attach Photo Proof</span>
+                            <input type="file" id="citizenReviewPhoto" accept="image/*" style="display: none;" onchange="handleReviewPhotoSelected(this)">
+                        </label>
+                        <span id="citizenReviewPhotoLabel" style="font-size: 10px; color: #16a34a; font-weight: 600;"></span>
+                        <button type="button" onclick="submitCurrentCitizenReview()" style="padding: 4px 12px; font-size: 11px; font-weight: 700; background: #16a34a; color: #fff; border: none; border-radius: 6px; cursor: pointer;">
+                            Post Review
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reviews Feed -->
+                <div id="modalReviewsList" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Dynamically populated review cards -->
+                </div>
             </div>
 
             <!-- Modal Issue Voting & Community Impact -->

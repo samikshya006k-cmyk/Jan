@@ -44,6 +44,40 @@ class EvidenceOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class GrievanceReviewOut(BaseModel):
+    id: int
+    grievance_id: int
+    user_name: str
+    user_role: Optional[str] = "Verified Resident"
+    rating: int
+    is_verified_fixed: int
+    comment: str
+    proof_image_url: Optional[str] = None
+    helpful_count: int = 0
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class GrievanceReviewCreate(BaseModel):
+    user_name: Optional[str] = "Resident Citizen"
+    rating: int = 5
+    is_verified_fixed: int = 1
+    comment: str
+    proof_image_url: Optional[str] = None
+
+
+class GrievanceAssign(BaseModel):
+    assigned_officer_name: Optional[str] = "Er. Rajesh Mohapatra (Executive Engineer)"
+    assigned_officer_contact: Optional[str] = "0674-2548900"
+    contractor_name: Optional[str] = "Apex Civic Infra Ltd."
+    contractor_contact: Optional[str] = "+91 94370 55432"
+    work_order_id: Optional[str] = "WO-2026-881"
+    target_sla_date: Optional[str] = "24 Hours (SLA Target)"
+    department: Optional[str] = "Municipal Administration"
+    priority: Optional[str] = "High"
+
+
 class GrievanceOut(BaseModel):
     id: int
     ticket_id: str
@@ -62,6 +96,14 @@ class GrievanceOut(BaseModel):
     ai_confidence: Optional[float]
     ai_summary: Optional[str]
     resolution_notes: Optional[str]
+    resolution_proof_url: Optional[str] = None
+    contractor_name: Optional[str] = None
+    contractor_contact: Optional[str] = None
+    work_order_id: Optional[str] = None
+    target_sla_date: Optional[str] = None
+    assigned_officer_name: Optional[str] = None
+    assigned_officer_contact: Optional[str] = None
+    ward_councillor_name: Optional[str] = None
     community_impact_count: int
     citizen_id: int
     assigned_officer_id: Optional[int]
@@ -78,6 +120,7 @@ class GrievanceOut(BaseModel):
 class GrievanceDetail(GrievanceOut):
     history: List[GrievanceStatusHistoryOut] = []
     evidence: List[EvidenceOut] = []
+    reviews: List[GrievanceReviewOut] = []
 
 
 class GrievanceStatusUpdate(BaseModel):
@@ -85,4 +128,5 @@ class GrievanceStatusUpdate(BaseModel):
     comments: Optional[str] = None
     assigned_officer_id: Optional[int] = None
     resolution_notes: Optional[str] = None
+    resolution_proof_url: Optional[str] = None
     priority: Optional[str] = None

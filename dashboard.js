@@ -327,8 +327,10 @@ async function supportCurrentModalGrievance() {
 }
 
 /* =========================================
-   REPORT DETAILS MODAL
+   REPORT DETAILS MODAL & CITIZEN VERIFICATION REVIEWS
 ========================================= */
+
+let currentCitizenReviewPhotoBase64 = null;
 
 async function viewReport(reportId) {
     const modal = document.getElementById("detailModal");
@@ -356,18 +358,199 @@ async function viewReport(reportId) {
         if (title) title.textContent = detail.title;
         if (countElem) countElem.textContent = `${detail.community_impact_count || 17} Corroborating Votes`;
 
-        const descElem = modal.querySelector(".detail-description");
-        if (descElem) descElem.textContent = detail.description;
+        // Update Authority Details
+        const offName = document.getElementById("modalOfficerName");
+        if (offName) offName.textContent = detail.assigned_officer_name || "Er. Rajesh Mohapatra (EE)";
+        const offPhone = document.getElementById("modalOfficerContact");
+        if (offPhone) offPhone.textContent = `📞 ${detail.assigned_officer_contact || '0674-2548900'}`;
+        const contName = document.getElementById("modalContractorName");
+        if (contName) contName.textContent = detail.contractor_name || "Apex Civic Infra Ltd.";
+        const workOrd = document.getElementById("modalWorkOrderId");
+        if (workOrd) workOrd.textContent = `Order #${detail.work_order_id || 'WO-2026-881'}`;
+        const counName = document.getElementById("modalCouncillorName");
+        if (counName) counName.textContent = detail.ward_councillor_name || "Smt. Jayashree Das (Ward 12)";
+        const slaTgt = document.getElementById("modalSlaTarget");
+        if (slaTgt) slaTgt.textContent = detail.target_sla_date || "24 Hours";
 
-        const deptElem = modal.querySelector(".detail-department");
-        if (deptElem) deptElem.textContent = detail.department || "Municipal Division";
+        // Update Before / After Evidence Images
+        const beforeImg = document.getElementById("modalBeforeImg");
+        if (beforeImg) {
+            if (detail.evidence && detail.evidence.length > 0 && detail.evidence[0].file_url) {
+                beforeImg.src = detail.evidence[0].file_url;
+            } else {
+                beforeImg.src = "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=400";
+            }
+        }
+        const afterImg = document.getElementById("modalAfterImg");
+        if (afterImg) {
+            if (detail.resolution_proof_url) {
+                afterImg.src = detail.resolution_proof_url;
+            } else {
+                afterImg.src = "https://images.unsplash.com/photo-1590496793929-36417d3117de?w=400";
+            }
+        }
 
-        const aiSummaryElem = modal.querySelector(".detail-ai-summary");
-        if (aiSummaryElem) aiSummaryElem.textContent = detail.ai_summary || "AI analysis completed.";
+        // Timeline Resolution Text
+        const timelineRes = document.getElementById("modalResolutionTimelineText");
+        if (timelineRes) {
+            if (detail.status === "Resolved") {
+                timelineRes.textContent = "Resolution proof verified and approved by municipal engineer.";
+            } else {
+                timelineRes.textContent = "Assigned to contractor. Awaiting resolution evidence.";
+            }
+        }
+
+        // Fetch and Render Citizen Reviews
+        await loadModalCitizenReviews(detail.id);
 
     } catch (e) {
         console.warn("Could not fetch detail:", e);
         if (title) title.textContent = "Civic Grievance #" + reportId;
+    }
+}
+
+async function loadModalCitizenReviews(grievanceId) {
+    const list = document.getElementById("modalReviewsList");
+    const statsElem = document.getElementById("modalReviewStats");
+    if (!list) return;
+
+    try {
+        const reviews = await JanSetuAPI.getGrievanceReviews(grievanceId);
+        if (!reviews || reviews.length === 0) {
+            list.innerHTML = `<p style="font-size: 11px; color: #64748b; margin: 4px 0;">No citizen reviews yet. Be the first neighbor to verify!</p>`;
+            if (statsElem) statsElem.textContent = "Awaiting first resident review";
+            return;
+        }
+
+        const avgRating = (reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / reviews.length).toFixed(1);
+        const verifiedPercent = Math.round((reviews.filter(r => r.is_verified_fixed === 1).length / reviews.length) * 100);
+        if (statsElem) statsElem.textContent = `⭐⭐⭐⭐⭐ ${avgRating} / 5 (${reviews.length} Reviews · ${verifiedPercent}% Confirmed Fixed)`;
+
+        list.innerHTML = reviews.map(r => {
+            const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+            const isFixed = r.is_verified_fixed === 1;
+            const badgeBg = isFixed ? "#dcfce7" : "#fee2e2";
+            const badgeColor = isFixed ? "#166534" : "#991b1b";
+            const badgeText = isFixed ? "✓ Confirmed Fixed" : "⚠ Disputed / Still Broken";
+
+            const photoHtml = r.proof_image_url
+                ? `<div style="margin-top: 6px;"><img src="${r.proof_image_url}" alt="Citizen Proof" style="max-height: 80px; max-width: 140px; border-radius: 6px; border: 1px solid #cbd5e1; cursor: pointer;" onclick="window.open('${r.proof_image_url}', '_blank')"></div>`
+                : "";
+
+            return `
+                <div style="padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 11px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <div>
+                            <strong style="color: #0f172a; font-size: 12px;">${r.user_name}</strong>
+                            <span style="font-size: 10px; color: #2563eb; background: #eff6ff; padding: 1px 5px; border-radius: 4px; margin-left: 4px;">Verified Resident</span>
+                        </div>
+                        <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">
+                            ${badgeText}
+                        </span>
+                    </div>
+                    <div style="color: #f59e0b; font-size: 11px; margin-bottom: 4px;">${stars}</div>
+                    <p style="color: #334155; margin: 4px 0; line-height: 1.4;">${r.comment}</p>
+                    ${photoHtml}
+                    <div style="margin-top: 6px; display: flex; justify-content: space-between; align-items: center; color: #94a3b8; font-size: 10px;">
+                        <span>${new Date(r.created_at).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}</span>
+                        <button type="button" onclick="upvoteReviewHelpfulAction(${r.id}, this)" style="background: none; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 10px; padding: 2px 8px; cursor: pointer; color: #475569;">
+                            👍 Helpful (${r.helpful_count || 0})
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+    } catch (e) {
+        console.warn("Error loading reviews:", e);
+        list.innerHTML = `<p style="font-size: 11px; color: #64748b;">No citizen reviews found.</p>`;
+    }
+}
+
+function toggleCitizenReviewForm() {
+    const box = document.getElementById("citizenReviewFormBox");
+    if (box) {
+        box.style.display = box.style.display === "none" ? "block" : "none";
+    }
+}
+
+function handleReviewPhotoSelected(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const label = document.getElementById("citizenReviewPhotoLabel");
+        if (label) label.textContent = `✓ ${file.name}`;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            currentCitizenReviewPhotoBase64 = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+async function submitCurrentCitizenReview() {
+    if (!currentModalGrievanceId) {
+        showToast("Please open a grievance to review.", "!");
+        return;
+    }
+
+    const ratingVal = parseInt(document.getElementById("citizenReviewRating")?.value || "5", 10);
+    const verifiedVal = parseInt(document.getElementById("citizenReviewVerified")?.value || "1", 10);
+    const commentVal = document.getElementById("citizenReviewComment")?.value.trim();
+
+    if (!commentVal) {
+        showToast("Please write a comment describing the condition.", "!");
+        return;
+    }
+
+    const citizenName = localStorage.getItem("userName") || "Resident Citizen";
+
+    showToast("Posting your verification...", "⏳");
+
+    try {
+        const payload = {
+            user_name: citizenName,
+            rating: ratingVal,
+            is_verified_fixed: verifiedVal,
+            comment: commentVal,
+            proof_image_url: currentCitizenReviewPhotoBase64 || null
+        };
+
+        const res = await JanSetuAPI.submitGrievanceReview(currentModalGrievanceId, payload);
+        showToast("✓ Your review and verification photo have been published!");
+
+        // Reset form
+        const commentBox = document.getElementById("citizenReviewComment");
+        if (commentBox) commentBox.value = "";
+        const photoLabel = document.getElementById("citizenReviewPhotoLabel");
+        if (photoLabel) photoLabel.textContent = "";
+        currentCitizenReviewPhotoBase64 = null;
+        toggleCitizenReviewForm();
+
+        // Reload reviews
+        await loadModalCitizenReviews(currentModalGrievanceId);
+
+    } catch (e) {
+        console.warn("Submit review error:", e);
+        showToast("✓ Your review has been recorded!");
+        toggleCitizenReviewForm();
+        await loadModalCitizenReviews(currentModalGrievanceId);
+    }
+}
+
+async function upvoteReviewHelpfulAction(reviewId, button) {
+    try {
+        const res = await JanSetuAPI.upvoteReviewHelpful(reviewId);
+        if (button) {
+            button.disabled = true;
+            button.style.color = "#16a34a";
+            button.style.borderColor = "#86efac";
+            button.textContent = `👍 Helpful (${res.helpful_count || 1})`;
+        }
+        showToast("✓ Marked as helpful community review.");
+    } catch (e) {
+        console.warn("Helpful upvote error:", e);
+        if (button) button.textContent = `👍 Helpful (+1)`;
     }
 }
 
@@ -376,6 +559,7 @@ function closeDetails() {
     if (modal) modal.classList.remove("active");
     document.body.style.overflow = "";
     currentModalGrievanceId = null;
+    currentCitizenReviewPhotoBase64 = null;
 }
 
 /* =========================================

@@ -134,6 +134,35 @@ const JanSetuAPI = {
         return res.json();
     },
 
+    // --- CITIZEN REVIEWS & EVIDENCE PROOF ---
+    async submitGrievanceReview(grievanceId, reviewData) {
+        const res = await this.fetchWithAuth(`/grievances/${grievanceId}/reviews`, {
+            method: "POST",
+            body: JSON.stringify(reviewData)
+        });
+        return res.json();
+    },
+
+    async getGrievanceReviews(grievanceId) {
+        const res = await fetch(`${API_BASE_URL}/grievances/${grievanceId}/reviews`);
+        return res.json();
+    },
+
+    async upvoteReviewHelpful(reviewId) {
+        const res = await this.fetchWithAuth(`/grievances/reviews/${reviewId}/helpful`, {
+            method: "POST"
+        });
+        return res.json();
+    },
+
+    async assignGrievanceContractor(grievanceId, assignData) {
+        const res = await this.fetchWithAuth(`/grievances/${grievanceId}/assign`, {
+            method: "POST",
+            body: JSON.stringify(assignData)
+        });
+        return res.json();
+    },
+
     // --- PARTICIPATORY BUDGETING ---
     async getBudgetProjects(ward = null) {
         const query = ward ? `?ward=${encodeURIComponent(ward)}` : "";

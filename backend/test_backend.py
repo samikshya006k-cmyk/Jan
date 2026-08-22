@@ -319,3 +319,78 @@ def test_evidence_workflow(client):
     assert review_res.json()["is_verified"] is True
 
 
+def test_citizen_reviews_and_contractor_dispatch(client):
+    # 1. Login citizen & officer
+    c_login = client.post("/api/v1/auth/login", json={"email": "citizen@jansetu.in", "password": "password123"})
+    c_headers = {"Authorization": f"Bearer {c_login.json()['access_token']}"}
+
+    o_login = client.post("/api/v1/auth/login", json={"email": "officer@jansetu.in", "password": "password123"})
+    o_headers = {"Authorization": f"Bearer {o_login.json()['access_token']}"}
+
+    # 2. Create a grievance
+    g_res = client.post(
+        "/api/v1/grievances/",
+        json={"title": "Broken culvert bridge", "description": "Culvert bridge has cracked railings.", "category": "Road & Infrastructure"},
+        headers=c_headers
+    )
+    assert g_res.status_code == 201
+    g_id = g_res.json()["id"]
+
+    # 3. Officer assigns contractor & work order
+    assign_res = client.post(
+        f"/api/v1/grievances/{g_id}/assign",
+        json={
+            "contractor_name": "Apex Civic Infra Ltd.",
+            "work_order_id": "WO-2026-999",
+            "target_sla_date": "24 Hours (SLA Target)",
+            "assigned_officer_name": "Er. Rajesh Mohapatra"
+        },
+        headers=o_headers
+    )
+    assert assign_res.status_code == 200
+    assert assign_res.json()["contractor_name"] == "Apex Civic Infra Ltd."
+    assert assign_res.json()["work_order_id"] == "WO-2026-999"
+
+    # 4. Officer resolves with resolution proof
+    resolve_res = client.patch(
+        f"/api/v1/grievances/{g_id}/status",
+        json={
+            "status": "Resolved",
+            "resolution_notes": "Railing replaced and reinforced.",
+            "resolution_proof_url": "https://images.unsplash.com/photo-1590496793929-36417d3117de?w=400"
+        },
+        headers=o_headers
+    )
+    assert resolve_res.status_code == 200
+    assert resolve_res.json()["resolution_proof_url"] is not None
+
+    # 5. Citizen submits verification review with photo proof
+    review_res = client.post(
+        f"/api/v1/grievances/{g_id}/reviews",
+        json={
+            "user_name": "Sourav Resident",
+            "rating": 5,
+            "is_verified_fixed": 1,
+            "comment": "Inspected the bridge railing today. Perfectly welded and safe!",
+            "proof_image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=400"
+        },
+        headers=c_headers
+    )
+    assert review_res.status_code == 201
+    review_data = review_res.json()
+    assert review_data["rating"] == 5
+    assert review_data["is_verified_fixed"] == 1
+    review_id = review_data["id"]
+
+    # 6. Upvote review helpfulness
+    helpful_res = client.post(f"/api/v1/grievances/reviews/{review_id}/helpful", headers=c_headers)
+    assert helpful_res.status_code == 200
+    assert helpful_res.json()["helpful_count"] >= 1
+
+    # 7. List reviews
+    list_rev = client.get(f"/api/v1/grievances/{g_id}/reviews")
+    assert list_rev.status_code == 200
+    assert len(list_rev.json()) >= 1
+
+
+
