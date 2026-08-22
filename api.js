@@ -273,6 +273,47 @@ const JanSetuAPI = {
             body: formData
         });
         return res.json();
+    },
+
+    // --- WARD COMMUNITY BULLETINS & ANNOUNCEMENTS ---
+    async getWardBulletins(ward = null) {
+        const query = ward ? `?ward=${encodeURIComponent(ward)}` : "";
+        const res = await fetch(`${API_BASE_URL}/grievances/bulletin/list${query}`);
+        return res.json();
+    },
+
+    async createWardBulletin(bulletinData) {
+        const res = await this.fetchWithAuth("/grievances/bulletin/create", {
+            method: "POST",
+            body: JSON.stringify(bulletinData)
+        });
+        return res.json();
+    },
+
+    // --- MULTILINGUAL VOICE SPEECH SYNTHESIS (HINDI, ODIA, BENGALI, ENGLISH) ---
+    speakText(text, lang = "en") {
+        if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+            console.warn("Speech synthesis not supported in this browser.");
+            return false;
+        }
+
+        window.speechSynthesis.cancel(); // stop previous speech
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Map language code to BCP 47 locale
+        const langMap = {
+            "hi": "hi-IN",
+            "or": "hi-IN", // fallback for Odia
+            "bn": "bn-IN",
+            "en": "en-IN"
+        };
+        utterance.lang = langMap[lang] || "en-IN";
+        utterance.rate = 0.92;
+        utterance.pitch = 1.0;
+
+        window.speechSynthesis.speak(utterance);
+        return true;
     }
 };
 

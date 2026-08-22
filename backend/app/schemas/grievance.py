@@ -130,3 +130,28 @@ class GrievanceStatusUpdate(BaseModel):
     resolution_notes: Optional[str] = None
     resolution_proof_url: Optional[str] = None
     priority: Optional[str] = None
+
+
+class WardBulletinOut(BaseModel):
+    id: int
+    title: str
+    message: str
+    category: str
+    urgency: str
+    ward: str
+    author_name: str
+    author_role: str
+    is_active: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class WardBulletinCreate(BaseModel):
+    title: str
+    message: str
+    category: Optional[str] = "Service Advisory"
+    urgency: Optional[str] = "Normal"
+    ward: Optional[str] = "Ward 12"
+    author_name: Optional[str] = "Municipal Administration"
+    author_role: Optional[str] = "Ward Nodal Officer"

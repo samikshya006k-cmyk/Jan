@@ -128,3 +128,18 @@ class GrievanceReview(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     grievance = relationship("Grievance", back_populates="reviews")
+
+
+class WardBulletin(Base):
+    __tablename__ = "ward_bulletins"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    message = Column(Text, nullable=False)
+    category = Column(String, default="Service Advisory")  # Water Shutdown, Roadwork, Sanitation, Power
+    urgency = Column(String, default="Normal")  # Critical, High, Normal
+    ward = Column(String, default="Ward 12")
+    author_name = Column(String, default="Municipal Administration")
+    author_role = Column(String, default="Ward Nodal Officer")
+    is_active = Column(Integer, default=1)
+    created_at = Column(DateTime, default=datetime.utcnow)

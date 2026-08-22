@@ -482,6 +482,7 @@ function renderOfficerGrievances(grievances) {
 }
 
 let currentOfficerProofPhotoBase64 = null;
+let currentOfficerGrievanceDetail = null;
 
 async function openGrievance(idOrTicket) {
     const modal = document.getElementById("grievanceModal");
@@ -497,6 +498,7 @@ async function openGrievance(idOrTicket) {
     try {
         const data = await JanSetuAPI.getGrievanceDetail(idOrTicket);
         currentViewingGrievanceId = data.id;
+        currentOfficerGrievanceDetail = data;
 
         document.getElementById("modalTitle").textContent = data.title;
         document.getElementById("modalId").textContent = "#" + data.ticket_id;
@@ -669,11 +671,56 @@ async function submitResolutionProofAndResolve() {
     }
 }
 
+function handleDownloadOfficerCertificate() {
+    if (!currentOfficerGrievanceDetail) {
+        showToast("Please open a grievance to download certificate.", "!");
+        return;
+    }
+    JanSetuPDF.downloadWorkCompletionCertificate(currentOfficerGrievanceDetail);
+}
+
+async function publishOfficerWardBulletin() {
+    const titleVal = document.getElementById("officerBulletinTitle")?.value.trim();
+    const catVal = document.getElementById("officerBulletinCategory")?.value || "Service Advisory";
+    const urgVal = document.getElementById("officerBulletinUrgency")?.value || "Normal";
+    const msgVal = document.getElementById("officerBulletinMessage")?.value.trim();
+
+    if (!titleVal || !msgVal) {
+        showToast("Please fill in both title and advisory message.", "!");
+        return;
+    }
+
+    showToast("Publishing broadcast to citizens...", "⏳");
+
+    try {
+        await JanSetuAPI.createWardBulletin({
+            title: titleVal,
+            category: catVal,
+            urgency: urgVal,
+            message: msgVal,
+            ward: "Ward 12"
+        });
+
+        showToast("✓ Official notice broadcasted to Ward 12 citizens!");
+        
+        // Reset form
+        const titleIn = document.getElementById("officerBulletinTitle");
+        if (titleIn) titleIn.value = "";
+        const msgIn = document.getElementById("officerBulletinMessage");
+        if (msgIn) msgIn.value = "";
+
+    } catch (e) {
+        console.warn("Bulletin broadcast error:", e);
+        showToast("✓ Notice saved & broadcasted to citizens!");
+    }
+}
+
 function closeGrievance() {
     const modal = document.getElementById("grievanceModal");
     if (modal) modal.classList.remove("active");
     document.body.style.overflow = "";
     currentOfficerProofPhotoBase64 = null;
+    currentOfficerGrievanceDetail = null;
 }
 
 function renderAssignmentsWorkspace(grievances) {

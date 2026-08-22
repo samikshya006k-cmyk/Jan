@@ -393,4 +393,41 @@ def test_citizen_reviews_and_contractor_dispatch(client):
     assert len(list_rev.json()) >= 1
 
 
+def test_ward_bulletins_and_new_static_files(client):
+    # 1. Test Static files
+    res_pdf = client.get("/pdf-generator.js")
+    assert res_pdf.status_code == 200
+    assert "JanSetuPDF" in res_pdf.text
+
+    res_wa = client.get("/whatsapp-bot.js")
+    assert res_wa.status_code == 200
+    assert "JanSetuWhatsApp" in res_wa.text
+
+    # 2. Test Get bulletins
+    res_b = client.get("/api/v1/grievances/bulletin/list")
+    assert res_b.status_code == 200
+    bulletins = res_b.json()
+    assert len(bulletins) >= 1
+    assert "title" in bulletins[0]
+
+    # 3. Post officer bulletin
+    o_login = client.post("/api/v1/auth/login", json={"email": "officer@jansetu.in", "password": "password123"})
+    o_headers = {"Authorization": f"Bearer {o_login.json()['access_token']}"}
+
+    create_b = client.post(
+        "/api/v1/grievances/bulletin/create",
+        json={
+            "title": "Emergency Drain Silt Clearing Drive",
+            "message": "Drain desilting squad dispatched to Saheed Nagar.",
+            "category": "Drainage",
+            "urgency": "High",
+            "ward": "Ward 12"
+        },
+        headers=o_headers
+    )
+    assert create_b.status_code == 201
+    assert create_b.json()["title"] == "Emergency Drain Silt Clearing Drive"
+
+
+
 

@@ -7,9 +7,11 @@
 let currentCitizenGrievances = [];
 let currentBudgetProjects = [];
 let currentNotifications = [];
+let currentWardBulletins = [];
 let citizenMap = null;
 let citizenMapMarkers = [];
 let currentModalGrievanceId = null;
+let currentModalGrievanceDetail = null;
 
 /* =========================================
    INITIALIZATION & DATA LOADING
@@ -104,9 +106,47 @@ async function loadCitizenDashboardData() {
         console.warn("Budget load:", e);
     }
 
-    // 5. Initialize Interactive Civic Map
+    // 5. Fetch Ward Community Bulletins
+    try {
+        await loadWardBulletins();
+    } catch (e) {
+        console.warn("Bulletins load:", e);
+    }
+
+    // 6. Initialize Interactive Civic Map
     initCitizenMap();
 }
+
+/* =========================================
+   WARD COMMUNITY BULLETINS & ANNOUNCEMENTS
+========================================= */
+
+async function loadWardBulletins() {
+    try {
+        const bulletins = await JanSetuAPI.getWardBulletins("Ward 12");
+        if (Array.isArray(bulletins) && bulletins.length > 0) {
+            currentWardBulletins = bulletins;
+            const topB = bulletins[0];
+            const head = document.getElementById("bulletinHeadline");
+            const msg = document.getElementById("bulletinMessage");
+            const tag = document.getElementById("bulletinWardTag");
+
+            if (head) head.textContent = topB.title;
+            if (msg) msg.textContent = topB.message;
+            if (tag) tag.textContent = `${topB.ward || 'Ward 12'} • ${topB.category || 'Advisory'}`;
+        }
+    } catch (e) {
+        console.warn("Could not load ward bulletins:", e);
+    }
+}
+
+window.JanSetuBulletin = {
+    speakCurrentBulletin() {
+        const head = document.getElementById("bulletinHeadline")?.textContent || "Ward notice";
+        const msg = document.getElementById("bulletinMessage")?.textContent || "";
+        JanSetuAPI.speakText(`Official Municipal Bulletin for Ward 12. ${head}. ${msg}`, "en");
+    }
+};
 
 /* =========================================
    INTERACTIVE CIVIC MAP (GOOGLE MAPS & LEAFLET)
@@ -378,6 +418,7 @@ async function viewReport(reportId) {
     try {
         const detail = await JanSetuAPI.getGrievanceDetail(reportId);
         currentModalGrievanceId = detail.id;
+        currentModalGrievanceDetail = detail;
         if (title) title.textContent = detail.title;
         if (countElem) countElem.textContent = `${detail.community_impact_count || 17} Corroborating Votes`;
 
@@ -577,11 +618,33 @@ async function upvoteReviewHelpfulAction(reviewId, button) {
     }
 }
 
+function handleDownloadCurrentReceipt() {
+    if (!currentModalGrievanceDetail) {
+        showToast("Please open a grievance to download receipt.", "!");
+        return;
+    }
+    JanSetuPDF.downloadCitizenReceipt(currentModalGrievanceDetail);
+}
+
+function handleVoiceReadoutModal() {
+    if (!currentModalGrievanceDetail) return;
+    const lang = document.getElementById("modalVoiceLangSelect")?.value || "en";
+    const g = currentModalGrievanceDetail;
+    const textMap = {
+        "en": `Grievance number ${g.ticket_id}. Title: ${g.title}. Department: ${g.category}. Current status: ${g.status}. Assigned contractor: ${g.contractor_name || 'Apex Civic Infra'}. Resolution target SLA: ${g.target_sla_date || '24 hours'}.`,
+        "hi": `शिकायत संख्या ${g.ticket_id}. शीर्षक: ${g.title}. श्रेणी: ${g.category}. वर्तमान स्थिति: ${g.status}. समाधान समयसीमा: ${g.target_sla_date || '24 घंटे'}.`,
+        "or": `ଅଭିଯୋଗ ନମ୍ବର ${g.ticket_id}. ଶୀର୍ଷକ: ${g.title}. ବିଭାଗ: ${g.category}. ବର୍ତ୍ତମାନ ସ୍ଥିତି: ${g.status}. ସମାଧାନ ସମୟ: ${g.target_sla_date || '24 ଘଣ୍ଟା'}.`,
+        "bn": `অভিযোগ নম্বর ${g.ticket_id}। শিরোনাম: ${g.title}। বিভাগ: ${g.category}। বর্তমান অবস্থা: ${g.status}।`
+    };
+    JanSetuAPI.speakText(textMap[lang] || textMap["en"], lang);
+}
+
 function closeDetails() {
     const modal = document.getElementById("detailModal");
     if (modal) modal.classList.remove("active");
     document.body.style.overflow = "";
     currentModalGrievanceId = null;
+    currentModalGrievanceDetail = null;
     currentCitizenReviewPhotoBase64 = null;
 }
 

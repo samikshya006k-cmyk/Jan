@@ -2180,6 +2180,55 @@
                     </table>
                 </div>
             </div>
+
+            <!-- WARD EMERGENCY BROADCAST & BULLETIN PUBLISHER -->
+            <div class="card" style="margin-top: 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <div style="background: #16a34a; color: #fff; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        📢
+                    </div>
+                    <div>
+                        <h2 style="font-size: 15px; font-weight: 700; margin: 0; color: #0f172a;">Publish Ward Announcement & Service Advisory</h2>
+                        <small style="color: #64748b;">Broadcast official notices (water supply interruptions, drain cleaning drives, power maintenance) to citizens.</small>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Notice Headline / Title</label>
+                        <input type="text" id="officerBulletinTitle" placeholder="e.g. Scheduled Water Supply Maintenance (Sunday 8 AM - 2 PM)" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Service Category</label>
+                        <select id="officerBulletinCategory" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; background: #fff;">
+                            <option value="Water Supply">💧 Water Supply Advisory</option>
+                            <option value="Roadwork">🚧 Roadwork & Paving</option>
+                            <option value="Drainage">≋ Drainage & Desilting</option>
+                            <option value="Sanitation">🗑️ Cleanliness Drive</option>
+                            <option value="Power">⚡ Power Maintenance</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Target Ward / Urgency</label>
+                        <select id="officerBulletinUrgency" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; background: #fff;">
+                            <option value="Normal">🟢 Normal Notice</option>
+                            <option value="High">🟠 High Priority Advisory</option>
+                            <option value="Critical">🔴 Emergency Alert</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Detailed Advisory Message</label>
+                    <textarea id="officerBulletinMessage" rows="2" placeholder="Enter detailed guidelines, affected landmarks, and helpline contacts for residents..." style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; font-family: inherit; box-sizing: border-box;"></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end;">
+                    <button type="button" onclick="publishOfficerWardBulletin()" style="background: #16a34a; color: #fff; font-size: 12px; font-weight: 700; padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        <span>📢</span> Broadcast to Ward Citizens
+                    </button>
+                </div>
+            </div>
         </section>
 
     </main>
@@ -2398,7 +2447,14 @@
         </div>
 
         <!-- ACTION BUTTONS -->
-        <div class="modal-actions" style="margin-top: 16px;">
+        <div class="modal-actions" style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+            <button
+                type="button"
+                onclick="handleDownloadOfficerCertificate()"
+                style="width: 100%; padding: 10px; font-weight: 700; background: #f0fdf4; color: #166534; border: 1px solid #86efac; border-radius: 8px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;"
+            >
+                <span>📜</span> Download Contractor Clearance Certificate (PDF)
+            </button>
             <button
                 type="button"
                 class="primary-btn full-width"
@@ -2437,6 +2493,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="maps-adapter.js"></script>
 <script src="api.js"></script>
+<script src="pdf-generator.js"></script>
+<script src="whatsapp-bot.js"></script>
 <script src="officerdashboard.js"></script>
 
 </body>

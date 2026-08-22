@@ -7,8 +7,8 @@ from sqlalchemy import or_, desc
 
 from app.core.database import get_db
 from app.models.user import User, UserRole
-from app.models.grievance import Grievance, GrievanceStatusHistory, GrievanceSupport, GrievanceStatus, GrievanceReview
-from app.schemas.grievance import GrievanceCreate, GrievanceOut, GrievanceDetail, GrievanceStatusUpdate, GrievanceReviewCreate, GrievanceReviewOut, GrievanceAssign
+from app.models.grievance import Grievance, GrievanceStatusHistory, GrievanceSupport, GrievanceStatus, GrievanceReview, WardBulletin
+from app.schemas.grievance import GrievanceCreate, GrievanceOut, GrievanceDetail, GrievanceStatusUpdate, GrievanceReviewCreate, GrievanceReviewOut, GrievanceAssign, WardBulletinCreate, WardBulletinOut
 from app.services.ai_triage import AITriageService
 from app.services.duplicate_finder import DuplicateFinderService
 from app.services.notification_mgr import NotificationManager
@@ -446,3 +446,82 @@ def support_grievance(
             "community_impact_count": grievance.community_impact_count,
             "message": "Thank you for corroborating this civic issue."
         }
+
+
+# ==========================================
+# WARD COMMUNITY BULLETIN & NOTICES
+# ==========================================
+
+@router.get("/bulletin/list", response_model=List[WardBulletinOut])
+def get_ward_bulletins(
+    ward: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Fetch active ward announcements and emergency service advisories.
+    """
+    query = db.query(WardBulletin).filter(WardBulletin.is_active == 1)
+    if ward:
+        query = query.filter(or_(WardBulletin.ward == ward, WardBulletin.ward == "All Wards"))
+    
+    bulletins = query.order_by(desc(WardBulletin.created_at)).all()
+
+    # Seed default sample bulletins if empty
+    if not bulletins:
+        b1 = WardBulletin(
+            title="Scheduled Water Supply Maintenance (Sunday 8 AM - 2 PM)",
+            message="Municipal PHED pipeline interconnection work will take place in Ward 12 & Saheed Nagar on Sunday. Citizens are requested to store adequate water.",
+            category="Water Supply",
+            urgency="High",
+            ward="Ward 12",
+            author_name="Er. S. Patnaik",
+            author_role="Executive Engineer (PHED)"
+        )
+        b2 = WardBulletin(
+            title="Monsoon Stormwater Drain Desilting Drive Underway",
+            message="Rapid response teams are clearing primary culvert drains across Market Road and Unit 4 junctions. Please avoid dumping solid waste into open drains.",
+            category="Drainage",
+            urgency="Normal",
+            ward="Ward 12",
+            author_name="Municipal Health Officer",
+            author_role="Sanitation Division"
+        )
+        b3 = WardBulletin(
+            title="Ward 12 Participatory Budget Voting Closes in 48 Hours",
+            message="Final 48 hours remaining for citizens to vote on the ₹18.4 Lakh community solar lighting and park development proposals.",
+            category="Participatory Budget",
+            urgency="Normal",
+            ward="Ward 12",
+            author_name="Smt. Jayashree Das",
+            author_role="Ward 12 Councillor"
+        )
+        db.add_all([b1, b2, b3])
+        db.commit()
+        return [b1, b2, b3]
+
+    return bulletins
+
+
+@router.post("/bulletin/create", response_model=WardBulletinOut, status_code=status.HTTP_201_CREATED)
+def create_ward_bulletin(
+    bulletin_in: WardBulletinCreate,
+    current_officer: User = Depends(get_current_officer),
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Post an official municipal bulletin or emergency service advisory.
+    """
+    bulletin = WardBulletin(
+        title=bulletin_in.title,
+        message=bulletin_in.message,
+        category=bulletin_in.category or "Service Advisory",
+        urgency=bulletin_in.urgency or "Normal",
+        ward=bulletin_in.ward or "Ward 12",
+        author_name=current_officer.full_name,
+        author_role=f"{current_officer.department} Nodal Officer"
+    )
+    db.add(bulletin)
+    db.commit()
+    db.refresh(bulletin)
+    return bulletin
+
