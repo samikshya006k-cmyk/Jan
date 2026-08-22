@@ -2748,22 +2748,16 @@ td small {
 
 
 .modal-box {
-
     width: 100%;
-
-    max-width: 560px;
-
+    max-width: 580px;
+    max-height: 88vh;
+    overflow-y: auto;
     background: white;
-
-    border-radius: 14px;
-
-    padding: 27px;
-
+    border-radius: 16px;
+    padding: 24px;
     position: relative;
-
-    box-shadow:
-        0 25px 70px rgba(0,0,0,.18);
-
+    box-shadow: 0 25px 70px rgba(0,0,0,.25);
+    scrollbar-width: thin;
 }
 
 

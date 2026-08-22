@@ -877,3 +877,10 @@ document.addEventListener("keydown", function(event) {
         closeSidebar();
     }
 });
+
+document.addEventListener("click", function(event) {
+    const grievanceModal = document.getElementById("grievanceModal");
+    if (grievanceModal && event.target === grievanceModal) {
+        closeGrievance();
+    }
+});

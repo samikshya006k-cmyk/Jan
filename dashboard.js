@@ -866,3 +866,10 @@ document.addEventListener("keydown", function(event) {
         if (profileMenu) profileMenu.classList.remove("active");
     }
 });
+
+document.addEventListener("click", function(event) {
+    const detailModal = document.getElementById("detailModal");
+    if (detailModal && event.target === detailModal) {
+        closeDetails();
+    }
+});
