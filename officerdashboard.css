@@ -2762,27 +2762,28 @@ td small {
 
 
 .modal-close {
-
     position: absolute;
-
     top: 14px;
-
     right: 14px;
+    border: 1px solid #cbd5e1;
+    background: #f1f5f9;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #475569;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
 
-    border: none;
-
-    background: #f4f6f8;
-
-    width: 30px;
-
-    height: 30px;
-
-    border-radius: 7px;
-
-    font-size: 18px;
-
-    color: #697487;
-
+.modal-close:hover {
+    background: #e2e8f0;
+    color: #0f172a;
 }
 
 
