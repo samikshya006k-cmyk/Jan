@@ -140,34 +140,112 @@ async function loadWardBulletins() {
     }
 }
 
+let currentKarmaXP = parseInt(localStorage.getItem("jansetu_citizen_xp") || "340", 10);
+
+function triggerKarmaGain(xp, reason = "Civic Action") {
+    currentKarmaXP += xp;
+    localStorage.setItem("jansetu_citizen_xp", currentKarmaXP);
+    
+    const display = document.getElementById("karmaScoreDisplay");
+    if (display) display.textContent = `${currentKarmaXP} Points`;
+    
+    const profileKarma = document.getElementById("modalProfileKarma");
+    if (profileKarma) profileKarma.textContent = `${currentKarmaXP} XP`;
+    
+    const leaderScore = document.getElementById("leaderboardSelfScore");
+    if (leaderScore) leaderScore.textContent = `${currentKarmaXP} XP`;
+    
+    const bar = document.getElementById("karmaProgressBar");
+    if (bar) {
+        const pct = Math.min(100, Math.round(((currentKarmaXP % 500) / 500) * 100));
+        bar.style.width = `${pct}%`;
+    }
+
+    showToast(`🎉 +${xp} Civic XP! ${reason}`);
+}
+
 window.JanSetuBulletin = {
     async speakCurrentBulletin() {
         const head = document.getElementById("bulletinHeadline")?.textContent || "Ward notice";
         const msg = document.getElementById("bulletinMessage")?.textContent || "";
         const rawText = `Official Municipal Bulletin for Ward 12. ${head}. ${msg}`;
         
-        const lang = document.getElementById("modalVoiceLangSelect")?.value || "en";
+        const lang = document.getElementById("globalDashboardLangSelect")?.value || localStorage.getItem("jansetu_preferred_lang") || "en";
+        const statusBox = document.getElementById("bulletinAudioStatusBox");
+        const stopBtn = document.getElementById("bulletinStopAudioBtn");
+        const langLabel = document.getElementById("bulletinAudioLangLabel");
+        const transcriptText = document.getElementById("bulletinAudioTranscriptText");
+
+        if (statusBox) statusBox.style.display = "block";
+        if (stopBtn) stopBtn.style.display = "inline-flex";
+        if (langLabel) langLabel.textContent = `Translating to ${lang.toUpperCase()}...`;
+        if (transcriptText) transcriptText.textContent = "Loading neural translation...";
+
         let spoken = rawText;
         if (lang !== "en" && JanSetuAPI.translateText) {
             const res = await JanSetuAPI.translateText(rawText, lang);
             spoken = res.translated_text || rawText;
         }
-        JanSetuAPI.speakText(spoken, lang);
+
+        if (langLabel) langLabel.textContent = `Playing Notice (${lang.toUpperCase()})`;
+        if (transcriptText) transcriptText.textContent = spoken;
+
+        JanSetuAPI.speakText(
+            spoken, 
+            lang,
+            () => {},
+            () => {
+                if (statusBox) statusBox.style.display = "none";
+                if (stopBtn) stopBtn.style.display = "none";
+            }
+        );
     },
 
     async speakDashboardBriefing() {
-        const activeCount = document.getElementById("inProgressReportsCount")?.textContent || "1";
-        const resCount = document.getElementById("resolvedReportsCount")?.textContent || "1";
-        const rawBriefing = `JanSetu Citizen Executive Briefing for Ward 12. You currently have ${activeCount} active grievance in progress with municipal contractor Apex Civic Infra under 24-hour statutory guarantee, and ${resCount} verified resolved issue. No emergency flood alerts in your sector.`;
+        const activeCount = document.getElementById("inProgressReportsCount")?.textContent?.trim() || "03";
+        const resCount = document.getElementById("resolvedReportsCount")?.textContent?.trim() || "04";
+        const rawBriefing = `JanSetu Citizen Executive Briefing for Ward 12. You currently have ${activeCount} active grievances in progress with municipal contractor Apex Civic Infra under statutory SLA guarantee, and ${resCount} verified resolved issues. No emergency flood alerts in your sector.`;
 
-        const lang = document.getElementById("modalVoiceLangSelect")?.value || "en";
+        const lang = document.getElementById("globalDashboardLangSelect")?.value || localStorage.getItem("jansetu_preferred_lang") || "en";
+        const statusBox = document.getElementById("bulletinAudioStatusBox");
+        const stopBtn = document.getElementById("bulletinStopAudioBtn");
+        const langLabel = document.getElementById("bulletinAudioLangLabel");
+        const transcriptText = document.getElementById("bulletinAudioTranscriptText");
+
+        if (statusBox) statusBox.style.display = "block";
+        if (stopBtn) stopBtn.style.display = "inline-flex";
+        if (langLabel) langLabel.textContent = `Translating to ${lang.toUpperCase()}...`;
+        if (transcriptText) transcriptText.textContent = "Preparing daily civic audio briefing...";
+
         let spoken = rawBriefing;
         if (lang !== "en" && JanSetuAPI.translateText) {
             const res = await JanSetuAPI.translateText(rawBriefing, lang);
             spoken = res.translated_text || rawBriefing;
         }
+
+        if (langLabel) langLabel.textContent = `Daily Briefing (${lang.toUpperCase()})`;
+        if (transcriptText) transcriptText.textContent = spoken;
+
         showToast("🔊 Playing Daily Civic Audio Briefing...");
-        JanSetuAPI.speakText(spoken, lang);
+        JanSetuAPI.speakText(
+            spoken, 
+            lang,
+            () => {},
+            () => {
+                if (statusBox) statusBox.style.display = "none";
+                if (stopBtn) stopBtn.style.display = "none";
+            }
+        );
+    },
+
+    stopAudio() {
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        const statusBox = document.getElementById("bulletinAudioStatusBox");
+        const stopBtn = document.getElementById("bulletinStopAudioBtn");
+        if (statusBox) statusBox.style.display = "none";
+        if (stopBtn) stopBtn.style.display = "none";
     }
 };
 
@@ -175,6 +253,7 @@ let currentVoicePlaybackRate = 1.0;
 
 function setVoiceSpeed(rate, btn) {
     currentVoicePlaybackRate = rate;
+    window.currentVoicePlaybackRate = rate;
     document.querySelectorAll(".voice-spd-btn").forEach(b => {
         b.style.background = "#fff";
         b.style.color = "#0f172a";
@@ -205,13 +284,318 @@ function toggleWhatsAppSubscription() {
         if (isWhatsAppSubscribed) {
             btn.textContent = "✓ Subscribed";
             btn.style.background = "#25D366";
-            showToast("✓ Live WhatsApp progress updates enabled!");
+            triggerKarmaGain(5, "Subscribed to live WhatsApp progress updates!");
         } else {
             btn.textContent = "+ Subscribe";
             btn.style.background = "#64748b";
             showToast("WhatsApp notifications paused.");
         }
     }
+}
+
+/* =========================================
+   CLICKABLE STATS & STATUS FILTERING
+========================================= */
+
+function filterGrievanceList(statusFilter, clickedTab) {
+    // 1. Update filter pill active styling
+    const pills = document.querySelectorAll(".filter-tab-pill");
+    pills.forEach(pill => {
+        pill.classList.remove("active");
+        pill.style.background = "#fff";
+        pill.style.color = "#475569";
+        pill.style.borderColor = "#cbd5e1";
+        pill.style.fontWeight = "600";
+    });
+
+    if (clickedTab) {
+        clickedTab.classList.add("active");
+        clickedTab.style.background = statusFilter === "critical" ? "#dc2626" : "#2563eb";
+        clickedTab.style.color = "#fff";
+        clickedTab.style.borderColor = statusFilter === "critical" ? "#dc2626" : "#2563eb";
+        clickedTab.style.fontWeight = "700";
+    } else {
+        // Find matching pill if triggered from Stat Card
+        pills.forEach(p => {
+            if (statusFilter === "all" && p.textContent.includes("All")) {
+                p.style.background = "#2563eb"; p.style.color = "#fff"; p.style.borderColor = "#2563eb"; p.style.fontWeight = "700";
+            } else if (statusFilter === "in_progress" && p.textContent.includes("In Progress")) {
+                p.style.background = "#2563eb"; p.style.color = "#fff"; p.style.borderColor = "#2563eb"; p.style.fontWeight = "700";
+            } else if (statusFilter === "resolved" && p.textContent.includes("Resolved")) {
+                p.style.background = "#2563eb"; p.style.color = "#fff"; p.style.borderColor = "#2563eb"; p.style.fontWeight = "700";
+            }
+        });
+    }
+
+    // 2. Filter reports list rows
+    const rows = document.querySelectorAll(".reports-list .report-row");
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const statusSpan = row.querySelector(".status");
+        const statusText = statusSpan ? statusSpan.textContent.toLowerCase() : "";
+
+        let match = false;
+        if (statusFilter === "all") {
+            match = true;
+        } else if (statusFilter === "in_progress") {
+            match = statusText.includes("progress") || statusText.includes("pending") || text.includes("progress");
+        } else if (statusFilter === "resolved") {
+            match = statusText.includes("resolved") || text.includes("resolved");
+        } else if (statusFilter === "critical") {
+            match = text.includes("road") || text.includes("damage") || text.includes("20481");
+        }
+
+        if (match) {
+            row.style.display = "flex";
+            visibleCount++;
+        } else {
+            row.style.display = "none";
+        }
+    });
+
+    // 3. Smooth scroll to reports section
+    const reportsElem = document.getElementById("reports");
+    if (reportsElem) {
+        reportsElem.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    showToast(`Showing ${statusFilter.replace('_', ' ').toUpperCase()} reports (${visibleCount} items)`);
+}
+
+/* =========================================
+   GLOBAL DASHBOARD LANGUAGE SWITCHER
+========================================= */
+
+const DASHBOARD_TRANSLATIONS = {
+    "hi": {
+        greeting: "शुभ प्रभात",
+        portal: "नागरिक पोर्टल",
+        subtitle: "यहाँ आपके क्षेत्र और समुदाय से जुड़ी ताज़ा जानकारी है।",
+        reportBtn: "＋ समस्या दर्ज करें",
+        bulletinTag: "आधिकारिक वार्ड बुलेटिन",
+        briefingBtn: "🔊 दैनिक नागरिक ब्रीफिंग",
+        readNoticeBtn: "📢 नोटिस सुनें",
+        karmaRank: "पद: वार्ड संरक्षक (लेवल 3)",
+        reportsSubmitted: "कुल दर्ज शिकायतें",
+        inProgress: "प्रगति पर",
+        resolved: "समाधान पूर्ण",
+        communityImpact: "सामुदायिक प्रभाव"
+    },
+    "or": {
+        greeting: "ଶୁଭ ସକାଳ",
+        portal: "ନାଗରିକ ପୋର୍ଟାଲ୍",
+        subtitle: "ଏଠାରେ ଆପଣଙ୍କ ପୌରାଞ୍ଚଳ ଓ ୱାର୍ଡ଼ର ତାଜା ତଥ୍ୟ।",
+        reportBtn: "＋ ଅଭିଯୋଗ ଦାଖଲ କରନ୍ତୁ",
+        bulletinTag: "ସରକାରୀ ୱାର୍ଡ଼ ବିଜ୍ଞପ୍ତି",
+        briefingBtn: "🔊 ଦୈନିକ ପୌର ବାର୍ତ୍ତା",
+        readNoticeBtn: "📢 ନୋଟିସ୍ ଶୁଣନ୍ତୁ",
+        karmaRank: "ପଦବୀ: ୱାର୍ଡ଼ ଗାର୍ଡିଆନ୍ (ଲେଭଲ ୩)",
+        reportsSubmitted: "ଦାଖଲ ଅଭିଯୋଗ",
+        inProgress: "କାର୍ଯ୍ୟ ଚାଲୁଅଛି",
+        resolved: "ସମାଧାନ ହୋଇଛି",
+        communityImpact: "ସାମୂହିକ ଲାଭ"
+    },
+    "bn": {
+        greeting: "সুপ্রভাত",
+        portal: "নাগরিক পোর্টাল",
+        subtitle: "আপনার এলাকার সর্বশেষ তথ্য ও পরিষেবা আপডেট।",
+        reportBtn: "＋ অভিযোগ জানান",
+        bulletinTag: "অফিসিয়াল পৌর বুলেটিন",
+        briefingBtn: "🔊 দৈনিক নাগরিক ব্রিফিং",
+        readNoticeBtn: "📢 নোটিশ শুনুন",
+        karmaRank: "র‌্যাঙ্ক: ওয়ার্ড অভিভাবক (লেভেল ৩)",
+        reportsSubmitted: "মোট অভিযোগ",
+        inProgress: "কাজ চলছে",
+        resolved: "সমাধান সম্পন্ন",
+        communityImpact: "নাগরিক প্রভাব"
+    },
+    "gu": {
+        greeting: "શુભ સવાર",
+        portal: "નાગરિક પોર્ટલ",
+        subtitle: "તમારા વોર્ડ અને વિસ્તારની તાજી વિગતો અહીં જુઓ.",
+        reportBtn: "＋ સમસ્યા નોંધાવો",
+        bulletinTag: "સત્તાવાર વોર્ડ બુલેટિન",
+        briefingBtn: "🔊 દૈનિક નાગરિક બ્રીફિંગ",
+        readNoticeBtn: "📢 નોટિસ સાંભળો",
+        karmaRank: "રેન્ક: વોર્ડ ગાર્ડિયન (લેવલ ૩)",
+        reportsSubmitted: "કુલ ફરિયાદો",
+        inProgress: "કામ ચાલુ છે",
+        resolved: "નિરાકરણ થયેલ",
+        communityImpact: "સમુદાય પ્રભાવ"
+    },
+    "ta": {
+        greeting: "காலை வணக்கம்",
+        portal: "குடிமக்கள் போர்டல்",
+        subtitle: "உங்கள் வார்டின் தற்போதைய நிலவரங்கள்.",
+        reportBtn: "＋ புகார் செய்க",
+        bulletinTag: "அதிகாரப்பூர்வ அறிவிப்பு",
+        briefingBtn: "🔊 தினசரி அறிக்கை",
+        readNoticeBtn: "📢 அறிவிப்பை கேட்கவும்",
+        karmaRank: "நிலை: வார்டு பாதுகாவலர் (நிலை 3)",
+        reportsSubmitted: "பதிவு செய்த புகார்கள்",
+        inProgress: "செயலில் உள்ளது",
+        resolved: "தீர்க்கப்பட்டது",
+        communityImpact: "பொதுமக்கள் தாக்கம்"
+    },
+    "te": {
+        greeting: "శుభోదయం",
+        portal: "పౌర పోర్టల్",
+        subtitle: "మీ వార్డు తాజా వివరాలు మరియు నివేదికలు.",
+        reportBtn: "＋ ఫిర్యాదు చేయండి",
+        bulletinTag: "అధికారిక వార్డు సమాచారం",
+        briefingBtn: "🔊 రోజువారీ సారాంశం",
+        readNoticeBtn: "📢 నోటీసు వినండి",
+        karmaRank: "హోదా: వార్డ్ గార్డియన్ (స్థాయి 3)",
+        reportsSubmitted: "దాఖలు చేసిన ఫిర్యాదులు",
+        inProgress: "పురోగతిలో ఉంది",
+        resolved: "పరిష్కరించబడింది",
+        communityImpact: "సమాజ ప్రభావం"
+    },
+    "mr": {
+        greeting: "शुभ प्रभात",
+        portal: "नागरी पोर्टल",
+        subtitle: "आपल्या प्रभागातील ताज्या घडामोडी व तक्रारी.",
+        reportBtn: "＋ तक्रार नोंदवा",
+        bulletinTag: "अधिकृत प्रभाग सूचना",
+        briefingBtn: "🔊 दैनिक नागरी माहिती",
+        readNoticeBtn: "📢 नोटीस ऐका",
+        karmaRank: "पद: प्रभाग संरक्षक (पातळी ३)",
+        reportsSubmitted: "एकूण तक्रारी",
+        inProgress: "काम सुरू",
+        resolved: "निवारण पूर्ण",
+        communityImpact: "नागरी प्रभाव"
+    },
+    "kn": {
+        greeting: "ಶುಭೋದಯ",
+        portal: "ಪೌರ ಪೋರ್ಟಲ್",
+        subtitle: "ನಿಮ್ಮ ವಾರ್ಡ್‌ನ ಇತ್ತೀಚಿನ ಮಾಹಿತಿ.",
+        reportBtn: "＋ ದೂರು ಸಲ್ಲಿಸಿ",
+        bulletinTag: "ಅಧಿಕೃತ ವಾರ್ಡ್ ಪ್ರಕಟಣೆ",
+        briefingBtn: "🔊 ದೈನಂದಿನ ಮಾಹಿತಿ",
+        readNoticeBtn: "📢 ಪ್ರಕಟಣೆ ಆಲಿಸಿ",
+        karmaRank: "ಶ್ರೇಣಿ: ವಾರ್ಡ್ ಗಾರ್ಡಿಯನ್ (ಹಂತ 3)",
+        reportsSubmitted: "ಸಲ್ಲಿಸಿದ ದೂರುಗಳು",
+        inProgress: "ಪ್ರಗತಿಯಲ್ಲಿದೆ",
+        resolved: "ಪರಿಹರಿಸಲಾಗಿದೆ",
+        communityImpact: "ಸಮುದಾಯ ಪರಿಣಾಮ"
+    },
+    "en": {
+        greeting: "Good morning",
+        portal: "CITIZEN PORTAL",
+        subtitle: "Here's what's happening with your community.",
+        reportBtn: "＋ Report an Issue",
+        bulletinTag: "Official Ward Bulletin",
+        briefingBtn: "🔊 Daily Civic Briefing",
+        readNoticeBtn: "📢 Read Notice",
+        karmaRank: "Rank: Ward Guardian (Level 3)",
+        reportsSubmitted: "Reports Submitted",
+        inProgress: "In Progress",
+        resolved: "Issues Resolved",
+        communityImpact: "Community Impact"
+    }
+};
+
+function changeDashboardLanguage(lang) {
+    localStorage.setItem("jansetu_preferred_lang", lang);
+
+    // Sync all dropdown selects
+    const headerSelect = document.getElementById("globalDashboardLangSelect");
+    if (headerSelect) headerSelect.value = lang;
+    const modalSelect = document.getElementById("modalVoiceLangSelect");
+    if (modalSelect) modalSelect.value = lang;
+    const profileSelect = document.getElementById("profileInputLang");
+    if (profileSelect) profileSelect.value = lang;
+
+    // Apply translations
+    const dict = DASHBOARD_TRANSLATIONS[lang] || DASHBOARD_TRANSLATIONS["en"];
+    const welcome = document.querySelector(".welcome-row h1");
+    const nameSpan = document.getElementById("welcomeName")?.textContent || "Citizen";
+    if (welcome) welcome.innerHTML = `${dict.greeting}, <span id="welcomeName">${nameSpan}</span> 👋`;
+
+    const portalEyebrow = document.querySelector(".welcome-row .eyebrow");
+    if (portalEyebrow) portalEyebrow.textContent = dict.portal;
+
+    const sub = document.querySelector(".welcome-row p");
+    if (sub) sub.textContent = dict.subtitle;
+
+    const briefingBtn = document.getElementById("bulletinBriefingBtn");
+    if (briefingBtn) briefingBtn.innerHTML = `<span>🔊</span> ${dict.briefingBtn.replace('🔊 ', '')}`;
+
+    const noticeBtn = document.getElementById("bulletinNoticeBtn");
+    if (noticeBtn) noticeBtn.innerHTML = `<span>📢</span> ${dict.readNoticeBtn.replace('📢 ', '')}`;
+
+    showToast(`🌐 Language switched to ${headerSelect?.options[headerSelect.selectedIndex]?.text || lang.toUpperCase()}`);
+}
+
+/* =========================================
+   MY CIVIC PROFILE MODAL LOGIC
+========================================= */
+
+function openProfileModal() {
+    const modal = document.getElementById("profileModal");
+    if (modal) {
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+
+        // Load saved profile data
+        const savedName = localStorage.getItem("jansetu_user_name") || "Sourav P.";
+        const savedPhone = localStorage.getItem("jansetu_user_phone") || "+91 98765 43210";
+        const savedWard = localStorage.getItem("jansetu_user_ward") || "Ward 12";
+        const savedLang = localStorage.getItem("jansetu_preferred_lang") || "en";
+
+        const nameInput = document.getElementById("profileInputName");
+        if (nameInput) nameInput.value = savedName;
+        const phoneInput = document.getElementById("profileInputPhone");
+        if (phoneInput) phoneInput.value = savedPhone;
+        const wardInput = document.getElementById("profileInputWard");
+        if (wardInput) wardInput.value = savedWard;
+        const langInput = document.getElementById("profileInputLang");
+        if (langInput) langInput.value = savedLang;
+
+        const profileKarma = document.getElementById("modalProfileKarma");
+        if (profileKarma) profileKarma.textContent = `${currentKarmaXP} XP`;
+    }
+}
+
+function closeProfileModal() {
+    const modal = document.getElementById("profileModal");
+    if (modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "";
+    }
+}
+
+function saveProfileChanges() {
+    const name = document.getElementById("profileInputName")?.value || "Sourav P.";
+    const phone = document.getElementById("profileInputPhone")?.value || "+91 98765 43210";
+    const ward = document.getElementById("profileInputWard")?.value || "Ward 12";
+    const lang = document.getElementById("profileInputLang")?.value || "en";
+
+    localStorage.setItem("jansetu_user_name", name);
+    localStorage.setItem("jansetu_user_phone", phone);
+    localStorage.setItem("jansetu_user_ward", ward);
+    localStorage.setItem("jansetu_preferred_lang", lang);
+
+    // Update UI headers
+    const userNameElem = document.getElementById("userName");
+    if (userNameElem) userNameElem.textContent = name;
+    const welcomeNameElem = document.getElementById("welcomeName");
+    if (welcomeNameElem) welcomeNameElem.textContent = name;
+    const profileMenuName = document.getElementById("profileMenuName");
+    if (profileMenuName) profileMenuName.textContent = name;
+    const modalProfileName = document.getElementById("modalProfileCitizenName");
+    if (modalProfileName) modalProfileName.textContent = `Citizen (${name})`;
+    const leaderName = document.getElementById("leaderboardSelfName");
+    if (leaderName) leaderName.textContent = `${name} (You)`;
+
+    const wardTag = document.getElementById("bulletinWardTag");
+    if (wardTag) wardTag.textContent = `${ward} • Saheed Nagar`;
+
+    changeDashboardLanguage(lang);
+    triggerKarmaGain(15, "Profile details updated & verified!");
+    closeProfileModal();
 }
 
 /* =========================================
@@ -427,10 +811,11 @@ async function supportGrievance(grievanceId, button, event) {
         // Refresh local analytics
         const analytics = await JanSetuAPI.getCitizenAnalytics();
         updateStatsUI(analytics);
+        triggerKarmaGain(10, "Upvoted neighborhood issue!");
     } catch (e) {
         console.warn("Support grievance error:", e);
         if (button) button.innerHTML = `▲ Supported ✓`;
-        showToast("✓ Vote recorded! Prioritizing for municipal intervention.");
+        triggerKarmaGain(10, "Upvoted neighborhood issue!");
     }
 }
 
@@ -447,11 +832,11 @@ async function supportCurrentModalGrievance() {
             btn.style.background = "#16a34a";
             btn.textContent = "Supported ✓ (+1)";
         }
-        showToast("✓ Upvoted! Prioritizing for municipal intervention.");
+        triggerKarmaGain(10, "Upvoted neighborhood issue!");
     } catch (e) {
         console.warn("Modal support error:", e);
         if (btn) btn.textContent = "Supported ✓";
-        showToast("✓ Upvoted! Prioritizing for municipal intervention.");
+        triggerKarmaGain(10, "Upvoted neighborhood issue!");
     }
 }
 
@@ -492,7 +877,8 @@ async function viewReport(reportId) {
         const offName = document.getElementById("modalOfficerName");
         if (offName) offName.textContent = detail.assigned_officer_name || "Er. Rajesh Mohapatra (EE)";
         const offPhone = document.getElementById("modalOfficerContact");
-        if (offPhone) offPhone.textContent = `📞 ${detail.assigned_officer_contact || '0674-2548900'}`;
+        const offEmail = detail.assigned_officer_email || "rajesh.mohapatra@bmc.gov.in";
+        if (offPhone) offPhone.innerHTML = `✉️ <a href="mailto:${offEmail}" style="color: #2563eb; text-decoration: underline;">${offEmail}</a>`;
         const contName = document.getElementById("modalContractorName");
         if (contName) contName.textContent = detail.contractor_name || "Apex Civic Infra Ltd.";
         const workOrd = document.getElementById("modalWorkOrderId");
@@ -647,7 +1033,7 @@ async function submitCurrentCitizenReview() {
         };
 
         const res = await JanSetuAPI.submitGrievanceReview(currentModalGrievanceId, payload);
-        showToast("✓ Your review and verification photo have been published!");
+        triggerKarmaGain(25, "On-ground verification review published!");
 
         // Reset form
         const commentBox = document.getElementById("citizenReviewComment");
@@ -662,7 +1048,7 @@ async function submitCurrentCitizenReview() {
 
     } catch (e) {
         console.warn("Submit review error:", e);
-        showToast("✓ Your review has been recorded!");
+        triggerKarmaGain(25, "On-ground verification review published!");
         toggleCitizenReviewForm();
         await loadModalCitizenReviews(currentModalGrievanceId);
     }
@@ -677,10 +1063,11 @@ async function upvoteReviewHelpfulAction(reviewId, button) {
             button.style.borderColor = "#86efac";
             button.textContent = `👍 Helpful (${res.helpful_count || 1})`;
         }
-        showToast("✓ Marked as helpful community review.");
+        triggerKarmaGain(5, "Marked community review as helpful!");
     } catch (e) {
         console.warn("Helpful upvote error:", e);
         if (button) button.textContent = `👍 Helpful (+1)`;
+        triggerKarmaGain(5, "Marked community review as helpful!");
     }
 }
 
@@ -690,6 +1077,7 @@ function handleDownloadCurrentReceipt() {
         return;
     }
     JanSetuPDF.downloadCitizenReceipt(currentModalGrievanceDetail);
+    triggerKarmaGain(5, "Downloaded verified civic receipt PDF!");
 }
 
 async function handleVoiceReadoutModal() {
@@ -813,6 +1201,7 @@ async function voteOnBudgetProject(projectId, button) {
         }
 
         showToast("✓ Your vote has been recorded on the Municipal Budget proposal!");
+        triggerKarmaGain(30, "Voted on Ward Participatory Budget proposal!");
     } catch (e) {
         console.warn("Vote project error:", e);
         if (button) {
@@ -820,7 +1209,7 @@ async function voteOnBudgetProject(projectId, button) {
             button.style.background = "#16a34a";
             button.innerHTML = "<span>✓</span> Vote Cast Successfully";
         }
-        showToast("✓ Your vote has been recorded on the Municipal Budget proposal!");
+        triggerKarmaGain(30, "Voted on Ward Participatory Budget proposal!");
     }
 }
 
