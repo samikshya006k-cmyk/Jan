@@ -20,6 +20,10 @@ class TriagePreviewResponse(BaseModel):
     urgency_reason: Optional[str] = None
     estimated_sla_hours: Optional[int] = 48
     ai_engine: Optional[str] = "JanSetu Multilingual NLP Engine"
+    detected_location: Optional[str] = None
+    detected_latitude: Optional[float] = None
+    detected_longitude: Optional[float] = None
+    detected_ward: Optional[str] = None
 
 
 class DuplicateCheckRequest(BaseModel):

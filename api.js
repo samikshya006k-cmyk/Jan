@@ -318,41 +318,64 @@ const JanSetuAPI = {
     },
 
     // --- MULTILINGUAL VOICE SPEECH SYNTHESIS (HINDI, ODIA, BENGALI, TAMIL, TELUGU, MARATHI, ENGLISH) ---
-    speakText(text, lang = "en") {
+    speakText(text, lang = "en", onStart = null, onEnd = null) {
         if (typeof window === "undefined" || !("speechSynthesis" in window)) {
             console.warn("Speech synthesis not supported in this browser.");
             return false;
         }
 
-        window.speechSynthesis.cancel(); // stop previous speech
+        try {
+            window.speechSynthesis.cancel(); // stop previous speech
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+            }
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        
-        // Map language code to BCP 47 locale
-        const langMap = {
-            "hi": "hi-IN",
-            "or": "hi-IN", // phonetic Indian voice for Odia
-            "bn": "bn-IN",
-            "ta": "ta-IN",
-            "te": "te-IN",
-            "mr": "mr-IN",
-            "en": "en-IN"
-        };
+            const cleanText = String(text || "").replace(/[#*_`]/g, " ").trim();
+            if (!cleanText) return false;
 
-        const targetLocale = langMap[lang] || "en-IN";
-        utterance.lang = targetLocale;
-        utterance.rate = 0.90;
-        utterance.pitch = 1.0;
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            window._activeSpeechUtterance = utterance; // Prevent GC bug in Chrome/Safari
 
-        // Pick specific Indian regional voice if browser provides one
-        const voices = window.speechSynthesis.getVoices();
-        const matchingVoice = voices.find(v => v.lang === targetLocale || v.lang.startsWith(lang));
-        if (matchingVoice) {
-            utterance.voice = matchingVoice;
+            const langMap = {
+                "hi": "hi-IN",
+                "or": "hi-IN", // phonetic Indian voice for Odia
+                "bn": "bn-IN",
+                "ta": "ta-IN",
+                "te": "te-IN",
+                "mr": "mr-IN",
+                "en": "en-IN"
+            };
+
+            const targetLocale = langMap[lang] || "en-IN";
+            utterance.lang = targetLocale;
+            utterance.rate = 0.92;
+            utterance.pitch = 1.0;
+
+            const voices = window.speechSynthesis.getVoices();
+            if (voices && voices.length > 0) {
+                const matchingVoice = voices.find(v => v.lang === targetLocale || v.lang.replace('_', '-').startsWith(targetLocale) || v.lang.startsWith(lang));
+                if (matchingVoice) {
+                    utterance.voice = matchingVoice;
+                }
+            }
+
+            if (onStart) utterance.onstart = onStart;
+            utterance.onend = (e) => {
+                if (onEnd) onEnd(e);
+                window._activeSpeechUtterance = null;
+            };
+            utterance.onerror = (e) => {
+                console.warn("Speech synthesis error:", e);
+                if (onEnd) onEnd(e);
+                window._activeSpeechUtterance = null;
+            };
+
+            window.speechSynthesis.speak(utterance);
+            return true;
+        } catch (err) {
+            console.warn("Speech synthesis execution error:", err);
+            return false;
         }
-
-        window.speechSynthesis.speak(utterance);
-        return true;
     }
 };
 

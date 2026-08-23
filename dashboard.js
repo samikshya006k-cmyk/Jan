@@ -630,6 +630,7 @@ async function handleVoiceReadoutModal() {
     if (!currentModalGrievanceDetail) return;
     const lang = document.getElementById("modalVoiceLangSelect")?.value || "en";
     const transcriptBox = document.getElementById("modalVoiceTranscript");
+    const listenBtn = document.getElementById("modalVoiceListenBtn");
     const g = currentModalGrievanceDetail;
 
     const baseText = `Grievance number ${g.ticket_id}. Title: ${g.title}. Department: ${g.category}. Current status: ${g.status}. Assigned contractor: ${g.contractor_name || 'Apex Civic Infra Ltd.'}. Resolution target SLA: ${g.target_sla_date || '24 hours'}.`;
@@ -638,6 +639,7 @@ async function handleVoiceReadoutModal() {
         transcriptBox.style.display = "block";
         transcriptBox.innerHTML = `<em>🌐 Translating with JanSetu AI...</em>`;
     }
+    if (listenBtn) listenBtn.innerHTML = `<span>⏳</span> Translating...`;
 
     try {
         let spokenText = baseText;
@@ -650,13 +652,19 @@ async function handleVoiceReadoutModal() {
             transcriptBox.innerHTML = `<strong>🗣️ AI Voice Transcript (${lang.toUpperCase()}):</strong><br>${spokenText}`;
         }
 
-        JanSetuAPI.speakText(spokenText, lang);
+        JanSetuAPI.speakText(
+            spokenText, 
+            lang,
+            () => { if (listenBtn) listenBtn.innerHTML = `<span>🔊</span> Speaking...`; },
+            () => { if (listenBtn) listenBtn.innerHTML = `<span>🔊</span> Listen`; }
+        );
     } catch (e) {
         console.warn("Translation error:", e);
         if (transcriptBox) {
             transcriptBox.innerHTML = `<strong>🗣️ AI Voice Transcript:</strong><br>${baseText}`;
         }
         JanSetuAPI.speakText(baseText, "en");
+        if (listenBtn) listenBtn.innerHTML = `<span>🔊</span> Listen`;
     }
 }
 

@@ -1404,7 +1404,7 @@ description.addEventListener(
 
         validateForm();
 
-        // Live AI Triage Analysis
+        // Live AI Triage Analysis & Location Auto-Detection
         const text = this.value.trim();
         const aiDesc = document.querySelector(".ai-info p");
         if (text.length >= 8 && aiDesc) {
@@ -1414,6 +1414,32 @@ description.addEventListener(
                     const aiData = await JanSetuAPI.getAIPreview(text, currentLanguage);
                     if (aiData && aiData.category) {
                         aiDesc.innerHTML = `<strong>AI Triage:</strong> Auto-routing to <em>${aiData.suggested_department}</em> (Severity: <strong>${aiData.priority}</strong>, Confidence: ${Math.round((aiData.confidence || 0.85) * 100)}%)`;
+                    }
+
+                    // Auto-assign location from AI if detected in report description
+                    if (aiData && aiData.detected_location && aiData.detected_latitude) {
+                        currentReportLat = parseFloat(aiData.detected_latitude.toFixed(5));
+                        currentReportLng = parseFloat(aiData.detected_longitude.toFixed(5));
+
+                        const locIn = document.getElementById("issueLocation");
+                        const badge = document.getElementById("aiLocationBadge");
+                        const badgeText = document.getElementById("aiDetectedLocationText");
+                        const coordDisplay = document.getElementById("coordDisplay");
+
+                        if (locIn && (!locIn.value.trim() || locIn.dataset.autoFilled === "true")) {
+                            locIn.value = aiData.detected_location;
+                            locIn.dataset.autoFilled = "true";
+                        }
+                        if (badge && badgeText) {
+                            badgeText.textContent = aiData.detected_location;
+                            badge.style.display = "flex";
+                        }
+                        if (coordDisplay) {
+                            coordDisplay.textContent = `Coordinates: ${currentReportLat}° N, ${currentReportLng}° E (✨ AI Detected)`;
+                        }
+                        if (locationPicker && locationPicker.setPosition) {
+                            locationPicker.setPosition(currentReportLat, currentReportLng);
+                        }
                     }
                 } catch (e) {
                     console.warn("AI Triage preview offline:", e);
@@ -1612,6 +1638,34 @@ async function initReportLocationPicker() {
 
 // Call on load
 initReportLocationPicker();
+
+window.applyManualLandmark = async function(landmarkName) {
+    const locationInput = document.getElementById("issueLocation");
+    const coordDisplay = document.getElementById("coordDisplay");
+    const aiBadge = document.getElementById("aiLocationBadge");
+    
+    if (locationInput) {
+        locationInput.value = landmarkName;
+        locationInput.dataset.autoFilled = "false"; // mark as manually chosen
+    }
+    if (aiBadge) {
+        aiBadge.style.display = "none";
+    }
+
+    if (typeof JanSetuAPI !== "undefined" && JanSetuAPI.geocodeLocation) {
+        const geo = await JanSetuAPI.geocodeLocation(landmarkName);
+        if (geo && geo.latitude && geo.longitude) {
+            currentReportLat = parseFloat(geo.latitude.toFixed(5));
+            currentReportLng = parseFloat(geo.longitude.toFixed(5));
+            if (coordDisplay) {
+                coordDisplay.textContent = `Coordinates: ${currentReportLat}° N, ${currentReportLng}° E (Manual: ${geo.address || landmarkName})`;
+            }
+            if (locationPicker && locationPicker.setPosition) {
+                locationPicker.setPosition(currentReportLat, currentReportLng);
+            }
+        }
+    }
+};
 
 /* =====================================================
    SAVE REPORT WITH EVIDENCE & COORDINATES

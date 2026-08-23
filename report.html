@@ -608,7 +608,7 @@
 
 
         <!-- =================================================
-             LOCATION & MAP PINNING
+             LOCATION & MAP PINNING (AI AUTO-DETECT + MANUAL PINNING)
         ================================================== -->
 
         <div class="form-section">
@@ -623,9 +623,27 @@
                 </button>
             </div>
 
+            <!-- AI Auto-Detected Location Banner -->
+            <div id="aiLocationBadge" style="display: none; margin-top: 8px; padding: 8px 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; font-size: 0.82rem; color: #166534; display: flex; align-items: center; gap: 6px;">
+                <span>✨</span>
+                <span>AI Auto-Detected: <strong id="aiDetectedLocationText">Unit 4 Market</strong></span>
+            </div>
+
             <div style="margin-top: 8px;">
                 <input type="text" id="issueLocation" placeholder="e.g. Near Unit 4 Market Gate, Saheed Nagar, Ward 12" style="width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; font-family: inherit;">
-                <div style="font-size: 0.78rem; color: #64748b; margin-top: 6px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px;">
+                
+                <!-- Quick Landmark Chips for Manual Pick -->
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; align-items: center;">
+                    <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">Quick Pick:</span>
+                    <button type="button" class="loc-chip-btn" onclick="applyManualLandmark('Master Canteen Square')" style="padding: 3px 8px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 0.75rem; cursor: pointer; font-family: inherit;">Master Canteen</button>
+                    <button type="button" class="loc-chip-btn" onclick="applyManualLandmark('Saheed Nagar Main Road')" style="padding: 3px 8px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 0.75rem; cursor: pointer; font-family: inherit;">Saheed Nagar</button>
+                    <button type="button" class="loc-chip-btn" onclick="applyManualLandmark('Unit 4 Market')" style="padding: 3px 8px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 0.75rem; cursor: pointer; font-family: inherit;">Unit 4 Market</button>
+                    <button type="button" class="loc-chip-btn" onclick="applyManualLandmark('Patia Infocity Square')" style="padding: 3px 8px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 0.75rem; cursor: pointer; font-family: inherit;">Patia Infocity</button>
+                    <button type="button" class="loc-chip-btn" onclick="applyManualLandmark('Nayapalli IRC Village')" style="padding: 3px 8px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 0.75rem; cursor: pointer; font-family: inherit;">Nayapalli</button>
+                    <button type="button" class="loc-chip-btn" onclick="applyManualLandmark('Khandagiri Square')" style="padding: 3px 8px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 0.75rem; cursor: pointer; font-family: inherit;">Khandagiri</button>
+                </div>
+
+                <div style="font-size: 0.78rem; color: #64748b; margin-top: 8px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px;">
                     <span id="coordDisplay">Coordinates: 20.2961° N, 85.8245° E</span>
                     <span>Click or drag pin on map to adjust exact spot</span>
                 </div>

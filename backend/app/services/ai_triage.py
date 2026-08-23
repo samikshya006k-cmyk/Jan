@@ -274,6 +274,8 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
 
         summary = f"Identified as {best_category} issue. Recommended routing to {suggested_dept} with {priority} priority."
 
+        geo_info = cls.geocode_location(text)
+
         return {
             "category": best_category,
             "suggested_department": suggested_dept,
@@ -284,7 +286,11 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
             "key_entities": list(set(entities)),
             "urgency_reason": urgency_reason,
             "estimated_sla_hours": sla_hours,
-            "ai_engine": "JanSetu Multilingual NLP Engine"
+            "ai_engine": "JanSetu Multilingual NLP Engine",
+            "detected_location": geo_info.get("address"),
+            "detected_latitude": geo_info.get("latitude"),
+            "detected_longitude": geo_info.get("longitude"),
+            "detected_ward": geo_info.get("ward")
         }
 
     @classmethod
