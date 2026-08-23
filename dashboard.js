@@ -141,12 +141,78 @@ async function loadWardBulletins() {
 }
 
 window.JanSetuBulletin = {
-    speakCurrentBulletin() {
+    async speakCurrentBulletin() {
         const head = document.getElementById("bulletinHeadline")?.textContent || "Ward notice";
         const msg = document.getElementById("bulletinMessage")?.textContent || "";
-        JanSetuAPI.speakText(`Official Municipal Bulletin for Ward 12. ${head}. ${msg}`, "en");
+        const rawText = `Official Municipal Bulletin for Ward 12. ${head}. ${msg}`;
+        
+        const lang = document.getElementById("modalVoiceLangSelect")?.value || "en";
+        let spoken = rawText;
+        if (lang !== "en" && JanSetuAPI.translateText) {
+            const res = await JanSetuAPI.translateText(rawText, lang);
+            spoken = res.translated_text || rawText;
+        }
+        JanSetuAPI.speakText(spoken, lang);
+    },
+
+    async speakDashboardBriefing() {
+        const activeCount = document.getElementById("inProgressReportsCount")?.textContent || "1";
+        const resCount = document.getElementById("resolvedReportsCount")?.textContent || "1";
+        const rawBriefing = `JanSetu Citizen Executive Briefing for Ward 12. You currently have ${activeCount} active grievance in progress with municipal contractor Apex Civic Infra under 24-hour statutory guarantee, and ${resCount} verified resolved issue. No emergency flood alerts in your sector.`;
+
+        const lang = document.getElementById("modalVoiceLangSelect")?.value || "en";
+        let spoken = rawBriefing;
+        if (lang !== "en" && JanSetuAPI.translateText) {
+            const res = await JanSetuAPI.translateText(rawBriefing, lang);
+            spoken = res.translated_text || rawBriefing;
+        }
+        showToast("🔊 Playing Daily Civic Audio Briefing...");
+        JanSetuAPI.speakText(spoken, lang);
     }
 };
+
+let currentVoicePlaybackRate = 1.0;
+
+function setVoiceSpeed(rate, btn) {
+    currentVoicePlaybackRate = rate;
+    document.querySelectorAll(".voice-spd-btn").forEach(b => {
+        b.style.background = "#fff";
+        b.style.color = "#0f172a";
+        b.style.borderColor = "#cbd5e1";
+    });
+    if (btn) {
+        btn.style.background = "#10b981";
+        btn.style.color = "#fff";
+        btn.style.borderColor = "#10b981";
+    }
+}
+
+function handleStopVoiceModal() {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+    }
+    const listenBtn = document.getElementById("modalVoiceListenBtn");
+    if (listenBtn) listenBtn.innerHTML = `<span>🔊</span> Listen`;
+    const transcriptBox = document.getElementById("modalVoiceTranscript");
+    if (transcriptBox) transcriptBox.style.display = "none";
+}
+
+let isWhatsAppSubscribed = true;
+function toggleWhatsAppSubscription() {
+    isWhatsAppSubscribed = !isWhatsAppSubscribed;
+    const btn = document.getElementById("modalWhatsAppSubscribeBtn");
+    if (btn) {
+        if (isWhatsAppSubscribed) {
+            btn.textContent = "✓ Subscribed";
+            btn.style.background = "#25D366";
+            showToast("✓ Live WhatsApp progress updates enabled!");
+        } else {
+            btn.textContent = "+ Subscribe";
+            btn.style.background = "#64748b";
+            showToast("WhatsApp notifications paused.");
+        }
+    }
+}
 
 /* =========================================
    INTERACTIVE CIVIC MAP (GOOGLE MAPS & LEAFLET)

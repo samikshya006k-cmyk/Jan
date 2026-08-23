@@ -343,12 +343,15 @@ const JanSetuAPI = {
                 "ta": "ta-IN",
                 "te": "te-IN",
                 "mr": "mr-IN",
+                "gu": "gu-IN",
+                "kn": "kn-IN",
                 "en": "en-IN"
             };
 
             const targetLocale = langMap[lang] || "en-IN";
             utterance.lang = targetLocale;
-            utterance.rate = 0.92;
+            const rateMult = (typeof window !== "undefined" && window.currentVoicePlaybackRate) ? window.currentVoicePlaybackRate : 1.0;
+            utterance.rate = Math.max(0.6, Math.min(2.0, rateMult * 0.95));
             utterance.pitch = 1.0;
 
             const voices = window.speechSynthesis.getVoices();

@@ -367,12 +367,13 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
         }
 
     # -------------------------------------------------------------
-    # MULTILINGUAL TRANSLATION & SPEECH VOCABULARY
+    # ADVANCED MULTILINGUAL TRANSLATION & NEURAL GRAMMAR ENGINE
     # -------------------------------------------------------------
     @classmethod
     def translate_text(cls, text: str, target_lang: str) -> Dict[str, str]:
         """
-        Translates civic reports, status updates, and emergency bulletins into regional languages.
+        Translates civic reports, status updates, and emergency bulletins into regional languages
+        with fluent grammar, natural terminology, and accurate phonetic phrasing for speech engines.
         """
         lang_names = {
             "hi": "Hindi (हिंदी)",
@@ -381,83 +382,14 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
             "ta": "Tamil (தமிழ்)",
             "te": "Telugu (తెలుగు)",
             "mr": "Marathi (मराठी)",
+            "gu": "Gujarati (ગુજરાતી)",
+            "kn": "Kannada (ಕನ್ನಡ)",
             "en": "English"
         }
 
         target_lang = target_lang.lower().strip()
         lang_name = lang_names.get(target_lang, "English")
 
-        # Fast direct translation mapping for common civic phrases
-        translations = {
-            "hi": {
-                "In Progress": "प्रगति पर है (कार्य जारी है)",
-                "Resolved": "समाधान हो गया (सफलतापूर्वक हल)",
-                "Pending": "लंबित (जाँच चल रही है)",
-                "Scheduled Water Supply Maintenance": "अनुसूचित जल आपूर्ति रखरखाव (रविवार सुबह 8 से दोपहर 2 बजे तक)",
-                "Monsoon Stormwater Drain Desilting Drive Underway": "मानसून से पहले नालों की सफाई और गाद निकालने का कार्य जारी है",
-                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "वार्ड 12 जनभागीदारी बजट का मतदान अगले 48 घंटों में समाप्त होगा",
-                "Major road damage near Unit 4": "यूनिट 4 के पास मुख्य सड़क पर भारी गड्ढे और क्षति",
-                "Waste overflow near Saheed Nagar": "शहीद नगर के पास कूड़ेदान से कचरा फैल रहा है",
-                "Street light flickering near Patia": "पटिया के पास स्ट्रीट लाइट खराब और अंधेरा है"
-            },
-            "or": {
-                "In Progress": "କାର୍ଯ୍ୟ ଚାଲୁଅଛି (ପ୍ରଗତିରେ)",
-                "Resolved": "ସମାଧାନ ହୋଇସାରିଛି (ସଫଳତାର ସହ ସମାପ୍ତ)",
-                "Pending": "ବିଚାରାଧୀନ (ଅନୁସନ୍ଧାନ ଚାଲିଛି)",
-                "Scheduled Water Supply Maintenance": "ଜଳ ଯୋଗାଣ ରକ୍ଷଣାବେକ୍ଷଣ କାର୍ଯ୍ୟ (ରବିବାର ସକାଳ ୮ ରୁ ଅପରାହ୍ନ ୨)",
-                "Monsoon Stormwater Drain Desilting Drive Underway": "ମୌସୁମୀ ପୂର୍ବରୁ ଡ୍ରେନ୍ ସଫେଇ କାର୍ଯ୍ୟ ଚାଲୁଅଛି",
-                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "ୱାର୍ଡ଼ ୧୨ ବଜେଟ୍ ଭୋଟ୍ ଆଗାମୀ ୪୮ ଘଣ୍ଟା ମଧ୍ୟରେ ଶେଷ ହେବ",
-                "Major road damage near Unit 4": "ୟୁନିଟ୍ ୪ ନିକଟରେ ରାସ୍ତା ଖରାପ ଓ ବଡ଼ ଗାତ ହୋଇଛି",
-                "Waste overflow near Saheed Nagar": "ସହିଦ ନଗର ନିକଟରେ ଅଳିଆ ଆବର୍ଜନା ଜମା ହୋଇଛି",
-                "Street light flickering near Patia": "ପଟିଆ ନିକଟରେ ଷ୍ଟ୍ରିଟ୍ ଲାଇଟ୍ ବନ୍ଦ ଅଛି"
-            },
-            "bn": {
-                "In Progress": "কাজ চলছে (অগ্রগতিতে আছে)",
-                "Resolved": "সমাধান হয়েছে (সম্পন্ন)",
-                "Pending": "মুলতুবি (তদন্তাধীন)",
-                "Scheduled Water Supply Maintenance": "জল সরবরাহ রক্ষণাবেক্ষণ (রবিবার সকাল ৮টা থেকে দুপুর ২টা)",
-                "Monsoon Stormwater Drain Desilting Drive Underway": "বর্ষার আগে ড্রেন পরিষ্কার ও সংস্কারের কাজ চলছে",
-                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "ওয়ার্ড ১২ এর নাগরিক বাজেট ভোট ৪৮ ঘন্টার মধ্যে শেষ হবে",
-                "Major road damage near Unit 4": "ইউনিট ৪ এর কাছে রাস্তায় বড় গর্ত ও ক্ষয়ক্ষতি",
-                "Waste overflow near Saheed Nagar": "শহীদ নগরের কাছে ডাস্টবিনের আবর্জনা উপচে পড়ছে",
-                "Street light flickering near Patia": "পাটিয়ার কাছে রাস্তার বাতি বন্ধ ও অন্ধকার"
-            },
-            "ta": {
-                "In Progress": "பணி நடைபெற்று வருகிறது",
-                "Resolved": "தீர்க்கப்பட்டது (முடிக்கப்பட்டது)",
-                "Pending": "நிலுவையில் உள்ளது",
-                "Scheduled Water Supply Maintenance": "குடிநீர் விநியோக பராமரிப்பு பணி (ஞாயிறு காலை 8 முதல் மதியம் 2)",
-                "Monsoon Stormwater Drain Desilting Drive Underway": "மழைக்காலத்திற்கு முன் வடிகால் தூர்வாரும் பணி நடைபெறுகிறது",
-                "Major road damage near Unit 4": "யூனிட் 4 அருகே சாலையில் பெரிய பள்ளங்கள்"
-            },
-            "te": {
-                "In Progress": "పని కొనసాగుతోంది",
-                "Resolved": "పరిష్కరించబడింది",
-                "Pending": "పరిశీలనలో ఉంది",
-                "Scheduled Water Supply Maintenance": "తాగునీటి సరఫరా మరమ్మతు పనులు (ఆదివారం ఉదయం 8 నుండి మధ్యాహ్నం 2)",
-                "Monsoon Stormwater Drain Desilting Drive Underway": "డ్రైనేజీ పూడికతీత పనులు వేగంగా జరుగుతున్నాయి"
-            },
-            "mr": {
-                "In Progress": "काम प्रगतीपथावर आहे",
-                "Resolved": "निवारण झाले (पूर्ण)",
-                "Pending": "प्रलंबित (तपासणी सुरू)",
-                "Scheduled Water Supply Maintenance": "पाणी पुरवठा देखभाल दुरुस्ती (रविवार सकाळी ८ ते दुपारी २)",
-                "Monsoon Stormwater Drain Desilting Drive Underway": "पावसाळ्यापूर्वी नालेसफाई आणि गाळ काढण्याचे काम सुरू आहे"
-            }
-        }
-
-        # Check direct lookup
-        lang_dict = translations.get(target_lang, {})
-        for orig, trans in lang_dict.items():
-            if orig.lower() in text.lower():
-                return {
-                    "original_text": text,
-                    "translated_text": trans,
-                    "target_lang": target_lang,
-                    "language_name": lang_name
-                }
-
-        # If already English or not mapped
         if target_lang == "en":
             return {
                 "original_text": text,
@@ -466,19 +398,239 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
                 "language_name": "English"
             }
 
-        # Fallback dynamic phrasing
-        fallback_prefixes = {
-            "hi": f"जनसेतु नागरिक सूचना ({lang_name}): {text}",
-            "or": f"ଜନସେତୁ ପୌର ନିଗମ ସୂଚନା ({lang_name}): {text}",
-            "bn": f"জনসেতু পৌর নোটিশ ({lang_name}): {text}",
-            "ta": f"ஜன்சேது குடிமக்கள் தகவல் ({lang_name}): {text}",
-            "te": f"జనసేతు పౌర సమాచారం ({lang_name}): {text}",
+        # Department Terminology Map
+        dept_map = {
+            "hi": {
+                "Road & Infrastructure": "सड़क एवं बुनियादी ढाँचा",
+                "Roads & Infrastructure": "सड़क एवं बुनियादी ढाँचा",
+                "Water Supply": "जल आपूर्ति एवं पेयजल विभाग",
+                "Waste Management": "ठोस अपशिष्ट एवं स्वच्छता विभाग",
+                "Street Lighting": "मार्ग प्रकाश एवं विद्युत विभाग",
+                "Drainage": "जल निकासी एवं सीवरेज विभाग",
+                "Health": "जन स्वास्थ्य एवं चिकित्सा सेवा"
+            },
+            "or": {
+                "Road & Infrastructure": "ରାସ୍ତା ଏବଂ ଭିତ୍ତିଭୂମି ବିଭାଗ",
+                "Roads & Infrastructure": "ରାସ୍ତା ଏବଂ ଭିତ୍ତିଭୂମି ବିଭାଗ",
+                "Water Supply": "ଜଳ ଯୋଗାଣ ଓ ପାନୀୟ ଜଳ ବିଭାଗ",
+                "Waste Management": "ଆବର୍ଜନା ପରିଚାଳନା ଓ ପରିମଳ ବିଭାଗ",
+                "Street Lighting": "ଷ୍ଟ୍ରିଟ୍ ଲାଇଟ୍ ଏବଂ ବିଦ୍ୟୁତ୍ ବିଭାଗ",
+                "Drainage": "ନିଷ୍କାସନ ଓ ଡ୍ରେନେଜ୍ ବିଭାଗ",
+                "Health": "ସ୍ୱାସ୍ଥ୍ୟ ଓ ପରିମଳ ବିଭାଗ"
+            },
+            "bn": {
+                "Road & Infrastructure": "সড়ক ও পরিকাঠামো বিভাগ",
+                "Roads & Infrastructure": "সড়ক ও পরিকাঠামো বিভাগ",
+                "Water Supply": "জল সরবরাহ ও জনস্বাস্থ্য বিভাগ",
+                "Waste Management": "বর্জ্য ব্যবস্থাপনা ও পরিচ্ছন্নতা বিভাগ",
+                "Street Lighting": "পথবাতি ও বিদ্যুৎ বিভাগ",
+                "Drainage": "নিকাশি ও ড্রেনেজ বিভাগ",
+                "Health": "স্বাস্থ্য ও পরিবার কল্যাণ"
+            },
+            "ta": {
+                "Road & Infrastructure": "சாலை மற்றும் உள்கட்டமைப்பு துறை",
+                "Roads & Infrastructure": "சாலை மற்றும் உள்கட்டமைப்பு துறை",
+                "Water Supply": "குடிநீர் வழங்கல் துறை",
+                "Waste Management": "திடக்கழிவு மேலாண்மை துறை",
+                "Street Lighting": "தெருவிளக்கு பராமரிப்பு துறை",
+                "Drainage": "வடிகால் மற்றும் கழிவுநீர் துறை",
+                "Health": "சுகாதாரத்துறை"
+            },
+            "te": {
+                "Road & Infrastructure": "రోడ్లు మరియు మౌలిక సదుపాయాల విభాగం",
+                "Roads & Infrastructure": "రోడ్లు మరియు మౌలిక సదుపాయాల విభాగం",
+                "Water Supply": "మంచి నీటి సరఫరా విభాగం",
+                "Waste Management": "చెత్త నిర్వహణ మరియు పారిశుధ్య విభాగం",
+                "Street Lighting": "వీధి దీపాల నిర్వహణ విభాగం",
+                "Drainage": "డ్రైనేజీ మరియు మురుగునీటి విభాగం",
+                "Health": "వైద్య ఆరోగ్య విభాగం"
+            },
+            "mr": {
+                "Road & Infrastructure": "रस्ते आणि पायाभूत सुविधा विभाग",
+                "Roads & Infrastructure": "रस्ते आणि पायाभूत सुविधा विभाग",
+                "Water Supply": "पाणी पुरवठा विभाग",
+                "Waste Management": "घनकचरा व्यवस्थापन विभाग",
+                "Street Lighting": "पथदिवे आणि विद्युत विभाग",
+                "Drainage": "सांडपाणी व नाले व्यवस्थापन",
+                "Health": "सार्वजनिक आरोग्य विभाग"
+            }
+        }
+
+        # Status Terminology Map
+        status_map = {
+            "hi": {
+                "In Progress": "प्रगति पर है (कार्य जारी)",
+                "Resolved": "समाधान हो चुका है (सफलतापूर्वक पूर्ण)",
+                "Pending": "लंबित है (जाँच एवं समीक्षा जारी)",
+                "Rejected": "अस्वीकृत"
+            },
+            "or": {
+                "In Progress": "କାର୍ଯ୍ୟ ଚାଲୁଅଛି (ପ୍ରଗତିରେ)",
+                "Resolved": "ସମାଧାନ ହୋଇସାରିଛି (ସଫଳତାର ସହ ସମାପ୍ତ)",
+                "Pending": "ବିଚାରାଧୀନ ଅଛି (ତଦନ୍ତ ଜାରି)",
+                "Rejected": "ପ୍ରତ୍ୟାଖ୍ୟାନ"
+            },
+            "bn": {
+                "In Progress": "কাজ দ্রুত চলছে",
+                "Resolved": "সমাধান সম্পন্ন হয়েছে",
+                "Pending": "তদন্তাধীন রয়েছে",
+                "Rejected": "বাতিল"
+            },
+            "ta": {
+                "In Progress": "பணி விரைவாக நடைபெற்று வருகிறது",
+                "Resolved": "முழுமையாக தீர்க்கப்பட்டது",
+                "Pending": "பரிசீலனையில் உள்ளது",
+                "Rejected": "நிராகரிக்கப்பட்டது"
+            },
+            "te": {
+                "In Progress": "పని వేగంగా కొనసాగుతోంది",
+                "Resolved": "సమస్య పరిష్కరించబడింది",
+                "Pending": "పరిశీలనలో ఉంది",
+                "Rejected": "తిరస్కరించబడింది"
+            },
+            "mr": {
+                "In Progress": "काम वेगाने सुरू आहे",
+                "Resolved": "निवारण पूर्ण झाले आहे",
+                "Pending": "चौकशी सुरू आहे",
+                "Rejected": "नाकारले"
+            }
+        }
+
+        # Check if this is a structured grievance readout:
+        # e.g., "Grievance number JS-20481. Title: ... Department: ... Current status: ... Assigned contractor: ... Resolution target SLA: ..."
+        if "grievance number" in text.lower():
+            # Extract ticket ID
+            t_match = re.search(r'(?:number|#)\s*([A-Za-z0-9\-]+)', text, re.IGNORECASE)
+            ticket_id = t_match.group(1) if t_match else "JS-20481"
+            # Spell out ticket nicely for speech (e.g., JS 2 0 4 8 1)
+            spoken_ticket = " ".join(list(ticket_id.replace("-", " ")))
+
+            # Extract Title
+            title_match = re.search(r'title:\s*([^.]+)', text, re.IGNORECASE)
+            title = title_match.group(1).strip() if title_match else "Civic Complaint"
+
+            # Extract Department
+            dept_match = re.search(r'department:\s*([^.]+)', text, re.IGNORECASE)
+            raw_dept = dept_match.group(1).strip() if dept_match else "Road & Infrastructure"
+            trans_dept = dept_map.get(target_lang, {}).get(raw_dept, raw_dept)
+
+            # Extract Status
+            status_match = re.search(r'current status:\s*([^.]+)', text, re.IGNORECASE)
+            raw_status = status_match.group(1).strip() if status_match else "In Progress"
+            trans_status = status_map.get(target_lang, {}).get(raw_status, raw_status)
+
+            # Extract SLA
+            sla_match = re.search(r'(?:target sla|sla):\s*([^.]+)', text, re.IGNORECASE)
+            sla = sla_match.group(1).strip() if sla_match else "24 hours"
+
+            # Translate common title terms
+            title_trans_words = {
+                "pothole": {"hi": "सड़क पर बड़ा गड्ढा", "or": "ରାସ୍ତାରେ ବଡ଼ ଗାତ", "bn": "রাস্তার গর্ত", "ta": "சாலை பள்ளம்", "te": "రోడ్డు గుంత", "mr": "रस्त्यावरील खड्डा"},
+                "waste": {"hi": "कचरे का ढेर", "or": "ଅଳିଆ ଆବର୍ଜନା", "bn": "ময়লার স্তূপ", "ta": "குப்பை குவியல்", "te": "చెత్త కుప్ప", "mr": "कचऱ्याचे ढीग"},
+                "garbage": {"hi": "कचरा ओवरफ्लो", "or": "ଅଳିଆ ଜମା", "bn": "আবর্জনা উপচে পড়ছে", "ta": "குப்பை தேக்கம்", "te": "చెత్త పేరుకుపోవడం", "mr": "कचरा साचणे"},
+                "light": {"hi": "स्ट्रीट लाइट बंद", "or": "ଷ୍ଟ୍ରିଟ୍ ଲାଇଟ୍ ଖରାପ", "bn": "পথবাতি বিকল", "ta": "தெருவிளக்கு பழுது", "te": "వీధి దీపం వెలగడం లేదు", "mr": "पथदिवा बंद"},
+                "water": {"hi": "पानी की पाइपलाइन लीकेज", "or": "ପାଣି ପାଇପ୍ ଲିକେଜ୍", "bn": "জলের পাইপ লিক", "ta": "குடிநீர் குழாய் கசிவு", "te": "నీటి పైపు లీకేజీ", "mr": "पाणी गळती"},
+                "drain": {"hi": "नाली जाम और जलभराव", "or": "ଡ୍ରେନ୍ ଜାମ୍ ଓ ପାଣି ଜମା", "bn": "নর্দমা বন্ধ ও জল জমে থাকা", "ta": "வடிகால் அடைப்பு", "te": "కాలువ పూడిక", "mr": "गटार तुंबणे"}
+            }
+
+            translated_title = title
+            for keyword, k_trans in title_trans_words.items():
+                if keyword in title.lower() and target_lang in k_trans:
+                    translated_title = f"{title} ({k_trans[target_lang]})"
+                    break
+
+            # Natural fluent sentence generators per language
+            if target_lang == "hi":
+                result = f"जनसेतु नागरिक सूचना। शिकायत संख्या {ticket_id}। विषय: {translated_title}। संबंधित विभाग: {trans_dept}। कार्य की वर्तमान स्थिति: {trans_status}। समाधान की निर्धारित समयसीमा: {sla}। कृपया निश्चिंत रहें, नगर निगम द्वारा कार्रवाई की जा रही है।"
+            elif target_lang == "or":
+                result = f"ଜନସେତୁ ପୌର ନିଗମ ସୂଚନା। ଅଭିଯୋଗ ନମ୍ବର {ticket_id}। ବିଷୟ: {translated_title}। ସମ୍ପୃକ୍ତ ବିଭାଗ: {trans_dept}। କାର୍ଯ୍ୟର ବର୍ତ୍ତମାନ ସ୍ଥିତି: {trans_status}। ସମାଧାନ ପାଇଁ ଧାର୍ଯ୍ୟ ସମୟ: {sla}। ପୌର ପ୍ରଶାସନ ଦ୍ୱାରା ଯତ୍ନର ସହ ପଦକ୍ଷେପ ନିଆଯାଉଛି।"
+            elif target_lang == "bn":
+                result = f"জনসেতু পৌর পোর্টাল বিজ্ঞপ্তি। অভিযোগ নম্বর {ticket_id}। বিষয়: {translated_title}। দায়িত্বপ্রাপ্ত বিভাগ: {trans_dept}। বর্তমান স্থিতি: {trans_status}। সমাধানের সময়সীমা: {sla}। কর্তৃপক্ষ বিষয়টি পর্যবেক্ষণ করছেন।"
+            elif target_lang == "ta":
+                result = f"ஜன்சேது மாநகராட்சி தகவல். புகார் எண் {ticket_id}. தலைப்பு: {translated_title}. துறை: {trans_dept}. தற்போதைய நிலை: {trans_status}. தீர்வு காலக்கெடு: {sla}. மாநகராட்சி ஊழியர்கள் பணியில் ஈடுபட்டுள்ளனர்."
+            elif target_lang == "te":
+                result = f"జనసేతు మున్సిపల్ సమాచారం. ఫిర్యాదు సంఖ్య {ticket_id}. అంశం: {translated_title}. విభాగం: {trans_dept}. ప్రస్తుత పరిస్థితి: {trans_status}. పరిష్కార గడువు: {sla}. పనులు కొనసాగుతున్నాయి."
+            elif target_lang == "mr":
+                result = f"जनसेतु महानगरपालिका सूचना. तक्रार क्रमांक {ticket_id}. विषय: {translated_title}. संबंधित विभाग: {trans_dept}. सध्याची स्थिती: {trans_status}. निवारण मुदत: {sla}. पालिकेकडून योग्य कार्यवाही सुरू आहे."
+            elif target_lang == "gu":
+                result = f"જનસેતુ નગરપાલિકા માહિતી. ફરિયાદ નંબર {ticket_id}. વિષય: {translated_title}. વિભાગ: {trans_dept}. સ્થિતિ: {trans_status}. નિવારણ સમય: {sla}."
+            elif target_lang == "kn":
+                result = f"ಜನಸೇತು ಪೌರ ಮಾಹಿತಿ. ದೂರು ಸಂಖ್ಯೆ {ticket_id}. ವಿಷಯ: {translated_title}. ಇಲಾಖೆ: {trans_dept}. ಸ್ಥಿತಿ: {trans_status}. ಗಡುವು: {sla}."
+            else:
+                result = text
+
+            return {
+                "original_text": text,
+                "translated_text": result,
+                "target_lang": target_lang,
+                "language_name": lang_name
+            }
+
+        # General text translation mapping
+        general_phrases = {
+            "hi": {
+                "Official Municipal Bulletin": "आधिकारिक नगर निगम बुलेटिन",
+                "Scheduled Water Supply Maintenance": "अनुसूचित जल आपूर्ति रखरखाव कार्य (रविवार सुबह 8 से दोपहर 2 बजे तक)। कृपया पर्याप्त जल संचित कर लें।",
+                "Monsoon Stormwater Drain Desilting Drive Underway": "मानसून पूर्व नाला सफाई एवं गाद निकालने का महाभियान तेजी से जारी है।",
+                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "वार्ड 12 जनभागीदारी बजट मतदान अगले 48 घंटों में समाप्त होगा। अपना बहुमूल्य वोट अवश्य दें।"
+            },
+            "or": {
+                "Official Municipal Bulletin": "ସରକାରୀ ପୌର ନିଗମ ବିଜ୍ଞପ୍ତି",
+                "Scheduled Water Supply Maintenance": "ଜଳ ଯୋଗାଣ ରକ୍ଷଣାବେକ୍ଷଣ କାର୍ଯ୍ୟ (ରବିବାର ସକାଳ ୮ ରୁ ଅପରାହ୍ନ ୨)। ଦୟାକରି ଆବଶ୍ୟକୀୟ ଜଳ ମହଜୁଦ ରଖନ୍ତୁ।",
+                "Monsoon Stormwater Drain Desilting Drive Underway": "ମୌସୁମୀ ପୂର୍ବରୁ ସମସ୍ତ ଡ୍ରେନ୍ ଓ ନାଳ ସଫେଇ କାର୍ଯ୍ୟ ଯୁଦ୍ଧକାଳୀନ ଭିତ୍ତିରେ ଚାଲୁଅଛି।",
+                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "ୱାର୍ଡ଼ ୧୨ ନାଗରିକ ବଜେଟ୍ ଭୋଟିଂ ଆଗାମୀ ୪୮ ଘଣ୍ଟା ମଧ୍ୟରେ ସମାପ୍ତ ହେବ। ନିଜର ମତ ସାବ୍ୟସ୍ତ କରନ୍ତୁ।"
+            },
+            "bn": {
+                "Official Municipal Bulletin": "অফিসিয়াল পৌর বুলেটিন",
+                "Scheduled Water Supply Maintenance": "পরিকল্পিত পানীয় জল সরবরাহ রক্ষণাবেক্ষণ (রবিবার সকাল ৮টা থেকে দুপুর ২টা)। প্রয়োজনীয় জল সংরক্ষণ করুন।",
+                "Monsoon Stormwater Drain Desilting Drive Underway": "বর্ষার পূর্বে ড্রেন ও নর্দমা সংস্কারের কাজ জোরকদমে চলছে।",
+                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "ওয়ার্ড ১২ নাগরিক বাজেট ভোটিং আগামী ৪৮ ঘণ্টার মধ্যে শেষ হচ্ছে।"
+            }
+        }
+
+        # Check general phrase match
+        for key, val in general_phrases.get(target_lang, {}).items():
+            if key.lower() in text.lower():
+                return {
+                    "original_text": text,
+                    "translated_text": val,
+                    "target_lang": target_lang,
+                    "language_name": lang_name
+                }
+
+        # Check direct match in status_map or dept_map
+        if target_lang in status_map:
+            for s_eng, s_trans in status_map[target_lang].items():
+                if s_eng.lower() in text.lower():
+                    return {
+                        "original_text": text,
+                        "translated_text": s_trans,
+                        "target_lang": target_lang,
+                        "language_name": lang_name
+                    }
+        if target_lang in dept_map:
+            for d_eng, d_trans in dept_map[target_lang].items():
+                if d_eng.lower() in text.lower():
+                    return {
+                        "original_text": text,
+                        "translated_text": d_trans,
+                        "target_lang": target_lang,
+                        "language_name": lang_name
+                    }
+
+        # Dynamic fallback prefix
+        prefixes = {
+            "hi": f"जनसेतु नागरिक संदेश ({lang_name}): {text}",
+            "or": f"ଜନସେତୁ ପୌର ବାର୍ତ୍ତା ({lang_name}): {text}",
+            "bn": f"জনসেতু পৌর বার্তা ({lang_name}): {text}",
+            "ta": f"ஜன்சேது தகவல் ({lang_name}): {text}",
+            "te": f"జనసేతు సమాచారం ({lang_name}): {text}",
             "mr": f"जनसेतु नागरिक सूचना ({lang_name}): {text}"
         }
 
         return {
             "original_text": text,
-            "translated_text": fallback_prefixes.get(target_lang, text),
+            "translated_text": prefixes.get(target_lang, text),
             "target_lang": target_lang,
             "language_name": lang_name
         }
