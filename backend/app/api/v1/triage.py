@@ -7,7 +7,11 @@ from app.schemas.triage import (
     TriagePreviewRequest, 
     TriagePreviewResponse, 
     DuplicateCheckRequest, 
-    DuplicateCheckResponse
+    DuplicateCheckResponse,
+    TranslationRequest,
+    TranslationResponse,
+    GeocodeRequest,
+    GeocodeResponse
 )
 from app.services.ai_triage import AITriageService
 from app.services.duplicate_finder import DuplicateFinderService
@@ -44,3 +48,29 @@ def check_duplicates(
         radius_meters=request.radius_meters or 1000.0
     )
     return result
+
+
+@router.post("/translate", response_model=TranslationResponse)
+def translate_text(request: TranslationRequest) -> Any:
+    """
+    AI multilingual translation for civic voice narration and regional readability.
+    """
+    result = AITriageService.translate_text(
+        text=request.text,
+        target_lang=request.target_lang
+    )
+    return result
+
+
+@router.post("/geocode", response_model=GeocodeResponse)
+def geocode_location(request: GeocodeRequest) -> Any:
+    """
+    Resolves Odisha civic landmarks and coordinates for accurate map placement.
+    """
+    result = AITriageService.geocode_location(
+        query=request.query,
+        user_lat=request.latitude,
+        user_lng=request.longitude
+    )
+    return result
+

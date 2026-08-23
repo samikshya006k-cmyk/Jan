@@ -429,5 +429,33 @@ def test_ward_bulletins_and_new_static_files(client):
     assert create_b.json()["title"] == "Emergency Drain Silt Clearing Drive"
 
 
+def test_ai_translation_and_geocoding(client):
+    # 1. Test AI Translation to Hindi
+    trans_hi = client.post("/api/v1/triage/translate", json={
+        "text": "In Progress",
+        "target_lang": "hi"
+    })
+    assert trans_hi.status_code == 200
+    assert "प्रगति" in trans_hi.json()["translated_text"]
+
+    # 2. Test AI Translation to Odia
+    trans_or = client.post("/api/v1/triage/translate", json={
+        "text": "Resolved",
+        "target_lang": "or"
+    })
+    assert trans_or.status_code == 200
+    assert "ସମାଧାନ" in trans_or.json()["translated_text"]
+
+    # 3. Test Odisha Geocoding
+    geo_res = client.post("/api/v1/triage/geocode", json={
+        "query": "Saheed Nagar Main Road"
+    })
+    assert geo_res.status_code == 200
+    data = geo_res.json()
+    assert abs(data["latitude"] - 20.2894) < 0.01
+    assert abs(data["longitude"] - 85.8431) < 0.01
+
+
+
 
 

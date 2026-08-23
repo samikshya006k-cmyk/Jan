@@ -626,17 +626,38 @@ function handleDownloadCurrentReceipt() {
     JanSetuPDF.downloadCitizenReceipt(currentModalGrievanceDetail);
 }
 
-function handleVoiceReadoutModal() {
+async function handleVoiceReadoutModal() {
     if (!currentModalGrievanceDetail) return;
     const lang = document.getElementById("modalVoiceLangSelect")?.value || "en";
+    const transcriptBox = document.getElementById("modalVoiceTranscript");
     const g = currentModalGrievanceDetail;
-    const textMap = {
-        "en": `Grievance number ${g.ticket_id}. Title: ${g.title}. Department: ${g.category}. Current status: ${g.status}. Assigned contractor: ${g.contractor_name || 'Apex Civic Infra'}. Resolution target SLA: ${g.target_sla_date || '24 hours'}.`,
-        "hi": `शिकायत संख्या ${g.ticket_id}. शीर्षक: ${g.title}. श्रेणी: ${g.category}. वर्तमान स्थिति: ${g.status}. समाधान समयसीमा: ${g.target_sla_date || '24 घंटे'}.`,
-        "or": `ଅଭିଯୋଗ ନମ୍ବର ${g.ticket_id}. ଶୀର୍ଷକ: ${g.title}. ବିଭାଗ: ${g.category}. ବର୍ତ୍ତମାନ ସ୍ଥିତି: ${g.status}. ସମାଧାନ ସମୟ: ${g.target_sla_date || '24 ଘଣ୍ଟା'}.`,
-        "bn": `অভিযোগ নম্বর ${g.ticket_id}। শিরোনাম: ${g.title}। বিভাগ: ${g.category}। বর্তমান অবস্থা: ${g.status}।`
-    };
-    JanSetuAPI.speakText(textMap[lang] || textMap["en"], lang);
+
+    const baseText = `Grievance number ${g.ticket_id}. Title: ${g.title}. Department: ${g.category}. Current status: ${g.status}. Assigned contractor: ${g.contractor_name || 'Apex Civic Infra Ltd.'}. Resolution target SLA: ${g.target_sla_date || '24 hours'}.`;
+
+    if (transcriptBox) {
+        transcriptBox.style.display = "block";
+        transcriptBox.innerHTML = `<em>🌐 Translating with JanSetu AI...</em>`;
+    }
+
+    try {
+        let spokenText = baseText;
+        if (lang !== "en" && JanSetuAPI.translateText) {
+            const transRes = await JanSetuAPI.translateText(baseText, lang);
+            spokenText = transRes.translated_text || baseText;
+        }
+
+        if (transcriptBox) {
+            transcriptBox.innerHTML = `<strong>🗣️ AI Voice Transcript (${lang.toUpperCase()}):</strong><br>${spokenText}`;
+        }
+
+        JanSetuAPI.speakText(spokenText, lang);
+    } catch (e) {
+        console.warn("Translation error:", e);
+        if (transcriptBox) {
+            transcriptBox.innerHTML = `<strong>🗣️ AI Voice Transcript:</strong><br>${baseText}`;
+        }
+        JanSetuAPI.speakText(baseText, "en");
+    }
 }
 
 function closeDetails() {

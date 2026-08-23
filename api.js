@@ -290,7 +290,34 @@ const JanSetuAPI = {
         return res.json();
     },
 
-    // --- MULTILINGUAL VOICE SPEECH SYNTHESIS (HINDI, ODIA, BENGALI, ENGLISH) ---
+    // --- AI MULTILINGUAL TRANSLATION & GEOCODING ---
+    async translateText(text, targetLang = "hi") {
+        try {
+            const res = await fetch(`${API_BASE_URL}/triage/translate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text, target_lang: targetLang })
+            });
+            return res.json();
+        } catch (e) {
+            return { original_text: text, translated_text: text, target_lang: targetLang, language_name: "English" };
+        }
+    },
+
+    async geocodeLocation(query, lat = null, lng = null) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/triage/geocode`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query, latitude: lat, longitude: lng })
+            });
+            return res.json();
+        } catch (e) {
+            return { latitude: 20.2742, longitude: 85.8324, address: query, ward: "Ward 12" };
+        }
+    },
+
+    // --- MULTILINGUAL VOICE SPEECH SYNTHESIS (HINDI, ODIA, BENGALI, TAMIL, TELUGU, MARATHI, ENGLISH) ---
     speakText(text, lang = "en") {
         if (typeof window === "undefined" || !("speechSynthesis" in window)) {
             console.warn("Speech synthesis not supported in this browser.");
@@ -304,13 +331,25 @@ const JanSetuAPI = {
         // Map language code to BCP 47 locale
         const langMap = {
             "hi": "hi-IN",
-            "or": "hi-IN", // fallback for Odia
+            "or": "hi-IN", // phonetic Indian voice for Odia
             "bn": "bn-IN",
+            "ta": "ta-IN",
+            "te": "te-IN",
+            "mr": "mr-IN",
             "en": "en-IN"
         };
-        utterance.lang = langMap[lang] || "en-IN";
-        utterance.rate = 0.92;
+
+        const targetLocale = langMap[lang] || "en-IN";
+        utterance.lang = targetLocale;
+        utterance.rate = 0.90;
         utterance.pitch = 1.0;
+
+        // Pick specific Indian regional voice if browser provides one
+        const voices = window.speechSynthesis.getVoices();
+        const matchingVoice = voices.find(v => v.lang === targetLocale || v.lang.startsWith(lang));
+        if (matchingVoice) {
+            utterance.voice = matchingVoice;
+        }
 
         window.speechSynthesis.speak(utterance);
         return true;

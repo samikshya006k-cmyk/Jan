@@ -45,13 +45,24 @@ def create_grievance(
     ticket_id = generate_ticket_id(db)
     title = grievance_in.title or (grievance_in.description[:60].strip() + "...")
 
+    # Accurate Geocoding for Map Pinning
+    geo_res = AITriageService.geocode_location(
+        query=f"{grievance_in.landmark or ''} {grievance_in.address or ''} {grievance_in.title or ''}",
+        user_lat=grievance_in.latitude,
+        user_lng=grievance_in.longitude
+    )
+    final_lat = geo_res["latitude"]
+    final_lng = geo_res["longitude"]
+    final_ward = grievance_in.ward or geo_res.get("ward") or current_user.ward or "Ward 12"
+    final_addr = grievance_in.address or geo_res.get("address") or "Bhubaneswar Central Zone"
+
     # Check for potential duplicates to calculate initial community impact count
     dup_analysis = DuplicateFinderService.find_duplicates(
         db=db,
         description=grievance_in.description,
         category=ai_result["category"],
-        latitude=grievance_in.latitude,
-        longitude=grievance_in.longitude
+        latitude=final_lat,
+        longitude=final_lng
     )
 
     impact_count = dup_analysis.get("cluster_size", 0) + 1
@@ -64,11 +75,11 @@ def create_grievance(
         status=GrievanceStatus.PENDING.value,
         priority=ai_result["priority"],
         language=grievance_in.language or "en",
-        latitude=grievance_in.latitude,
-        longitude=grievance_in.longitude,
-        address=grievance_in.address,
-        landmark=grievance_in.landmark,
-        ward=grievance_in.ward or current_user.ward or "Ward 12",
+        latitude=final_lat,
+        longitude=final_lng,
+        address=final_addr,
+        landmark=grievance_in.landmark or final_addr,
+        ward=final_ward,
         department=ai_result["suggested_department"],
         ai_confidence=ai_result["confidence"],
         ai_summary=ai_result["summary"],

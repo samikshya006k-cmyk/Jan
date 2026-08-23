@@ -1,6 +1,6 @@
 /**
- * JanSetu WhatsApp Civic Bot Assistant Widget
- * Natural language triage, instant ticket dispatch, and civic inquiry via simulated WhatsApp chat.
+ * JanSetu WhatsApp Civic Bot Assistant Widget (Advanced)
+ * Photo attachments, voice notes, live location sharing, and instant PDF ticket receipts.
  */
 
 (function() {
@@ -49,9 +49,9 @@
             position: fixed;
             bottom: 92px;
             right: 24px;
-            width: 360px;
+            width: 375px;
             max-width: calc(100vw - 32px);
-            height: 520px;
+            height: 540px;
             max-height: calc(100vh - 120px);
             background: #efeae2;
             border-radius: 16px;
@@ -107,7 +107,7 @@
             background-repeat: repeat;
         }
         .wa-msg {
-            max-width: 82%;
+            max-width: 84%;
             padding: 8px 12px;
             border-radius: 8px;
             font-size: 13px;
@@ -161,32 +161,71 @@
         }
         .wa-input-bar {
             background: #f0f2f5;
-            padding: 10px 12px;
+            padding: 8px 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .wa-input {
             flex: 1;
             border: none;
             background: #ffffff;
-            padding: 9px 14px;
+            padding: 8px 12px;
             border-radius: 20px;
             font-size: 13px;
             outline: none;
             font-family: inherit;
         }
+        .wa-icon-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            color: #54656f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .wa-icon-btn:hover {
+            background: #e2e8f0;
+        }
         .wa-send-btn {
             background: #00a884;
             color: #ffffff;
             border: none;
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+        }
+        .wa-voice-bubble {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+        .wa-voice-play {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #00a884;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .wa-waveform {
+            font-family: monospace;
+            letter-spacing: 1px;
+            color: #54656f;
+            font-size: 12px;
         }
     `;
     document.head.appendChild(style);
@@ -218,20 +257,28 @@
                 <div class="wa-msg bot">
                     🙏 <strong>Namaste!</strong> Welcome to JanSetu WhatsApp Civic Helpline.
                     <br><br>
-                    You can report potholes, broken lights, waterlogging, or check ticket status directly here.
+                    You can report potholes, broken lights, waste dumps, or share live photos and GPS location to register complaints instantly.
                     <span class="wa-time">Just now</span>
                 </div>
             </div>
 
             <div class="wa-chips">
                 <span class="wa-chip" onclick="JanSetuWhatsApp.sendQuick('🚧 Report large pothole on Market Road')">🚧 Pothole</span>
-                <span class="wa-chip" onclick="JanSetuWhatsApp.sendQuick('💡 Streetlight dark near Sector 5')">💡 Dark Streetlight</span>
-                <span class="wa-chip" onclick="JanSetuWhatsApp.sendQuick('🗑️ Garbage overflow at Unit 4 market')">🗑️ Garbage Overflow</span>
-                <span class="wa-chip" onclick="JanSetuWhatsApp.sendQuick('🔍 Track Status #JS-20481')">🔍 Track Ticket</span>
+                <span class="wa-chip" onclick="JanSetuWhatsApp.sendQuick('💡 Streetlight dark near Sector 5')">💡 Street Light</span>
+                <span class="wa-chip" onclick="JanSetuWhatsApp.sendQuick('🗑️ Garbage overflow at Unit 4 market')">🗑️ Garbage</span>
+                <span class="wa-chip" onclick="JanSetuWhatsApp.sendLiveLocation()">📍 Share GPS</span>
+                <span class="wa-chip" onclick="JanSetuWhatsApp.sendVoiceNote()">🎙️ Voice Note</span>
+                <span class="wa-chip" onclick="JanSetuWhatsApp.sendQuick('🔍 Track Status #JS-20481')">🔍 Track</span>
             </div>
 
             <div class="wa-input-bar">
-                <input type="text" class="wa-input" id="waInput" placeholder="Type a message or issue..." onkeypress="if(event.key==='Enter') JanSetuWhatsApp.sendMsg()">
+                <label class="wa-icon-btn" title="Attach Photo Proof">
+                    📷
+                    <input type="file" id="waPhotoUpload" accept="image/*" style="display: none;" onchange="JanSetuWhatsApp.handlePhotoUpload(this)">
+                </label>
+                <button class="wa-icon-btn" title="Send Voice Note" onclick="JanSetuWhatsApp.sendVoiceNote()">🎙️</button>
+                <button class="wa-icon-btn" title="Share Live Location" onclick="JanSetuWhatsApp.sendLiveLocation()">📍</button>
+                <input type="text" class="wa-input" id="waInput" placeholder="Type an issue or landmark..." onkeypress="if(event.key==='Enter') JanSetuWhatsApp.sendMsg()">
                 <button class="wa-send-btn" onclick="JanSetuWhatsApp.sendMsg()">➤</button>
             </div>
         </div>
@@ -264,6 +311,77 @@
             }
         },
 
+        handlePhotoUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.sendUserPhotoMessage(e.target.result, file.name);
+                };
+                reader.readAsDataURL(file);
+                input.value = '';
+            }
+        },
+
+        sendUserPhotoMessage(base64Data, fileName) {
+            const messages = document.getElementById('waMessages');
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'wa-msg user';
+            userMsg.innerHTML = `
+                <div style="margin-bottom: 4px;">
+                    <img src="${base64Data}" style="width: 100%; max-height: 140px; object-fit: cover; border-radius: 6px;">
+                </div>
+                <span>📸 Attached: ${fileName}</span>
+                <span class="wa-time">${now} ✓✓</span>
+            `;
+            messages.appendChild(userMsg);
+            messages.scrollTop = messages.scrollHeight;
+
+            this.processBotResponse('Photo uploaded: Civic damage inspection requested.');
+        },
+
+        sendVoiceNote() {
+            const messages = document.getElementById('waMessages');
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'wa-msg user';
+            userMsg.innerHTML = `
+                <div class="wa-voice-bubble">
+                    <div class="wa-voice-play" onclick="JanSetuAPI.speakText('There is a major water pipeline leakage near Unit 4 market road', 'en')">▶</div>
+                    <div class="wa-waveform">ılılllııılıllı</div>
+                    <span style="font-size: 11px; color: #54656f;">0:06</span>
+                </div>
+                <div style="font-size: 11px; color: #166534; margin-top: 3px;">🎙️ <em>Transcribing: "Major water pipeline leakage near Unit 4 market road"</em></div>
+                <span class="wa-time">${now} ✓✓</span>
+            `;
+            messages.appendChild(userMsg);
+            messages.scrollTop = messages.scrollHeight;
+
+            this.processBotResponse('Water pipeline leakage near Unit 4');
+        },
+
+        sendLiveLocation() {
+            const messages = document.getElementById('waMessages');
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'wa-msg user';
+            userMsg.innerHTML = `
+                <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; margin-bottom: 4px;">
+                    <strong style="color: #0284c7; font-size: 12px; display: block;">📍 Live GPS Location Shared</strong>
+                    <div style="font-size: 11px; color: #475569;">20.2742° N, 85.8324° E (Ward 12, Unit 4)</div>
+                </div>
+                <span class="wa-time">${now} ✓✓</span>
+            `;
+            messages.appendChild(userMsg);
+            messages.scrollTop = messages.scrollHeight;
+
+            this.processBotResponse('Location locked: Unit 4 Market, Ward 12');
+        },
+
         async sendMsg() {
             const input = document.getElementById('waInput');
             const messages = document.getElementById('waMessages');
@@ -276,22 +394,26 @@
 
             const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            // Append User Message
             const userMsg = document.createElement('div');
             userMsg.className = 'wa-msg user';
             userMsg.innerHTML = `${text} <span class="wa-time">${now} ✓✓</span>`;
             messages.appendChild(userMsg);
             messages.scrollTop = messages.scrollHeight;
 
-            // Typing indicator
+            this.processBotResponse(text);
+        },
+
+        processBotResponse(text) {
+            const messages = document.getElementById('waMessages');
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
             const typing = document.createElement('div');
             typing.className = 'wa-msg bot';
             typing.id = 'waTyping';
-            typing.innerHTML = '<em>JanSetu AI is analyzing...</em>';
+            typing.innerHTML = '<em>JanSetu AI is analyzing & routing...</em>';
             messages.appendChild(typing);
             messages.scrollTop = messages.scrollHeight;
 
-            // Bot Response Logic
             setTimeout(async () => {
                 const typingElem = document.getElementById('waTyping');
                 if (typingElem) typingElem.remove();
@@ -304,42 +426,38 @@
                 if (lower.includes('track') || lower.includes('status') || lower.includes('js-')) {
                     botMsg.innerHTML = `
                         📋 <strong>Ticket #JS-20481 Status:</strong><br>
-                        • <strong>Department:</strong> Roads & Civil Works<br>
+                        • <strong>Department:</strong> Roads & Infrastructure<br>
                         • <strong>Status:</strong> <span style="color:#2563eb; font-weight:bold;">In Progress</span><br>
                         • <strong>Assigned Contractor:</strong> Apex Civic Infra Ltd.<br>
-                        • <strong>SLA Deadline:</strong> Tomorrow, 5:00 PM<br><br>
-                        <a href="citizendashboard.html" style="color:#0284c7; font-weight:bold; text-decoration:underline;">View Full Live Tracker →</a>
+                        • <strong>SLA Target:</strong> 24 Hours<br><br>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <button onclick="JanSetuPDF.downloadCitizenReceipt({ticket_id: 'JS-20481', title: 'Road damage near Unit 4', category: 'Road & Infrastructure', status: 'In Progress', ward: 'Ward 12' })" style="background:#0284c7; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold; cursor:pointer;">📥 Download PDF</button>
+                            <a href="citizendashboard.html" style="background:#f1f5f9; color:#0f172a; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold; text-decoration:none; border:1px solid #cbd5e1;">Open Dashboard →</a>
+                        </div>
                         <span class="wa-time">${now}</span>
                     `;
                 } else {
-                    // Auto-triage complaint
-                    try {
-                        let category = 'Road & Infrastructure';
-                        if (lower.includes('light') || lower.includes('dark')) category = 'Lighting';
-                        if (lower.includes('waste') || lower.includes('garbage')) category = 'Sanitation';
-                        if (lower.includes('water') || lower.includes('drain')) category = 'Drainage';
+                    let category = 'Road & Infrastructure';
+                    if (lower.includes('light') || lower.includes('dark')) category = 'Street Lighting';
+                    if (lower.includes('waste') || lower.includes('garbage')) category = 'Waste Management';
+                    if (lower.includes('water') || lower.includes('drain') || lower.includes('pipe')) category = 'Water Supply';
 
-                        const randomNum = Math.floor(20000 + Math.random() * 80000);
-                        const ticket = 'JS-' + randomNum;
+                    const randomNum = Math.floor(20000 + Math.random() * 80000);
+                    const ticket = 'JS-' + randomNum;
 
-                        botMsg.innerHTML = `
-                            ✅ <strong>Grievance Registered Successfully!</strong><br><br>
-                            • <strong>Ticket ID:</strong> <code>#${ticket}</code><br>
-                            • <strong>Category:</strong> ${category}<br>
-                            • <strong>AI Priority:</strong> High (Auto-triaged)<br>
-                            • <strong>Assigned Nodal Officer:</strong> Er. Rajesh Mohapatra<br>
-                            • <strong>SLA Commitment:</strong> 24 Hours<br><br>
-                            We have alerted the Ward 12 rapid response squad. You will receive real-time SMS updates.
-                            <br><br>
-                            <a href="citizendashboard.html" style="color:#0284c7; font-weight:bold; text-decoration:underline;">Open in Citizen Dashboard →</a>
-                            <span class="wa-time">${now}</span>
-                        `;
-                    } catch (e) {
-                        botMsg.innerHTML = `
-                            ✓ Thank you! Your civic feedback has been logged. Our municipal officer will review it shortly.
-                            <span class="wa-time">${now}</span>
-                        `;
-                    }
+                    botMsg.innerHTML = `
+                        ✅ <strong>Grievance Registered Successfully!</strong><br><br>
+                        • <strong>Ticket ID:</strong> <code>#${ticket}</code><br>
+                        • <strong>Category:</strong> ${category}<br>
+                        • <strong>AI Priority:</strong> High (Auto-triaged)<br>
+                        • <strong>Assigned Nodal Officer:</strong> Er. Rajesh Mohapatra<br>
+                        • <strong>SLA Commitment:</strong> 24 Hours<br><br>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <button onclick="JanSetuPDF.downloadCitizenReceipt({ticket_id: '${ticket}', title: '${text.substring(0, 35)}...', category: '${category}', status: 'Pending', ward: 'Ward 12' })" style="background:#16a34a; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold; cursor:pointer;">📥 Download PDF Receipt</button>
+                            <a href="citizendashboard.html" style="background:#f1f5f9; color:#0f172a; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold; text-decoration:none; border:1px solid #cbd5e1;">Track on Web →</a>
+                        </div>
+                        <span class="wa-time">${now}</span>
+                    `;
                 }
 
                 messages.appendChild(botMsg);

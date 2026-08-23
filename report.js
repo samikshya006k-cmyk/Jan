@@ -1557,6 +1557,27 @@ async function initReportLocationPicker() {
         });
     }
 
+    if (locationInput) {
+        let geocodeTimer;
+        locationInput.addEventListener("input", function() {
+            clearTimeout(geocodeTimer);
+            geocodeTimer = setTimeout(async () => {
+                const query = locationInput.value.trim();
+                if (query.length >= 3 && typeof JanSetuAPI !== "undefined" && JanSetuAPI.geocodeLocation) {
+                    const geo = await JanSetuAPI.geocodeLocation(query);
+                    if (geo && geo.latitude && geo.longitude) {
+                        currentReportLat = parseFloat(geo.latitude.toFixed(5));
+                        currentReportLng = parseFloat(geo.longitude.toFixed(5));
+                        if (coordDisplay) coordDisplay.textContent = `Coordinates: ${currentReportLat}° N, ${currentReportLng}° E (${geo.address || 'Matched Location'})`;
+                        if (locationPicker && locationPicker.setPosition) {
+                            locationPicker.setPosition(currentReportLat, currentReportLng);
+                        }
+                    }
+                }
+            }, 500);
+        });
+    }
+
     if (gpsBtn) {
         gpsBtn.addEventListener("click", function() {
             if (navigator.geolocation) {

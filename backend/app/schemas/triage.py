@@ -45,3 +45,29 @@ class DuplicateCheckResponse(BaseModel):
     potential_matches: List[DuplicateMatch] = []
     cluster_size: int = 0
     estimated_impact_multiplier: int = 1
+
+
+class TranslationRequest(BaseModel):
+    text: str
+    target_lang: str = "hi"
+
+
+class TranslationResponse(BaseModel):
+    original_text: str
+    translated_text: str
+    target_lang: str
+    language_name: str
+
+
+class GeocodeRequest(BaseModel):
+    query: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+
+
+class GeocodeResponse(BaseModel):
+    latitude: float
+    longitude: float
+    address: str
+    ward: str
+
