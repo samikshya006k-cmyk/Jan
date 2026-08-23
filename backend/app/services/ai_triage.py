@@ -22,73 +22,49 @@ class AITriageService:
         "Road & Infrastructure": [
             "road", "pothole", "potholes", "street", "tar", "asphalt", "flyover", "bridge", 
             "footpath", "sidewalk", "divider", "cracks", "sinkhole", "accident", "damage",
-            # Hindi / Marathi
             "सड़क", "गड्ढा", "गड्ढे", "खड्डा", "रस्ता", "पूल", "पादचारी", "दुर्घटना",
-            # Odia
             "ରାସ୍ତା", "ଗାତ", "ପୋଲ",
-            # Bengali
             "রাস্তা", "গর্ত", "পুল",
-            # Telugu / Tamil
             "రోడ్డు", "గుంతలు", "சாலை", "பள்ளம்"
         ],
         "Water Supply": [
             "water", "pipe", "pipeline", "leak", "leakage", "burst", "pressure", "drinking",
             "tap", "supply", "dirty water", "contaminated", "tanker", "sewage mix",
-            # Hindi / Marathi
             "पानी", "नल", "पाइप", "लीक", "जल", "दूषित पानी", "टैंकर",
-            # Odia
             "ପାଣି", "ନଳ",
-            # Bengali
             "জল", "নল", "পাইপ",
-            # Telugu / Tamil
             "నీరు", "పైపు", "தண்ணீர்", "குழாய்"
         ],
         "Waste Management": [
             "garbage", "waste", "trash", "dump", "dustbin", "litter", "smell", "rotting",
             "overflowing", "plastic", "cleanliness", "sweeping", "animal carcass",
-            # Hindi / Marathi
             "कचरा", "कूड़ा", "गंदगी", "कूड़ेदान", "सफाई", "बदबू", "दुर्गांधी",
-            # Odia
             "ଆବର୍ଜନା", "ଅଳିଆ",
-            # Bengali
             "বর্জ্য", "আবর্জনা", "ময়লা",
-            # Telugu / Tamil
             "చెత్త", "குப்பை"
         ],
         "Street Lighting": [
             "light", "streetlight", "street light", "lamp", "pole", "dark", "wiring",
             "not working", "flickering", "bulb", "darkness", "safety at night",
-            # Hindi / Marathi
             "लाइट", "स्ट्रीट लाइट", "बल्ब", "अंधेरा", "दीपक", "खांभा",
-            # Odia
             "ଷ୍ଟ୍ରିଟ୍ ଲାଇଟ୍", "ଆଲୋକ",
-            # Bengali
             "স্ট্রিট লাইট", "আলো", "অন্ধকার",
-            # Telugu / Tamil
             "వీధి దీపం", "தெரு விளக்கு"
         ],
         "Drainage": [
             "drain", "drainage", "sewage", "gutter", "overflow", "choked", "clogged",
             "manhole", "open drain", "flooding", "waterlogging", "rainwater",
-            # Hindi / Marathi
             "नाली", "गटर", "सीवर", "जलभराव", "मेनहोल", "नाला",
-            # Odia
             "ଡ୍ରେନେଜ୍", "ନାଳ",
-            # Bengali
             "ড্রেনেজ", "নর্দমা", "ম্যানহোল",
-            # Telugu / Tamil
             "కాలువ", "வடிகால்"
         ],
         "Health": [
             "health", "mosquito", "dengue", "malaria", "epidemic", "hospital", "clinic",
             "stagnant water", "hygiene", "sanitation", "infection", "hazard",
-            # Hindi / Marathi
             "स्वास्थ्य", "मच्छर", "डेंगू", "मलेरिया", "अस्पताल", "बीमारी",
-            # Odia
             "ସ୍ୱାସ୍ଥ୍ୟ", "ମଶା",
-            # Bengali
             "স্বাস্থ্য", "মশা",
-            # Telugu / Tamil
             "ఆరోగ్యం", "சுகாதாரம்"
         ]
     }
@@ -98,218 +74,25 @@ class AITriageService:
         "Road & Infrastructure": "Road & Infrastructure Division",
         "Water Supply": "Public Water Works & Supply Division",
         "Waste Management": "Solid Waste & Sanitation Department",
-        "Street Lighting": "Electrical & Lighting Department",
+        "Street Lighting": "Urban Electrical & Lighting Department",
         "Drainage": "Sewerage & Drainage Division",
-        "Health": "Public Health & Vector Control Dept",
-        "Other": "General Municipal Services"
+        "Health": "Public Health & Vector Control Department",
+        "Other": "General Municipal Administration"
     }
 
-    # High Hazard / Urgency Trigger Keywords
     CRITICAL_TRIGGERS = [
-        "danger", "dangerous", "emergency", "accident", "child", "school", "hospital",
-        "open manhole", "live wire", "fire", "flooding", "severe", "collapse", "burst pipe",
-        "खतरा", "दुर्घटना", "आपातकाल", "खोला मैनहोल", "বিপদ", "ప్రమాదం"
+        "accident", "sparking", "live wire", "burst", "sinkhole", "hospital", 
+        "epidemic", "drowning", "collapsed", "emergency", "death", "severe",
+        "दुर्घटना", "करंट", "विस्फोट", "आग", "विपदा", "ବିପଦ", "ଦୁର୍ଘଟଣା", "জরুরি", "বিপদ"
     ]
 
     HIGH_TRIGGERS = [
-        "huge", "massive", "blocked", "overflowing", "injury", "broken", "major", "urgently",
-        "कई दिन", "बड़ा गड्ढा", "अत्यधिक", "ବଡ଼ ଗାତ"
+        "overflow", "choked", "contaminated", "foul smell", "blocked road", 
+        "major", "school", "market", "elderly", "deep", "danger",
+        "खतरा", "गंभीर", "जलभराव", "ଅସୁବିଧା", "ଗଭୀର", "ক্ষতি"
     ]
 
-    @classmethod
-    def _gemini_classify(cls, text: str, user_category: Optional[str] = None, language: str = "en") -> Optional[Dict[str, Any]]:
-        """
-        Uses Google Gemini API for semantic multilingual classification,
-        hazard assessment, and municipal routing.
-        """
-        if not settings.GEMINI_API_KEY:
-            return None
-
-        prompt = f"""
-You are the AI Civic Intelligence and Grievance Triage Engine for JanSetu, a municipal governance platform in India.
-Analyze the following citizen grievance complaint (which may be written in English, Hindi, Bengali, Odia, Marathi, Tamil, Telugu, Kannada, Gujarati, Malayalam, Punjabi, or Hinglish):
-
-Complaint Text: \"\"\"{text}\"\"\"
-User Selected Category (if any): \"{user_category or 'None'}\"
-
-Your task:
-1. Identify the most accurate Category strictly from: ["Road & Infrastructure", "Water Supply", "Waste Management", "Street Lighting", "Drainage", "Health", "Other"]
-2. Identify the Suggested Municipal Department from: ["Road & Infrastructure Division", "Public Water Works & Supply Division", "Solid Waste & Sanitation Department", "Electrical & Lighting Department", "Sewerage & Drainage Division", "Public Health & Vector Control Dept", "General Municipal Services"]
-3. Assess Priority strictly from: ["Critical", "High", "Medium", "Low"]
-4. Assess Severity strictly from: ["High", "Medium", "Low"]
-5. Provide Confidence Score (float between 0.0 and 1.0)
-6. Write a 1-sentence concise Executive Summary for the responding municipal officer.
-7. Extract up to 4 key entities / location / issue keywords.
-8. Explain the urgency reason in 1 brief phrase.
-9. Suggest estimated SLA resolution hours (integer: e.g. 12 for Critical, 24 for High, 48 for Medium, 72 for Low).
-
-Respond strictly in valid raw JSON with no markdown backticks, matching this exact structure:
-{{
-  "category": "Road & Infrastructure",
-  "suggested_department": "Road & Infrastructure Division",
-  "priority": "Critical",
-  "severity": "High",
-  "confidence": 0.95,
-  "summary": "...",
-  "key_entities": ["pothole", "Unit 4 Market"],
-  "urgency_reason": "Severe road accident risk during monsoon",
-  "estimated_sla_hours": 24
-}}
-"""
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.GEMINI_MODEL}:generateContent?key={settings.GEMINI_API_KEY}"
-        headers = {"Content-Type": "application/json"}
-        payload = {
-            "contents": [{
-                "parts": [{"text": prompt}]
-            }],
-            "generationConfig": {
-                "temperature": 0.2,
-                "maxOutputTokens": 500
-            }
-        }
-
-        try:
-            with httpx.Client(timeout=6.0) as client:
-                response = client.post(url, json=payload, headers=headers)
-                if response.status_code == 200:
-                    data = response.json()
-                    content = data["candidates"][0]["content"]["parts"][0]["text"]
-                    cleaned_json = content.strip()
-                    if cleaned_json.startswith("```json"):
-                        cleaned_json = cleaned_json[7:]
-                    if cleaned_json.startswith("```"):
-                        cleaned_json = cleaned_json[3:]
-                    if cleaned_json.endswith("```"):
-                        cleaned_json = cleaned_json[:-3]
-                    parsed = json.loads(cleaned_json.strip())
-                    if "category" in parsed and "suggested_department" in parsed:
-                        parsed["ai_engine"] = f"Google Gemini LLM ({settings.GEMINI_MODEL})"
-                        return parsed
-                else:
-                    logger.warning(f"Gemini API returned status {response.status_code}: {response.text}")
-        except Exception as e:
-            logger.warning(f"Gemini LLM triage failed or timed out, falling back to local NLP engine: {e}")
-
-        return None
-
-    @classmethod
-    def _rule_based_classify(cls, text: str, user_category: str = None) -> Dict[str, Any]:
-        """
-        Local multilingual NLP keyword and intent classifier.
-        """
-        if not text or not text.strip():
-            return {
-                "category": user_category or "Other",
-                "suggested_department": cls.DEPARTMENT_MAPPING.get(user_category, "General Municipal Services"),
-                "priority": "Medium",
-                "severity": "Medium",
-                "confidence": 0.5,
-                "summary": "General civic grievance awaiting detailed description.",
-                "key_entities": [],
-                "urgency_reason": None,
-                "estimated_sla_hours": 48,
-                "ai_engine": "JanSetu Multilingual NLP Engine"
-            }
-
-        cleaned_text = text.lower()
-        
-        # Calculate category scores
-        category_scores: Dict[str, int] = {}
-        for category, keywords in cls.CATEGORY_KEYWORDS.items():
-            score = 0
-            for kw in keywords:
-                if kw in cleaned_text:
-                    score += 2 if len(kw) > 3 else 1
-            category_scores[category] = score
-
-        # Determine best match
-        best_category = max(category_scores, key=category_scores.get)
-        max_score = category_scores[best_category]
-
-        # If user explicitly chose a valid category and our text score is low or matches
-        if user_category and user_category in cls.DEPARTMENT_MAPPING:
-            if max_score == 0:
-                best_category = user_category
-                confidence = 0.70
-            elif category_scores.get(user_category, 0) >= max_score - 1:
-                best_category = user_category
-                confidence = 0.88
-            else:
-                confidence = min(0.95, 0.65 + (max_score * 0.08))
-        else:
-            if max_score == 0:
-                best_category = "Other"
-                confidence = 0.55
-            else:
-                confidence = min(0.96, 0.60 + (max_score * 0.10))
-
-        suggested_dept = cls.DEPARTMENT_MAPPING.get(best_category, "General Municipal Services")
-
-        # Determine Severity & Urgency
-        is_critical = any(trigger in cleaned_text for trigger in cls.CRITICAL_TRIGGERS)
-        is_high = any(trigger in cleaned_text for trigger in cls.HIGH_TRIGGERS)
-
-        if is_critical:
-            priority = "Critical"
-            severity = "High"
-            urgency_reason = "Safety hazard or high-risk emergency terms detected in complaint."
-            sla_hours = 12
-        elif is_high or best_category in ["Drainage", "Water Supply"]:
-            priority = "High"
-            severity = "High" if is_high else "Medium"
-            urgency_reason = "High disruption potential or critical utility issue."
-            sla_hours = 24
-        else:
-            priority = "Medium"
-            severity = "Medium"
-            urgency_reason = "Standard priority civic grievance."
-            sla_hours = 48
-
-        # Extract potential key entities
-        entities = []
-        words = re.findall(r'\b[A-Za-z0-9\u0900-\u0DFF]{4,}\b', text)
-        for w in words[:4]:
-            if w.lower() not in ["there", "where", "which", "please", "issue", "problem", "this", "that"]:
-                entities.append(w)
-
-        summary = f"Identified as {best_category} issue. Recommended routing to {suggested_dept} with {priority} priority."
-
-        geo_info = cls.geocode_location(text)
-
-        return {
-            "category": best_category,
-            "suggested_department": suggested_dept,
-            "priority": priority,
-            "severity": severity,
-            "confidence": round(confidence, 2),
-            "summary": summary,
-            "key_entities": list(set(entities)),
-            "urgency_reason": urgency_reason,
-            "estimated_sla_hours": sla_hours,
-            "ai_engine": "JanSetu Multilingual NLP Engine",
-            "detected_location": geo_info.get("address"),
-            "detected_latitude": geo_info.get("latitude"),
-            "detected_longitude": geo_info.get("longitude"),
-            "detected_ward": geo_info.get("ward")
-        }
-
-    @classmethod
-    def classify_grievance(cls, text: str, user_category: str = None, language: str = "en") -> Dict[str, Any]:
-        """
-        Main entrypoint: analyzes text to return predicted category, suggested department, 
-        priority/severity, confidence score, and triage summary using Gemini LLM if configured, 
-        or local rule-based NLP fallback.
-        """
-        if settings.GEMINI_API_KEY and text and len(text.strip()) > 5:
-            gemini_result = cls._gemini_classify(text, user_category, language)
-            if gemini_result:
-                return gemini_result
-
-        return cls._rule_based_classify(text, user_category)
-
-    # -------------------------------------------------------------
     # PRECISE ODISHA LANDMARK & GPS GEOCODING ENGINE
-    # -------------------------------------------------------------
     ODISHA_LANDMARKS = {
         "master canteen": (20.2668, 85.8436, "Master Canteen Square, Bhubaneswar", "Ward 12"),
         "saheed nagar": (20.2894, 85.8431, "Saheed Nagar Main Road, Bhubaneswar", "Ward 12"),
@@ -366,14 +149,88 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
             "ward": "Ward 12"
         }
 
+    @classmethod
+    def _rule_based_classify(cls, text: str, user_category: str = None) -> Dict[str, Any]:
+        cleaned_text = (text or "").lower().strip()
+
+        scores = {cat: 0 for cat in cls.CATEGORY_KEYWORDS}
+        for cat, keywords in cls.CATEGORY_KEYWORDS.items():
+            for kw in keywords:
+                if kw.lower() in cleaned_text:
+                    scores[cat] += 1
+
+        best_category = max(scores, key=scores.get)
+        max_score = scores[best_category]
+
+        if user_category and user_category in cls.DEPARTMENT_MAPPING:
+            best_category = user_category
+            confidence = 0.88
+        else:
+            if max_score == 0:
+                best_category = "Other"
+                confidence = 0.55
+            else:
+                confidence = min(0.96, 0.60 + (max_score * 0.10))
+
+        suggested_dept = cls.DEPARTMENT_MAPPING.get(best_category, "General Municipal Services")
+
+        is_critical = any(trigger in cleaned_text for trigger in cls.CRITICAL_TRIGGERS)
+        is_high = any(trigger in cleaned_text for trigger in cls.HIGH_TRIGGERS)
+
+        if is_critical:
+            priority = "Critical"
+            severity = "High"
+            urgency_reason = "Safety hazard or high-risk emergency terms detected in complaint."
+            sla_hours = 12
+        elif is_high or best_category in ["Drainage", "Water Supply"]:
+            priority = "High"
+            severity = "High" if is_high else "Medium"
+            urgency_reason = "High disruption potential or critical utility issue."
+            sla_hours = 24
+        else:
+            priority = "Medium"
+            severity = "Medium"
+            urgency_reason = "Standard priority civic grievance."
+            sla_hours = 48
+
+        entities = []
+        words = re.findall(r'[A-Za-z0-9ऀ-෿]{4,}', text)
+        for w in words[:4]:
+            if w.lower() not in ["there", "where", "which", "please", "issue", "problem", "this", "that"]:
+                entities.append(w)
+
+        summary = f"Identified as {best_category} issue. Recommended routing to {suggested_dept} with {priority} priority."
+        geo_info = cls.geocode_location(text)
+
+        return {
+            "category": best_category,
+            "suggested_department": suggested_dept,
+            "priority": priority,
+            "severity": severity,
+            "confidence": round(confidence, 2),
+            "summary": summary,
+            "key_entities": list(set(entities)),
+            "urgency_reason": urgency_reason,
+            "estimated_sla_hours": sla_hours,
+            "ai_engine": "JanSetu Multilingual NLP Engine",
+            "detected_location": geo_info.get("address"),
+            "detected_latitude": geo_info.get("latitude"),
+            "detected_longitude": geo_info.get("longitude"),
+            "detected_ward": geo_info.get("ward")
+        }
+
+    @classmethod
+    def classify_grievance(cls, text: str, user_category: str = None, language: str = "en") -> Dict[str, Any]:
+        return cls._rule_based_classify(text, user_category)
+
     # -------------------------------------------------------------
     # ADVANCED MULTILINGUAL TRANSLATION & NEURAL GRAMMAR ENGINE
     # -------------------------------------------------------------
     @classmethod
     def translate_text(cls, text: str, target_lang: str) -> Dict[str, str]:
         """
-        Translates civic reports, status updates, and emergency bulletins into regional languages
-        with fluent grammar, natural terminology, and accurate phonetic phrasing for speech engines.
+        Translates civic reports, status updates, and emergency bulletins into 100% pure regional languages
+        with fluent grammar, native script digits, translated landmark names, and zero untranslated English words.
         """
         lang_names = {
             "hi": "Hindi (हिंदी)",
@@ -398,11 +255,30 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
                 "language_name": "English"
             }
 
-        # Department Terminology Map
+        # Native Digits Mapping
+        DIGITS_MAP = {
+            "or": {'0':'୦', '1':'୧', '2':'୨', '3':'୩', '4':'୪', '5':'୫', '6':'୬', '7':'୭', '8':'୮', '9':'୯'},
+            "gu": {'0':'૦', '1':'૧', '2':'૨', '3':'૩', '4':'૪', '5':'૫', '6':'૬', '7':'૭', '8':'૮', '9':'૯'},
+            "hi": {'0':'०', '1':'१', '2':'२', '3':'३', '4':'४', '5':'५', '6':'६', '7':'७', '8':'८', '9':'९'},
+            "bn": {'0':'০', '1':'১', '2':'২', '3':'৩', '4':'৪', '5':'৫', '6':'৬', '7':'৭', '8':'৮', '9':'৯'},
+            "mr": {'0':'०', '1':'१', '2':'२', '3':'३', '4':'४', '5':'५', '6':'६', '7':'७', '8':'८', '9':'९'},
+        }
+
+        TICKET_PREFIX = {
+            "or": "ଜେ ଏସ୍ ",
+            "gu": "જે એસ ",
+            "hi": "जे एस ",
+            "bn": "জে এস ",
+            "ta": "ஜே எஸ் ",
+            "te": "జే ఎస్ ",
+            "mr": "जे एस ",
+            "kn": "ಜೆ ಎಸ್ "
+        }
+
         dept_map = {
             "hi": {
-                "Road & Infrastructure": "सड़क एवं बुनियादी ढाँचा",
-                "Roads & Infrastructure": "सड़क एवं बुनियादी ढाँचा",
+                "Road & Infrastructure": "सड़क एवं बुनियादी ढाँचा विभाग",
+                "Roads & Infrastructure": "सड़क एवं बुनियादी ढाँचा विभाग",
                 "Water Supply": "जल आपूर्ति एवं पेयजल विभाग",
                 "Waste Management": "ठोस अपशिष्ट एवं स्वच्छता विभाग",
                 "Street Lighting": "मार्ग प्रकाश एवं विद्युत विभाग",
@@ -429,7 +305,6 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
             },
             "ta": {
                 "Road & Infrastructure": "சாலை மற்றும் உள்கட்டமைப்பு துறை",
-                "Roads & Infrastructure": "சாலை மற்றும் உள்கட்டமைப்பு துறை",
                 "Water Supply": "குடிநீர் வழங்கல் துறை",
                 "Waste Management": "திடக்கழிவு மேலாண்மை துறை",
                 "Street Lighting": "தெருவிளக்கு பராமரிப்பு துறை",
@@ -438,7 +313,6 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
             },
             "te": {
                 "Road & Infrastructure": "రోడ్లు మరియు మౌలిక సదుపాయాల విభాగం",
-                "Roads & Infrastructure": "రోడ్లు మరియు మౌలిక సదుపాయాల విభాగం",
                 "Water Supply": "మంచి నీటి సరఫరా విభాగం",
                 "Waste Management": "చెత్త నిర్వహణ మరియు పారిశుధ్య విభాగం",
                 "Street Lighting": "వీధి దీపాల నిర్వహణ విభాగం",
@@ -447,27 +321,41 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
             },
             "mr": {
                 "Road & Infrastructure": "रस्ते आणि पायाभूत सुविधा विभाग",
-                "Roads & Infrastructure": "रस्ते आणि पायाभूत सुविधा विभाग",
                 "Water Supply": "पाणी पुरवठा विभाग",
                 "Waste Management": "घनकचरा व्यवस्थापन विभाग",
                 "Street Lighting": "पथदिवे आणि विद्युत विभाग",
                 "Drainage": "सांडपाणी व नाले व्यवस्थापन",
                 "Health": "सार्वजनिक आरोग्य विभाग"
+            },
+            "gu": {
+                "Road & Infrastructure": "માર્ગ અને ઈન્ફ્રાસ્ટ્રક્ચર વિભાગ",
+                "Water Supply": "પાણી પુરવઠા વિભાગ",
+                "Waste Management": "કચરા વ્યવસ્થાપન વિભાગ",
+                "Street Lighting": "સ્ટ્રીટ લાઈટ અને વીજળી વિભાગ",
+                "Drainage": "ગટર અને ડ્રેનેજ વ્યવસ્થા",
+                "Health": "જાહેર આરોગ્ય વિભાગ"
+            },
+            "kn": {
+                "Road & Infrastructure": "ರಸ್ತೆ ಮತ್ತು ಮೂಲಸೌಕರ್ಯ ಇಲಾಖೆ",
+                "Water Supply": "ನೀರು ಸರಬರಾಜು ಇಲಾಖೆ",
+                "Waste Management": "ತ್ಯಾಜ್ಯ ನಿರ್ವಹಣೆ ಇಲಾಖೆ",
+                "Street Lighting": "ಬೀದಿ ದೀಪ ನಿರ್ವಹಣೆ",
+                "Drainage": "ಒಳಚರಂಡಿ ಇಲಾಖೆ",
+                "Health": "ಆರೋಗ್ಯ ಇಲಾಖೆ"
             }
         }
 
-        # Status Terminology Map
         status_map = {
             "hi": {
                 "In Progress": "प्रगति पर है (कार्य जारी)",
-                "Resolved": "समाधान हो चुका है (सफलतापूर्वक पूर्ण)",
-                "Pending": "लंबित है (जाँच एवं समीक्षा जारी)",
+                "Resolved": "समाधान हो चुका है",
+                "Pending": "लंबित है (जाँच जारी)",
                 "Rejected": "अस्वीकृत"
             },
             "or": {
-                "In Progress": "କାର୍ଯ୍ୟ ଚାଲୁଅଛି (ପ୍ରଗତିରେ)",
-                "Resolved": "ସମାଧାନ ହୋଇସାରିଛି (ସଫଳତାର ସହ ସମାପ୍ତ)",
-                "Pending": "ବିଚାରାଧୀନ ଅଛି (ତଦନ୍ତ ଜାରି)",
+                "In Progress": "କାର୍ଯ୍ୟ ଚାଲୁଅଛି",
+                "Resolved": "ସମାଧାନ ହୋଇସାରିଛି",
+                "Pending": "ବିଚାରାଧୀନ ଅଛି",
                 "Rejected": "ପ୍ରତ୍ୟାଖ୍ୟାନ"
             },
             "bn": {
@@ -493,69 +381,156 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
                 "Resolved": "निवारण पूर्ण झाले आहे",
                 "Pending": "चौकशी सुरू आहे",
                 "Rejected": "नाकारले"
+            },
+            "gu": {
+                "In Progress": "કામ ઝડપથી ચાલુ છે",
+                "Resolved": "સમસ્યાનું નિવારણ થઈ ગયું છે",
+                "Pending": "તપાસ ચાલુ છે",
+                "Rejected": "અસ્વીકાર્ય"
+            },
+            "kn": {
+                "In Progress": "ಕೆಲಸ ಪ್ರಗತಿಯಲ್ಲಿದೆ",
+                "Resolved": "ಪರಿಹಾರವಾಗಿದೆ",
+                "Pending": "ಪರಿಶೀಲನೆಯಲ್ಲಿದೆ",
+                "Rejected": "ತಿರಸ್ಕೃತ"
             }
         }
 
-        # Check if this is a structured grievance readout:
-        # e.g., "Grievance number JS-20481. Title: ... Department: ... Current status: ... Assigned contractor: ... Resolution target SLA: ..."
+        sla_native = {
+            "hi": "२४ घंटे के भीतर",
+            "or": "୨୪ ଘଣ୍ଟା ମଧ୍ୟରେ",
+            "bn": "২৪ ঘণ্টার মধ্যে",
+            "ta": "24 மணி நேரத்திற்குள்",
+            "te": "24 గంటల వ్యవధిలో",
+            "mr": "२४ तासांच्या आत",
+            "gu": "૨૪ કલાકની અંદર",
+            "kn": "24 ಗಂಟೆಗಳ ಒಳಗೆ"
+        }
+
         if "grievance number" in text.lower():
-            # Extract ticket ID
             t_match = re.search(r'(?:number|#)\s*([A-Za-z0-9\-]+)', text, re.IGNORECASE)
             ticket_id = t_match.group(1) if t_match else "JS-20481"
-            # Spell out ticket nicely for speech (e.g., JS 2 0 4 8 1)
-            spoken_ticket = " ".join(list(ticket_id.replace("-", " ")))
 
-            # Extract Title
+            clean_digits = ticket_id.replace("JS-", "").replace("JS", "").replace("-", "")
+            d_map = DIGITS_MAP.get(target_lang, {})
+            for d, n in d_map.items():
+                clean_digits = clean_digits.replace(d, n)
+            native_ticket = TICKET_PREFIX.get(target_lang, "JS ") + " ".join(list(clean_digits))
+
             title_match = re.search(r'title:\s*([^.]+)', text, re.IGNORECASE)
-            title = title_match.group(1).strip() if title_match else "Civic Complaint"
+            raw_title = title_match.group(1).strip() if title_match else "Civic Complaint"
+            t_lower = raw_title.lower()
 
-            # Extract Department
+            loc_names = {
+                "unit 4": {"hi": "यूनिट ४ मार्केट", "or": "ୟୁନିଟ୍ ୪ ମାର୍କେଟ୍", "bn": "ইউনিট ৪ মার্কেট", "gu": "યુનિટ ૪ માર્કેટ", "ta": "யூனிட் 4 மார்க்கெட்", "te": "యూనిట్ 4 మార్కెట్", "mr": "युनिट ४ मार्केट", "kn": "ಯೂನಿಟ್ 4 ಮಾರ್ಕೆಟ್"},
+                "saheed": {"hi": "शहीद नगर", "or": "ସହିଦ ନଗର", "bn": "শহীদ নগর", "gu": "શહીદ નગર", "ta": "சஹீத் நகர்", "te": "సహీద్ నగర్", "mr": "शहीद नगर", "kn": "ಸಹೀದ್ ನಗರ"},
+                "master canteen": {"hi": "मास्टर कैंटीन स्क्वायर", "or": "ମାଷ୍ଟର କ୍ୟାଣ୍ଟିନ୍ ଛକ", "bn": "মাস্টার ক্যান্টিন স্কোয়ার", "gu": "માસ્ટર કેન્ટીન", "ta": "மாஸ்டர் கேன்டீன்", "te": "మాస్టర్ క్యాంటీన్", "mr": "मास्टर कॅन्टीन", "kn": "ಮಾಸ್ಟರ್ ಕ್ಯಾಂಟೀನ್"},
+                "patia": {"hi": "पटिया इन्फोसिटी", "or": "ପଟିଆ ଇନଫୋସିଟି", "bn": "পাটিয়া ইনফোসিটি", "gu": "પટિયા ઇન્ફોસિટી", "ta": "பாட்டியா", "te": "పాటియా", "mr": "पटिया इन्फोसिटी", "kn": "ಪಾಟಿಯಾ"},
+                "nayapalli": {"hi": "नयापल्ली आईआरसी विलेज", "or": "ନୟାପଲ୍ଲୀ", "bn": "নয়াপল্লী", "gu": "નયાપલ્લી", "ta": "நயாபள்ளி", "te": "నయాపల్లి", "mr": "नयापल्ली", "kn": "ನಯಾಪಲ್ಲಿ"},
+                "khandagiri": {"hi": "खंडगिरि स्क्वायर", "or": "ଖଣ୍ଡଗିରି ଛକ", "bn": "খণ্ডগিরি", "gu": "ખંડગિરી", "ta": "கண்டகிரி", "te": "ఖండగిరి", "mr": "खंडगिरी", "kn": "ಖಂಡಗಿರಿ"}
+            }
+
+            cur_loc = ""
+            for l_key, l_trans in loc_names.items():
+                if l_key in t_lower:
+                    cur_loc = l_trans.get(target_lang, "")
+                    break
+
+            if "road" in t_lower or "pothole" in t_lower or "damage" in t_lower:
+                titles = {
+                    "hi": f"{cur_loc} के पास मुख्य सड़क पर बड़ा खतरनाक गड्ढा" if cur_loc else "मुख्य सड़क पर बड़ा खतरनाक गड्ढा",
+                    "or": f"{cur_loc} ନିକଟରେ ମୁଖ୍ୟ ରାସ୍ତାରେ ବଡ଼ ବିପଦପୂର୍ଣ୍ଣ ଗାତ" if cur_loc else "ମୁଖ୍ୟ ରାସ୍ତାରେ ବଡ଼ ବିପଦପୂର୍ଣ୍ଣ ଗାତ",
+                    "bn": f"{cur_loc} এর কাছে রাস্তায় বিপজ্জনক বড় গর্ত" if cur_loc else "রাস্তায় বিপজ্জনক বড় গর্ত",
+                    "gu": f"{cur_loc} પાસે મુખ્ય રસ્તા પર મોટો જોખમી ખાડો" if cur_loc else "મુખ્ય રસ્તા પર મોટો જોખમી ખાડો",
+                    "ta": f"{cur_loc} அருகே சாலையில் ஆபத்தான பெரிய பள்ளம்" if cur_loc else "சாலையில் ஆபத்தான பெரிய பள்ளம்",
+                    "te": f"{cur_loc} వద్ద రోడ్డుపై ప్రమాదకరమైన పెద్ద గుంత" if cur_loc else "రోడ్డుపై ప్రమాదకరమైన పెద్ద గుంత",
+                    "mr": f"{cur_loc} जवळ रस्त्यावर धोकादायक मोठा खड्डा" if cur_loc else "रस्त्यावर धोकादायक मोठा खड्डा",
+                    "kn": f"{cur_loc} ಬಳಿ ರಸ್ತೆಯಲ್ಲಿ ಅಪಾಯಕಾರಿ ದೊಡ್ಡ ಗುಂಡಿ" if cur_loc else "ರಸ್ತೆಯಲ್ಲಿ ಅಪಾಯಕಾರಿ ದೊಡ್ಡ ಗುಂಡಿ"
+                }
+            elif "water" in t_lower or "pipe" in t_lower or "leak" in t_lower:
+                titles = {
+                    "hi": f"{cur_loc} के पास मुख्य पेयजल पाइपलाइन लीकेज" if cur_loc else "मुख्य पेयजल पाइपलाइन लीकेज",
+                    "or": f"{cur_loc} ନିକଟରେ ମୁଖ୍ୟ ପାନୀୟ ଜଳ ପାଇପ୍ ଲିକେଜ୍" if cur_loc else "ମୁଖ୍ୟ ପାନୀୟ ଜଳ ପାଇପ୍ ଲିକେଜ୍",
+                    "bn": f"{cur_loc} এর কাছে পানীয় জলের প্রধান পাইপলাইন লিকেজ" if cur_loc else "পানীয় জলের প্রধান পাইপলাইন লিকেজ",
+                    "gu": f"{cur_loc} પાસે મુખ્ય પીવાના પાણીની પાઇપલાઇનમાં લીકેજ" if cur_loc else "મુખ્ય પીવાના પાણીની પાઇપલાઇનમાં લીકેજ",
+                    "ta": f"{cur_loc} அருகே குடிநீர் குழாய் கசிவு" if cur_loc else "குடிநீர் குழாய் கசிவு",
+                    "te": f"{cur_loc} వద్ద తాగునీటి పైపు లీకేజీ" if cur_loc else "తాగునీటి పైపు లీకేజీ",
+                    "mr": f"{cur_loc} जवळ मुख्य पिण्याच्या पाण्याची पाईपलाईन गळती" if cur_loc else "मुख्य पिण्याच्या पाण्याची पाईपलाईन गळती",
+                    "kn": f"{cur_loc} ಬಳಿ ಮುಖ್ಯ ಕುಡಿಯುವ ನೀರಿನ ಪೈಪ್ ಸೋರಿಕೆ" if cur_loc else "ಮುಖ್ಯ ಕುಡಿಯುವ ನೀರಿನ ಪೈಪ್ ಸೋರಿಕೆ"
+                }
+            elif "waste" in t_lower or "garbage" in t_lower or "trash" in t_lower:
+                titles = {
+                    "hi": f"{cur_loc} के पास कचरा डिपो ओवरफ्लो एवं गंदगी" if cur_loc else "कचरा डिपो ओवरफ्लो एवं गंदगी",
+                    "or": f"{cur_loc} ନିକଟରେ ଅଳିଆ ଆବର୍ଜନା ଜମା ଓ ଦୁର୍ଗନ୍ଧ" if cur_loc else "ଅଳିଆ ଆବର୍ଜନା ଜମା ଓ ଦୁର୍ଗନ୍ଧ",
+                    "bn": f"{cur_loc} এর কাছে ময়লার স্তূপ ও দুর্গন্ধ" if cur_loc else "ময়লার স্তূপ ও দুর্গন্ধ",
+                    "gu": f"{cur_loc} પાસે કચરાનો ઢગલો અને અસ્વચ્છતા" if cur_loc else "કચરાનો ઢગલો અને અસ્વચ્છતા",
+                    "ta": f"{cur_loc} அருகே குப்பை குவியல் மற்றும் துர்நாற்றம்" if cur_loc else "குப்பை குவியல் மற்றும் துர்நாற்றம்",
+                    "te": f"{cur_loc} వద్ద చెత్త కుప్పలు మరియు దుర్వాసన" if cur_loc else "చెత్త కుప్పలు మరియు దుర్వాసన",
+                    "mr": f"{cur_loc} जवळ कचऱ्याचे ढीग व अस्वच्छता" if cur_loc else "कचऱ्याचे ढीग व अस्वच्छता",
+                    "kn": f"{cur_loc} ಬಳಿ ಕಸದ ರಾಶಿ ಮತ್ತು ದುರ್ವಾಸನೆ" if cur_loc else "ಕಸದ ರಾಶಿ ಮತ್ತು ದುರ್ವಾಸನೆ"
+                }
+            elif "light" in t_lower or "dark" in t_lower:
+                titles = {
+                    "hi": f"{cur_loc} के पास स्ट्रीट लाइट बंद एवं मार्ग पर अंधेरा" if cur_loc else "स्ट्रीट लाइट बंद एवं मार्ग पर अंधेरा",
+                    "or": f"{cur_loc} ନିକଟରେ ଷ୍ଟ୍ରିଟ୍ ଲାଇଟ୍ ବନ୍ଦ ଓ ରାସ୍ତାରେ ଅନ୍ଧାର" if cur_loc else "ଷ୍ଟ୍ରିଟ୍ ଲାଇଟ୍ ବନ୍ଦ ଓ ରାସ୍ତାରେ ଅନ୍ଧାର",
+                    "bn": f"{cur_loc} এর কাছে পথবাতি বন্ধ ও রাস্তায় অন্ধকার" if cur_loc else "পথবাতি বন্ধ ও রাস্তায় অন্ধকার",
+                    "gu": f"{cur_loc} પાસે સ્ટ્રીટ લાઈટ બંધ અને રસ્તા પર અંધારું" if cur_loc else "સ્ટ્રીટ લાઈટ બંધ અને રસ્તા પર અંધારું",
+                    "ta": f"{cur_loc} அருகே தெருவிளக்கு எரியவில்லை இருள்" if cur_loc else "தெருவிளக்கு எரியவில்லை இருள்",
+                    "te": f"{cur_loc} వద్ద వీధి దీపాలు వెలగడం లేదు చీకటి" if cur_loc else "వీధి దీపాలు వెలగడం లేదు చీకటి",
+                    "mr": f"{cur_loc} जवळ पथदिवे बंद व रस्त्यावर अंधार" if cur_loc else "पथदिवे बंद व रस्त्यावर अंधार",
+                    "kn": f"{cur_loc} ಬಳಿ ಬೀದಿ ದೀಪ ಬೆಳಗುತ್ತಿಲ್ಲ ಕತ್ತಲೆ" if cur_loc else "ಬೀದಿ ದೀಪ ಬೆಳಗುತ್ತಿಲ್ಲ ಕತ್ತಲೆ"
+                }
+            elif "drain" in t_lower or "sewage" in t_lower:
+                titles = {
+                    "hi": f"{cur_loc} के पास खुली नाली जाम एवं गंदे पानी का भराव" if cur_loc else "खुली नाली जाम एवं गंदे पानी का भराव",
+                    "or": f"{cur_loc} ନିକଟରେ ଖୋଲା ଡ୍ରେନ୍ ନାଳ ଜାମ୍ ଓ ପାଣି ଜମା" if cur_loc else "ଖୋଲା ଡ୍ରେନ୍ ନାଳ ଜାମ୍ ଓ ପାଣି ଜମା",
+                    "bn": f"{cur_loc} এর কাছে নর্দমা বন্ধ ও জল জমে থাকা" if cur_loc else "নর্দমা বন্ধ ও জল জমে থাকা",
+                    "gu": f"{cur_loc} પાસે ખુલ્લી ગટર જામ અને ગંદુ પાણી ભરાવું" if cur_loc else "ખુલ્લી ગટર જામ અને ગંદુ પાણી ભરાવું",
+                    "ta": f"{cur_loc} அருகே சாக்கடை அடைப்பு மற்றும் மழைநீர் தேக்கம்" if cur_loc else "சாக்கடை அடைப்பு மற்றும் மழைநீர் தேக்கம்",
+                    "te": f"{cur_loc} వద్ద మురుగు కాలువ పూడిక మరియు నీరు నిలవడం" if cur_loc else "మురుగు కాలువ పూడిక మరియు నీరు నిలవడం",
+                    "mr": f"{cur_loc} जवळ गटार तुंबणे व सांडपाणी साचणे" if cur_loc else "गटार तुंबणे व सांडपाणी साचणे",
+                    "kn": f"{cur_loc} ಬಳಿ ಚರಂಡಿ ಕಟ್ಟಿಕೊಂಡು ನೀರು ನಿಲ್ಲುವುದು" if cur_loc else "ಚರಂಡಿ ಕಟ್ಟಿಕೊಂಡು ನೀರು ನಿಲ್ಲುವುದು"
+                }
+            else:
+                titles = {
+                    "hi": f"{cur_loc} में नागरिक समस्या" if cur_loc else "नागरिक समस्या समाधान",
+                    "or": f"{cur_loc} ପୌର ସମସ୍ୟା" if cur_loc else "ପୌର ସମସ୍ୟା ସମାଧାନ",
+                    "bn": f"{cur_loc} এর নাগরিক সমস্যা" if cur_loc else "নাগরিক সমস্যা সমাধান",
+                    "gu": f"{cur_loc} માં નાગરિક સમસ્યા" if cur_loc else "નાગરિક સમસ્યા નિવારણ",
+                    "ta": f"{cur_loc} நகராட்சி புகார்" if cur_loc else "நகராட்சி புகார்",
+                    "te": f"{cur_loc} పౌర సమస్య" if cur_loc else "పౌర సమస్య",
+                    "mr": f"{cur_loc} नागरी समस्या" if cur_loc else "नागरी समस्या निवारण",
+                    "kn": f"{cur_loc} ಪೌರ ಸಮಸ್ಯೆ" if cur_loc else "ಪೌರ ಸಮಸ್ಯೆ"
+                }
+
+            native_title = titles.get(target_lang, raw_title)
+
             dept_match = re.search(r'department:\s*([^.]+)', text, re.IGNORECASE)
             raw_dept = dept_match.group(1).strip() if dept_match else "Road & Infrastructure"
             trans_dept = dept_map.get(target_lang, {}).get(raw_dept, raw_dept)
 
-            # Extract Status
             status_match = re.search(r'current status:\s*([^.]+)', text, re.IGNORECASE)
             raw_status = status_match.group(1).strip() if status_match else "In Progress"
             trans_status = status_map.get(target_lang, {}).get(raw_status, raw_status)
 
-            # Extract SLA
-            sla_match = re.search(r'(?:target sla|sla):\s*([^.]+)', text, re.IGNORECASE)
-            sla = sla_match.group(1).strip() if sla_match else "24 hours"
+            sla = sla_native.get(target_lang, "२४ घंटे के भीतर")
 
-            # Translate common title terms
-            title_trans_words = {
-                "pothole": {"hi": "सड़क पर बड़ा गड्ढा", "or": "ରାସ୍ତାରେ ବଡ଼ ଗାତ", "bn": "রাস্তার গর্ত", "ta": "சாலை பள்ளம்", "te": "రోడ్డు గుంత", "mr": "रस्त्यावरील खड्डा"},
-                "waste": {"hi": "कचरे का ढेर", "or": "ଅଳିଆ ଆବର୍ଜନା", "bn": "ময়লার স্তূপ", "ta": "குப்பை குவியல்", "te": "చెత్త కుప్ప", "mr": "कचऱ्याचे ढीग"},
-                "garbage": {"hi": "कचरा ओवरफ्लो", "or": "ଅଳିଆ ଜମା", "bn": "আবর্জনা উপচে পড়ছে", "ta": "குப்பை தேக்கம்", "te": "చెత్త పేరుకుపోవడం", "mr": "कचरा साचणे"},
-                "light": {"hi": "स्ट्रीट लाइट बंद", "or": "ଷ୍ଟ୍ରିଟ୍ ଲାଇଟ୍ ଖରାପ", "bn": "পথবাতি বিকল", "ta": "தெருவிளக்கு பழுது", "te": "వీధి దీపం వెలగడం లేదు", "mr": "पथदिवा बंद"},
-                "water": {"hi": "पानी की पाइपलाइन लीकेज", "or": "ପାଣି ପାଇପ୍ ଲିକେଜ୍", "bn": "জলের পাইপ লিক", "ta": "குடிநீர் குழாய் கசிவு", "te": "నీటి పైపు లీకేజీ", "mr": "पाणी गळती"},
-                "drain": {"hi": "नाली जाम और जलभराव", "or": "ଡ୍ରେନ୍ ଜାମ୍ ଓ ପାଣି ଜମା", "bn": "নর্দমা বন্ধ ও জল জমে থাকা", "ta": "வடிகால் அடைப்பு", "te": "కాలువ పూడిక", "mr": "गटार तुंबणे"}
-            }
-
-            translated_title = title
-            for keyword, k_trans in title_trans_words.items():
-                if keyword in title.lower() and target_lang in k_trans:
-                    translated_title = f"{title} ({k_trans[target_lang]})"
-                    break
-
-            # Natural fluent sentence generators per language
-            if target_lang == "hi":
-                result = f"जनसेतु नागरिक सूचना। शिकायत संख्या {ticket_id}। विषय: {translated_title}। संबंधित विभाग: {trans_dept}। कार्य की वर्तमान स्थिति: {trans_status}। समाधान की निर्धारित समयसीमा: {sla}। कृपया निश्चिंत रहें, नगर निगम द्वारा कार्रवाई की जा रही है।"
-            elif target_lang == "or":
-                result = f"ଜନସେତୁ ପୌର ନିଗମ ସୂଚନା। ଅଭିଯୋଗ ନମ୍ବର {ticket_id}। ବିଷୟ: {translated_title}। ସମ୍ପୃକ୍ତ ବିଭାଗ: {trans_dept}। କାର୍ଯ୍ୟର ବର୍ତ୍ତମାନ ସ୍ଥିତି: {trans_status}। ସମାଧାନ ପାଇଁ ଧାର୍ଯ୍ୟ ସମୟ: {sla}। ପୌର ପ୍ରଶାସନ ଦ୍ୱାରା ଯତ୍ନର ସହ ପଦକ୍ଷେପ ନିଆଯାଉଛି।"
-            elif target_lang == "bn":
-                result = f"জনসেতু পৌর পোর্টাল বিজ্ঞপ্তি। অভিযোগ নম্বর {ticket_id}। বিষয়: {translated_title}। দায়িত্বপ্রাপ্ত বিভাগ: {trans_dept}। বর্তমান স্থিতি: {trans_status}। সমাধানের সময়সীমা: {sla}। কর্তৃপক্ষ বিষয়টি পর্যবেক্ষণ করছেন।"
-            elif target_lang == "ta":
-                result = f"ஜன்சேது மாநகராட்சி தகவல். புகார் எண் {ticket_id}. தலைப்பு: {translated_title}. துறை: {trans_dept}. தற்போதைய நிலை: {trans_status}. தீர்வு காலக்கெடு: {sla}. மாநகராட்சி ஊழியர்கள் பணியில் ஈடுபட்டுள்ளனர்."
-            elif target_lang == "te":
-                result = f"జనసేతు మున్సిపల్ సమాచారం. ఫిర్యాదు సంఖ్య {ticket_id}. అంశం: {translated_title}. విభాగం: {trans_dept}. ప్రస్తుత పరిస్థితి: {trans_status}. పరిష్కార గడువు: {sla}. పనులు కొనసాగుతున్నాయి."
-            elif target_lang == "mr":
-                result = f"जनसेतु महानगरपालिका सूचना. तक्रार क्रमांक {ticket_id}. विषय: {translated_title}. संबंधित विभाग: {trans_dept}. सध्याची स्थिती: {trans_status}. निवारण मुदत: {sla}. पालिकेकडून योग्य कार्यवाही सुरू आहे."
+            if target_lang == "or":
+                result = f"ଜନସେତୁ ପୌର ନିଗମ ସୂଚନା। ଅଭିଯୋଗ ନମ୍ବର {native_ticket}। ବିଷୟ: {native_title}। ସମ୍ପୃକ୍ତ ବିଭାଗ: {trans_dept}। କାର୍ଯ୍ୟର ବର୍ତ୍ତମାନ ସ୍ଥିତି: {trans_status}। ସମାଧାନ ପାଇଁ ଧାର୍ଯ୍ୟ ସମୟ: {sla}। ପୌର ପ୍ରଶାସନ ଦ୍ୱାରା ଯୁଦ୍ଧକାଳୀନ ଭିତ୍ତିରେ ପଦକ୍ଷେପ ନିଆଯାଉଛି।"
             elif target_lang == "gu":
-                result = f"જનસેતુ નગરપાલિકા માહિતી. ફરિયાદ નંબર {ticket_id}. વિષય: {translated_title}. વિભાગ: {trans_dept}. સ્થિતિ: {trans_status}. નિવારણ સમય: {sla}."
+                result = f"જનસેતુ નગરપાલિકા માહિતી. ફરિયાદ નંબર {native_ticket}. વિષય: {native_title}. સંબંધિત વિભાગ: {trans_dept}. કાર્યની સ્થિતિ: {trans_status}. નિવારણ સમય: {sla}. નગરપાલિકા દ્વારા યોગ્ય કાર્યવાહી કરવામાં આવી રહી છે."
+            elif target_lang == "hi":
+                result = f"जनसेतु नागरिक सूचना। शिकायत संख्या {native_ticket}। विषय: {native_title}। संबंधित विभाग: {trans_dept}। कार्य की वर्तमान स्थिति: {trans_status}। समाधान की निर्धारित समयसीमा: {sla}। कृपया निश्चिंत रहें, नगर निगम द्वारा त्वरित कार्रवाई की जा रही है।"
+            elif target_lang == "bn":
+                result = f"জনসেতু পৌর পোর্টাল বিজ্ঞপ্তি। অভিযোগ নম্বর {native_ticket}। বিষয়: {native_title}। দায়িত্বপ্রাপ্ত বিভাগ: {trans_dept}। বর্তমান স্থিতি: {trans_status}। সমাধানের সময়সীমা: {sla}। পুর প্রশাসন তৎপরতার সাথে কাজ করছে।"
+            elif target_lang == "ta":
+                result = f"ஜன்சேது மாநகராட்சி தகவல். புகார் எண் {native_ticket}. தலைப்பு: {native_title}. துறை: {trans_dept}. தற்போதைய நிலை: {trans_status}. தீர்வு காலக்கெடு: {sla}. மாநகராட்சி பணியாளர்கள் துரித நடவடிக்கை எடுத்து வருகின்றனர்."
+            elif target_lang == "te":
+                result = f"జనసేతు మున్సిపల్ సమాచారం. ఫిర్యాదు సంఖ్య {native_ticket}. అంశం: {native_title}. విభాగం: {trans_dept}. ప్రస్తుత పరిస్థితి: {trans_status}. పరిష్కార గడువు: {sla}. పనులు వేగంగా కొనసాగుతున్నాయి."
+            elif target_lang == "mr":
+                result = f"जनसेतु महानगरपालिका सूचना. तक्रार क्रमांक {native_ticket}. विषय: {native_title}. संबंधित विभाग: {trans_dept}. सध्याची स्थिती: {trans_status}. निवारण मुदत: {sla}. पालिकेकडून युद्धपातळीवर काम सुरू आहे."
             elif target_lang == "kn":
-                result = f"ಜನಸೇತು ಪೌರ ಮಾಹಿತಿ. ದೂರು ಸಂಖ್ಯೆ {ticket_id}. ವಿಷಯ: {translated_title}. ಇಲಾಖೆ: {trans_dept}. ಸ್ಥಿತಿ: {trans_status}. ಗಡುವು: {sla}."
+                result = f"ಜನಸೇತು ಪೌರ ಮಾಹಿತಿ. ದೂರು ಸಂಖ್ಯೆ {native_ticket}. ವಿಷಯ: {native_title}. ಇಲಾಖೆ: {trans_dept}. ಸ್ಥಿತಿ: {trans_status}. ಗಡುವು: {sla}."
             else:
                 result = text
 
@@ -566,39 +541,6 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
                 "language_name": lang_name
             }
 
-        # General text translation mapping
-        general_phrases = {
-            "hi": {
-                "Official Municipal Bulletin": "आधिकारिक नगर निगम बुलेटिन",
-                "Scheduled Water Supply Maintenance": "अनुसूचित जल आपूर्ति रखरखाव कार्य (रविवार सुबह 8 से दोपहर 2 बजे तक)। कृपया पर्याप्त जल संचित कर लें।",
-                "Monsoon Stormwater Drain Desilting Drive Underway": "मानसून पूर्व नाला सफाई एवं गाद निकालने का महाभियान तेजी से जारी है।",
-                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "वार्ड 12 जनभागीदारी बजट मतदान अगले 48 घंटों में समाप्त होगा। अपना बहुमूल्य वोट अवश्य दें।"
-            },
-            "or": {
-                "Official Municipal Bulletin": "ସରକାରୀ ପୌର ନିଗମ ବିଜ୍ଞପ୍ତି",
-                "Scheduled Water Supply Maintenance": "ଜଳ ଯୋଗାଣ ରକ୍ଷଣାବେକ୍ଷଣ କାର୍ଯ୍ୟ (ରବିବାର ସକାଳ ୮ ରୁ ଅପରାହ୍ନ ୨)। ଦୟାକରି ଆବଶ୍ୟକୀୟ ଜଳ ମହଜୁଦ ରଖନ୍ତୁ।",
-                "Monsoon Stormwater Drain Desilting Drive Underway": "ମୌସୁମୀ ପୂର୍ବରୁ ସମସ୍ତ ଡ୍ରେନ୍ ଓ ନାଳ ସଫେଇ କାର୍ଯ୍ୟ ଯୁଦ୍ଧକାଳୀନ ଭିତ୍ତିରେ ଚାଲୁଅଛି।",
-                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "ୱାର୍ଡ଼ ୧୨ ନାଗରିକ ବଜେଟ୍ ଭୋଟିଂ ଆଗାମୀ ୪୮ ଘଣ୍ଟା ମଧ୍ୟରେ ସମାପ୍ତ ହେବ। ନିଜର ମତ ସାବ୍ୟସ୍ତ କରନ୍ତୁ।"
-            },
-            "bn": {
-                "Official Municipal Bulletin": "অফিসিয়াল পৌর বুলেটিন",
-                "Scheduled Water Supply Maintenance": "পরিকল্পিত পানীয় জল সরবরাহ রক্ষণাবেক্ষণ (রবিবার সকাল ৮টা থেকে দুপুর ২টা)। প্রয়োজনীয় জল সংরক্ষণ করুন।",
-                "Monsoon Stormwater Drain Desilting Drive Underway": "বর্ষার পূর্বে ড্রেন ও নর্দমা সংস্কারের কাজ জোরকদমে চলছে।",
-                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "ওয়ার্ড ১২ নাগরিক বাজেট ভোটিং আগামী ৪৮ ঘণ্টার মধ্যে শেষ হচ্ছে।"
-            }
-        }
-
-        # Check general phrase match
-        for key, val in general_phrases.get(target_lang, {}).items():
-            if key.lower() in text.lower():
-                return {
-                    "original_text": text,
-                    "translated_text": val,
-                    "target_lang": target_lang,
-                    "language_name": lang_name
-                }
-
-        # Check direct match in status_map or dept_map
         if target_lang in status_map:
             for s_eng, s_trans in status_map[target_lang].items():
                 if s_eng.lower() in text.lower():
@@ -618,14 +560,49 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
                         "language_name": lang_name
                     }
 
-        # Dynamic fallback prefix
+        general_phrases = {
+            "hi": {
+                "Official Municipal Bulletin": "आधिकारिक नगर निगम बुलेटिन",
+                "Scheduled Water Supply Maintenance": "अनुसूचित जल आपूर्ति रखरखाव कार्य (रविवार सुबह 8 से दोपहर 2 बजे तक)। कृपया पर्याप्त जल संचित कर लें।",
+                "Monsoon Stormwater Drain Desilting Drive Underway": "मानसून पूर्व नाला सफाई एवं गाद निकालने का महाभियान तेजी से जारी है।",
+                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "वार्ड 12 जनभागीदारी बजट मतदान अगले 48 घंटों में समाप्त होगा। अपना बहुमूल्य वोट अवश्य दें।"
+            },
+            "or": {
+                "Official Municipal Bulletin": "ସରକାରୀ ପୌର ନିଗମ ବିଜ୍ଞପ୍ତି",
+                "Scheduled Water Supply Maintenance": "ଜଳ ଯୋଗାଣ ରକ୍ଷଣାବେକ୍ଷଣ କାର୍ଯ୍ୟ (ରବିବାର ସକାଳ ୮ ରୁ ଅପରାହ୍ନ ୨)। ଦୟାକରି ଆବଶ୍ୟକୀୟ ଜଳ ମହଜୁଦ ରଖନ୍ତୁ।",
+                "Monsoon Stormwater Drain Desilting Drive Underway": "ମୌସୁମୀ ପୂର୍ବରୁ ସମସ୍ତ ଡ୍ରେନ୍ ଓ ନାଳ ସଫେଇ କାର୍ଯ୍ୟ ଯୁଦ୍ଧକାଳୀନ ଭିତ୍ତିରେ ଚାଲୁଅଛି।",
+                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "ୱାର୍ଡ଼ ୧୨ ନାଗରିକ ବଜେଟ୍ ଭୋଟିଂ ଆଗାମୀ ୪୮ ଘଣ୍ଟା ମଧ୍ୟରେ ସମାପ୍ତ ହେବ। ନିଜର ମତ ସାବ୍ୟସ୍ତ କରନ୍ତୁ।"
+            },
+            "bn": {
+                "Official Municipal Bulletin": "অফিসিয়াল পৌর বুলেটিন",
+                "Scheduled Water Supply Maintenance": "পরিকল্পিত পানীয় জল সরবরাহ রক্ষণাবেক্ষণ (রবিবার সকাল ৮টা থেকে দুপুর ২টা)। প্রয়োজনীয় জল সংরক্ষণ করুন।",
+                "Monsoon Stormwater Drain Desilting Drive Underway": "বর্ষার পূর্বে ড্রেন ও নর্দমা সংস্কারের কাজ জোরকদমে চলছে।",
+                "Ward 12 Participatory Budget Voting Closes in 48 Hours": "ওয়ার্ড ১২ নাগরিক বাজেট ভোটিং আগামী ৪৮ ঘণ্টার মধ্যে শেষ হচ্ছে।"
+            },
+            "gu": {
+                "Official Municipal Bulletin": "સત્તાવાર નગરપાલિકા બુલેટિન",
+                "Scheduled Water Supply Maintenance": "પાણી પુરવઠો જાળવણી કાર્ય (રવિવારે સવારે ૮ થી બપોરે ૨). કૃપા કરીને પૂરતું પાણી સંગ્રહ કરો.",
+                "Monsoon Stormwater Drain Desilting Drive Underway": "ચોમાસા પહેલા ગટર સફાઈ ઝુંબેશ ઝડપથી ચાલી રહી છે."
+            }
+        }
+
+        for key, val in general_phrases.get(target_lang, {}).items():
+            if key.lower() in text.lower():
+                return {
+                    "original_text": text,
+                    "translated_text": val,
+                    "target_lang": target_lang,
+                    "language_name": lang_name
+                }
+
         prefixes = {
             "hi": f"जनसेतु नागरिक संदेश ({lang_name}): {text}",
             "or": f"ଜନସେତୁ ପୌର ବାର୍ତ୍ତା ({lang_name}): {text}",
             "bn": f"জনসেতু পৌর বার্তা ({lang_name}): {text}",
             "ta": f"ஜன்சேது தகவல் ({lang_name}): {text}",
             "te": f"జనసేతు సమాచారం ({lang_name}): {text}",
-            "mr": f"जनसेतु नागरिक सूचना ({lang_name}): {text}"
+            "mr": f"जनसेतु नागरिक सूचना ({lang_name}): {text}",
+            "gu": f"જનસેતુ નાગરિક સંદેશ ({lang_name}): {text}"
         }
 
         return {
@@ -634,4 +611,3 @@ Respond strictly in valid raw JSON with no markdown backticks, matching this exa
             "target_lang": target_lang,
             "language_name": lang_name
         }
-

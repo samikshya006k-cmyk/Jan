@@ -356,7 +356,11 @@ const JanSetuAPI = {
 
             const voices = window.speechSynthesis.getVoices();
             if (voices && voices.length > 0) {
-                const matchingVoice = voices.find(v => v.lang === targetLocale || v.lang.replace('_', '-').startsWith(targetLocale) || v.lang.startsWith(lang));
+                let matchingVoice = voices.find(v => v.lang === targetLocale || v.lang.replace('_', '-').startsWith(targetLocale) || v.lang.startsWith(lang));
+                if (!matchingVoice && lang !== "en") {
+                    // Fallback to any Indian voice engine for natural phonetics
+                    matchingVoice = voices.find(v => v.lang.includes("IN") || v.name.includes("India") || v.name.includes("Hindi") || v.name.includes("Bangla") || v.name.includes("Lekha") || v.name.includes("Rishi") || v.name.includes("Veena"));
+                }
                 if (matchingVoice) {
                     utterance.voice = matchingVoice;
                 }
