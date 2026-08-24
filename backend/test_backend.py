@@ -401,7 +401,10 @@ def test_ward_bulletins_and_new_static_files(client):
 
     res_wa = client.get("/whatsapp-bot.js")
     assert res_wa.status_code == 200
-    assert "JanSetuWhatsApp" in res_wa.text
+
+    res_ai = client.get("/ai-chatbot.js")
+    assert res_ai.status_code == 200
+    assert "JanSetuAIChatbot" in res_ai.text
 
     # 2. Test Get bulletins
     res_b = client.get("/api/v1/grievances/bulletin/list")

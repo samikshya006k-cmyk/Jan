@@ -60,7 +60,7 @@ FRONTEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FRONTEND_FILES = {
     "index.html", "citizendashboard.html", "officerdashboard.html", "report.html", "signup.html",
     "api.js", "script.js", "dashboard.js", "officerdashboard.js", "report.js", "signup.js", "maps-adapter.js",
-    "whatsapp-bot.js", "pdf-generator.js",
+    "whatsapp-bot.js", "pdf-generator.js", "ai-chatbot.js",
     "style.css", "dashboard.css", "officerdashboard.css", "report.css", "signup.css"
 }
 
