@@ -337,6 +337,21 @@
         <div class="topbar-right">
 
 
+            <!-- Global Regional Language Selector -->
+            <div class="lang-selector-wrapper" style="margin-right: 8px;">
+                <select id="globalOfficerLangSelect" onchange="changeOfficerLanguage(this.value)" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #0f172a; font-size: 12px; font-weight: 600; cursor: pointer; outline: none;">
+                    <option value="en">🌐 English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="or">ଓଡ଼ିଆ (Odia)</option>
+                    <option value="bn">বাংলা (Bengali)</option>
+                    <option value="gu">ગુજરાતી (Gujarati)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                </select>
+            </div>
+
             <div class="office-status">
 
                 <span class="online-dot">
@@ -2493,6 +2508,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="maps-adapter.js"></script>
 <script src="api.js"></script>
+<script src="i18n.js"></script>
 <script src="pdf-generator.js"></script>
 <script src="ai-chatbot.js"></script>
 <script src="officerdashboard.js"></script>

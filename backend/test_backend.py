@@ -406,6 +406,10 @@ def test_ward_bulletins_and_new_static_files(client):
     assert res_ai.status_code == 200
     assert "JanSetuAIChatbot" in res_ai.text
 
+    res_i18n = client.get("/i18n.js")
+    assert res_i18n.status_code == 200
+    assert "JanSetuI18n" in res_i18n.text
+
     # 2. Test Get bulletins
     res_b = client.get("/api/v1/grievances/bulletin/list")
     assert res_b.status_code == 200
