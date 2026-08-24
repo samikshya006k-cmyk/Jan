@@ -1,100 +1,98 @@
-# JanSetu Deployment & Cloud Run Guide
+# ☁️ JanSetu Cloud Deployment & Production Configuration Guide
 
-This guide explains how to run **JanSetu** locally via Docker, configure Google Gemini AI, and deploy to modern cloud providers (Google Cloud Run, Render, Railway, AWS).
-
----
-
-## 🔑 1. Environment Variables & AI Configuration
-
-Create a `.env` file in the root directory (or in `backend/`):
-
-```env
-# Optional: Google Gemini API Key for LLM-powered deep semantic triage
-# Get your free key at: https://aistudio.google.com/
-GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-1.5-flash
-
-# Security
-SECRET_KEY=jansetu-super-secret-production-jwt-key-2026
-
-# Database (Default: SQLite; or use PostgreSQL in production)
-# DATABASE_URL=postgresql://user:password@host:5432/jansetu
-```
-
-> **Note:** If `GEMINI_API_KEY` is not provided, JanSetu automatically uses its built-in multilingual rule-based NLP engine.
+This guide details how to configure **JanSetu** with a secure **Cloud PostgreSQL Database** (Railway, Supabase, Neon, AWS RDS), configure production environment variables, and deploy to cloud platforms.
 
 ---
 
-## 🐳 2. Running with Docker Compose (Local or VPS)
+## 1. 📋 Environment Variables Overview
 
-### Build and Start
+Create or configure a `.env` file in the root directory (or inject via your Cloud Provider's Dashboard):
+
+| Variable | Description | Default / Example |
+| :--- | :--- | :--- |
+| `DATABASE_URL` | Cloud PostgreSQL or Local SQLite Connection URI | `postgresql://user:pass@host:5432/dbname` or `sqlite:///./jansetu.db` |
+| `SECRET_KEY` | High-entropy secret string for JWT HS256 encryption | `jansetu-production-secret-jwt-key-2026-xyz` |
+| `GEMINI_API_KEY` | Google Gemini API Key for AI Triage & Vision Analysis | `AIzaSy...` |
+| `GEMINI_MODEL` | Gemini Model identifier | `gemini-1.5-flash` |
+| `GOOGLE_MAPS_API_KEY` | Optional Google Maps JS API key for Satellite view | `AIzaSy...` (Falls back to Leaflet/OSM) |
+| `PORT` | Web server listening port | `8000` |
+
+---
+
+## 2. 🗄️ Cloud PostgreSQL Setup Options
+
+JanSetu automatically normalizes `postgres://` URLs into SQLAlchemy 2.0-compliant `postgresql://` strings, manages connection health checks (`pool_pre_ping=True`), and auto-initializes all tables and seed records on first launch.
+
+### Option A: Railway PostgreSQL
+1. Create a project on [Railway.app](https://railway.app).
+2. Click **+ New** $\rightarrow$ **Database** $\rightarrow$ **Add PostgreSQL**.
+3. In the PostgreSQL service, navigate to the **Variables** tab and copy `DATABASE_URL`.
+4. In your JanSetu application service, add the environment variable `DATABASE_URL` with the copied URI.
+
+### Option B: Supabase PostgreSQL
+1. Create a database on [Supabase.com](https://supabase.com).
+2. Navigate to **Project Settings** $\rightarrow$ **Database** $\rightarrow$ **Connection String** (URI mode, Transaction or Session pooler port `5432` or `6543`).
+3. Set `DATABASE_URL` in your environment:
+   ```bash
+   DATABASE_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres"
+   ```
+
+### Option C: Neon Serverless PostgreSQL
+1. Create a project on [Neon.tech](https://neon.tech).
+2. Copy the connection string from the dashboard and set `DATABASE_URL`.
+
+---
+
+## 3. 🚀 One-Click Deployment to Railway
+
+1. Push your repository to GitHub (`git push origin main`).
+2. Go to [Railway Dashboard](https://railway.app) $\rightarrow$ **+ New Project** $\rightarrow$ **Deploy from GitHub repo**.
+3. Select your `JanSetu` repository.
+4. Add the following **Variables** in the Railway service settings:
+   - `DATABASE_URL`: *(Your cloud PostgreSQL URI or attach Railway PostgreSQL)*
+   - `SECRET_KEY`: *(Generate a 32+ character random string)*
+   - `GEMINI_API_KEY`: *(Optional: your Gemini API key)*
+5. Railway will automatically detect the `Dockerfile`, build the container, and deploy your live URL.
+
+---
+
+## 4. 🐳 Running Locally or on VPS with Docker Compose
+
+To run JanSetu and a production-grade PostgreSQL database on your local machine or Linux VPS:
+
 ```bash
-docker compose up --build -d
-```
+# 1. Clone repository
+git clone https://github.com/samikshya006k-cmyk/Jan.git
+cd JanSetu-main
 
-### View Logs
-```bash
-docker compose logs -f
-```
+# 2. Build and start containers
+docker compose up -d --build
 
-### Stop
-```bash
-docker compose down
-```
+# 3. Check logs & status
+docker compose logs -f jansetu-app
 
-Once running:
-- **Web App:** [http://localhost:8000/index.html](http://localhost:8000/index.html)
-- **API Swagger Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Citizen Dashboard:** [http://localhost:8000/citizendashboard.html](http://localhost:8000/citizendashboard.html)
-- **Officer Dashboard:** [http://localhost:8000/officerdashboard.html](http://localhost:8000/officerdashboard.html)
+# 4. Open in browser
+http://localhost:8000
+```
 
 ---
 
-## ☁️ 3. Deploying to Google Cloud Run (Serverless)
+## 5. 🔒 Security & Email Verification Highlights
 
-### Prerequisites
-- Install [Google Cloud CLI (`gcloud`)](https://cloud.google.com/sdk/docs/install)
-- Authenticate: `gcloud auth login`
-
-### Deploy Command
-```bash
-# 1. Set your GCP Project ID
-gcloud config set project YOUR_PROJECT_ID
-
-# 2. Build and Deploy in one command
-gcloud run deploy jansetu \
-  --source . \
-  --platform managed \
-  --region asia-south1 \
-  --allow-unauthenticated \
-  --set-env-vars "GEMINI_API_KEY=your_key,SECRET_KEY=production_secret"
-```
-
-Cloud Run will output your live HTTPS URL (e.g. `https://jansetu-xyz-el.a.run.app`).
+- **Bcrypt Password Hashing**: Passwords are never stored in plaintext (`bcrypt.hashpw(..., gensalt())`).
+- **Strict Registration Check (`POST /api/v1/auth/signup`)**:
+  - Validates RFC-compliant email structure.
+  - Returns `400 Bad Request` if email is already registered.
+- **Strict Login Verification (`POST /api/v1/auth/login`)**:
+  - Returns `404 Not Found` if the email is not registered.
+  - Returns `401 Unauthorized` if password is incorrect.
+- **Email Verification Endpoint (`POST /api/v1/auth/verify-email`)**:
+  - Returns `{ "email": "...", "is_valid_format": bool, "exists_in_database": bool, "message": "..." }`.
 
 ---
 
-## 🚀 4. Deploying to Render / Railway
+## 6. 🧪 Running Backend Automated Tests
 
-### Render
-1. Create a new **Web Service** connected to your GitHub repository.
-2. Select **Docker** environment.
-3. Add Environment Variables:
-   - `GEMINI_API_KEY`: your API key
-   - `SECRET_KEY`: generated random string
-4. Click **Deploy**.
-
-### Railway
-1. Click **New Project** $\rightarrow$ **Deploy from GitHub repo**.
-2. Railway automatically detects the `Dockerfile`.
-3. Add your `GEMINI_API_KEY` in the **Variables** tab.
-4. Generate a public domain under **Settings $\rightarrow$ Networking**.
-
----
-
-## 🧪 5. Testing & Verification
-
-Run automated test suite:
 ```bash
 cd backend
 ./venv/bin/pytest test_backend.py -v

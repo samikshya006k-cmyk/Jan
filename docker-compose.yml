@@ -1,4 +1,7 @@
+version: '3.8'
+
 services:
+  # JanSetu Fullstack Application (FastAPI + Static Frontend)
   jansetu-app:
     build:
       context: .
@@ -11,19 +14,40 @@ services:
       - SECRET_KEY=${SECRET_KEY:-jansetu-super-secret-jwt-key-change-in-production-2026}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - GEMINI_MODEL=${GEMINI_MODEL:-gemini-1.5-flash}
-      - DATABASE_URL=sqlite:///./jansetu.db
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY:-}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://jansetu_user:jansetu_secure_pass_2026@postgres-db:5432/jansetu_db}
     volumes:
-      # Persist SQLite database and media uploads across container restarts
-      - jansetu-data:/app/backend/uploads
-      - jansetu-db:/app/backend
+      - jansetu-uploads:/app/backend/uploads
+    depends_on:
+      postgres-db:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 5s
       retries: 3
 
+  # Local/Production PostgreSQL Database Service (Alternative to Cloud PostgreSQL)
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: jansetu-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-jansetu_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jansetu_secure_pass_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-jansetu_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jansetu_user -d jansetu_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
-  jansetu-data:
+  jansetu-uploads:
     driver: local
-  jansetu-db:
+  postgres-data:
     driver: local

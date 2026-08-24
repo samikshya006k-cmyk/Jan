@@ -5,12 +5,23 @@ async function createAccount() {
     const confirmPassword = document.getElementById("confirmPassword").value;
 
     if (name === "" || email === "" || password === "" || confirmPassword === "") {
-        alert("Please fill all the fields.");
+        alert("Please fill in all the required fields.");
+        return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert("Please enter a valid email address.");
+        return;
+    }
+
+    if (password.length < 6) {
+        alert("Password must be at least 6 characters long.");
         return;
     }
 
     if (password !== confirmPassword) {
-        alert("Passwords do not match.");
+        alert("Passwords do not match. Please verify and try again.");
         return;
     }
 
@@ -20,7 +31,7 @@ async function createAccount() {
     const submitBtn = document.querySelector(".signup-btn");
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = "Creating Account...";
+        submitBtn.textContent = "Verifying & Creating Account...";
     }
 
     try {
@@ -32,28 +43,23 @@ async function createAccount() {
             localStorage.setItem("userName", name);
 
             alert(
-                "Account created successfully!\n\n" +
-                "Welcome to JanSetu, " + name + " (" + role + ")"
+                "✓ Account created successfully!\n\n" +
+                "Welcome to JanSetu, " + name + " (" + role.toUpperCase() + ")"
             );
 
             // Redirect to appropriate dashboard
-            if (role === "officer") {
+            if (role === "officer" || role === "admin") {
                 window.location.href = "officerdashboard.html";
             } else {
                 window.location.href = "citizendashboard.html";
             }
         } else {
-            const errorMsg = response.data?.detail || "Registration failed. Please try again.";
+            const errorMsg = response.data?.detail || "Registration failed. An account with this email may already exist.";
             alert(errorMsg);
         }
     } catch (error) {
-        console.error("Signup error:", error);
-        // Fallback for offline demo
-        localStorage.setItem("userRole", role);
-        localStorage.setItem("userEmail", email);
-        localStorage.setItem("userName", name);
-        alert("Account created in demo mode!");
-        window.location.href = role === "officer" ? "officerdashboard.html" : "citizendashboard.html";
+        console.error("Signup network error:", error);
+        alert("Connection error while creating account. Please check your network and try again.");
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;

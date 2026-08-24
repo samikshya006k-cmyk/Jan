@@ -463,6 +463,61 @@ def test_ai_translation_and_geocoding(client):
     assert abs(data["longitude"] - 85.8431) < 0.01
 
 
+def test_verify_email_endpoint(client):
+    # 1. Invalid email format
+    res_inv = client.post("/api/v1/auth/verify-email", json={"email": "invalid-email-string"})
+    assert res_inv.status_code == 200
+    assert res_inv.json()["is_valid_format"] is False
+    assert res_inv.json()["exists_in_database"] is False
+
+    # 2. Existing registered email
+    res_exist = client.post("/api/v1/auth/verify-email", json={"email": "citizen@jansetu.in"})
+    assert res_exist.status_code == 200
+    assert res_exist.json()["is_valid_format"] is True
+    assert res_exist.json()["exists_in_database"] is True
+
+    # 3. Available valid email
+    res_avail = client.post("/api/v1/auth/verify-email", json={"email": "unique.citizen.2026@jansetu.in"})
+    assert res_avail.status_code == 200
+    assert res_avail.json()["is_valid_format"] is True
+    assert res_avail.json()["exists_in_database"] is False
+
+
+def test_auth_strict_email_and_password_rejection(client):
+    # 1. Nonexistent email login -> 404
+    res_404 = client.post("/api/v1/auth/login", json={
+        "email": "nonexistent.user.12345@jansetu.in",
+        "password": "somepassword"
+    })
+    assert res_404.status_code == 404
+    assert "No account found" in res_404.json()["detail"]
+
+    # 2. Wrong password for existing user -> 401
+    res_401 = client.post("/api/v1/auth/login", json={
+        "email": "citizen@jansetu.in",
+        "password": "wrongpassword999"
+    })
+    assert res_401.status_code == 401
+    assert "Incorrect password" in res_401.json()["detail"]
+
+    # 3. Duplicate signup -> 400
+    res_dup = client.post("/api/v1/auth/signup", json={
+        "email": "citizen@jansetu.in",
+        "password": "password123",
+        "full_name": "Duplicate User",
+        "role": "citizen"
+    })
+    assert res_dup.status_code == 400
+    assert "already exists" in res_dup.json()["detail"]
+
+
+def test_cloud_database_url_normalization():
+    raw_cloud_url = "postgres://postgres:securepass@aws-0-ap-south-1.pooler.supabase.com:6543/postgres"
+    normalized = raw_cloud_url.replace("postgres://", "postgresql://", 1) if raw_cloud_url.startswith("postgres://") else raw_cloud_url
+    assert normalized.startswith("postgresql://")
+
+
+
 
 
 

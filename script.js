@@ -176,7 +176,7 @@ async function loginDemo() {
             localStorage.setItem("userEmail", user.email);
             localStorage.setItem("userName", user.full_name);
 
-            showToast("Login successful!", "✓");
+            showToast("Login successful! Redirecting...", "✓");
             setTimeout(() => {
                 if (user.role === "officer" || user.role === "admin") {
                     window.location.href = "officerdashboard.html";
@@ -186,18 +186,12 @@ async function loginDemo() {
             }, 600);
             return;
         } else {
-            const errorMsg = res.data?.detail || "Invalid email or password.";
+            const errorMsg = res.data?.detail || "Authentication failed. Please verify your credentials.";
             showToast(errorMsg, "!");
         }
     } catch (err) {
-        console.warn("Backend not reachable or error, falling back to demo:", err);
-        localStorage.setItem("userRole", role);
-        localStorage.setItem("userEmail", email);
-        if (role === "officer") {
-            window.location.href = "officerdashboard.html";
-        } else {
-            window.location.href = "citizendashboard.html";
-        }
+        console.warn("Network error during login:", err);
+        showToast("Connection error. Please check your network and try again.", "!");
     }
 }
 
