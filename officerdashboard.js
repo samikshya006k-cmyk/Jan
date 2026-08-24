@@ -419,6 +419,7 @@ function updateOfficerStatsUI(analytics) {
 
 function renderOfficerGrievances(grievances) {
     if (!grievances || grievances.length === 0) return;
+    const lang = localStorage.getItem("jansetu_preferred_lang") || "en";
 
     // 1. Render Priority Queue (Top urgent items)
     const priorityList = document.querySelector(".grievance-list");
@@ -430,6 +431,12 @@ function renderOfficerGrievances(grievances) {
 
         priorityList.innerHTML = criticalFirst.slice(0, 4).map(g => {
             const prioClass = (g.priority || "Medium").toLowerCase();
+            const displayTitle = window.JanSetuI18n ? window.JanSetuI18n.translateTitle(g.title, lang) : g.title;
+            const displayPrio = window.JanSetuI18n ? window.JanSetuI18n.translatePriority(g.priority, lang) : g.priority;
+            const displayCat = window.JanSetuI18n ? window.JanSetuI18n.translateCategory(g.category, lang) : g.category;
+            const displayStatus = window.JanSetuI18n ? window.JanSetuI18n.translateStatus(g.status, lang) : g.status;
+            const reviewText = window.JanSetuI18n ? window.JanSetuI18n.get("btn_review", lang) : "Review";
+
             return `
                 <div class="grievance-item" data-id="${g.ticket_id}">
                     <div class="priority-indicator ${prioClass}">
@@ -437,19 +444,19 @@ function renderOfficerGrievances(grievances) {
                     </div>
                     <div class="grievance-main">
                         <div class="grievance-title-row">
-                            <h3>${g.title}</h3>
-                            <span class="priority ${prioClass}">
-                                ${g.priority}
+                            <h3 data-raw-title="${g.title}">${displayTitle}</h3>
+                            <span class="priority ${prioClass}" data-raw-priority="${g.priority}">
+                                ${displayPrio}
                             </span>
                         </div>
-                        <p>#${g.ticket_id} • ${g.category}</p>
+                        <p>#${g.ticket_id} • ${displayCat}</p>
                         <div class="grievance-meta">
                             <span>⌖ ${g.landmark || g.ward || 'Ward 12'}</span>
-                            <span>◷ ${g.status}</span>
+                            <span data-raw-status="${g.status}">◷ ${displayStatus}</span>
                         </div>
                     </div>
                     <button class="review-button" onclick="openGrievance('${g.ticket_id}')">
-                        Review
+                        ${reviewText}
                     </button>
                 </div>
             `;
@@ -462,17 +469,23 @@ function renderOfficerGrievances(grievances) {
         tableBody.innerHTML = grievances.map(g => {
             const prioClass = (g.priority || "Medium").toLowerCase();
             const statusKey = (g.status || "").toLowerCase().includes("progress") ? "in-progress" : ((g.status || "").toLowerCase().includes("resolve") ? "resolved" : "pending");
+            const displayTitle = window.JanSetuI18n ? window.JanSetuI18n.translateTitle(g.title, lang) : g.title;
+            const displayPrio = window.JanSetuI18n ? window.JanSetuI18n.translatePriority(g.priority, lang) : g.priority;
+            const displayCat = window.JanSetuI18n ? window.JanSetuI18n.translateCategory(g.category, lang) : g.category;
+            const displayStatus = window.JanSetuI18n ? window.JanSetuI18n.translateStatus(g.status, lang) : g.status;
+            const reviewText = window.JanSetuI18n ? window.JanSetuI18n.get("btn_review", lang) : "Review";
+
             return `
                 <tr data-status="${statusKey}" data-priority="${prioClass}">
                     <td><strong>#${g.ticket_id}</strong></td>
-                    <td>${g.title}</td>
-                    <td>${g.category}</td>
-                    <td><span class="priority ${prioClass}">${g.priority}</span></td>
+                    <td data-raw-title="${g.title}">${displayTitle}</td>
+                    <td>${displayCat}</td>
+                    <td><span class="priority ${prioClass}" data-raw-priority="${g.priority}">${displayPrio}</span></td>
                     <td>${g.landmark || g.ward || 'Ward 12'}</td>
-                    <td><span class="status ${statusKey}">${g.status}</span></td>
+                    <td><span class="status ${statusKey}" data-raw-status="${g.status}">${displayStatus}</span></td>
                     <td>
                         <button class="action-btn" onclick="openGrievance('${g.ticket_id}')">
-                            Review →
+                            ${reviewText} →
                         </button>
                     </td>
                 </tr>

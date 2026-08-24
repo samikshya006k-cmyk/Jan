@@ -724,12 +724,22 @@ function getCategoryIcon(category) {
 
 function getStatusBadge(status) {
     const s = (status || "").toLowerCase();
-    if (s.includes("progress")) return `<span class="status in-progress">In Progress</span>`;
-    if (s.includes("resolve")) return `<span class="status resolved">Resolved</span>`;
-    return `<span class="status pending">Pending</span>`;
+    const lang = localStorage.getItem("jansetu_preferred_lang") || "en";
+    let statusLabel = "Pending";
+    let statusCls = "pending";
+    if (s.includes("progress")) {
+        statusCls = "in-progress";
+        statusLabel = "In Progress";
+    } else if (s.includes("resolve")) {
+        statusCls = "resolved";
+        statusLabel = "Resolved";
+    }
+    const translatedText = window.JanSetuI18n ? window.JanSetuI18n.translateStatus(statusLabel, lang) : statusLabel;
+    return `<span class="status ${statusCls}" data-raw-status="${statusLabel}">${translatedText}</span>`;
 }
 
 function renderGrievanceLists(grievances) {
+    const lang = localStorage.getItem("jansetu_preferred_lang") || "en";
     // 1. Render Recent Reports (top 3)
     const recentList = document.querySelector(".reports-list");
     if (recentList && grievances && grievances.length > 0) {
@@ -737,13 +747,14 @@ function renderGrievanceLists(grievances) {
             const catInfo = getCategoryIcon(g.category);
             const dateStr = new Date(g.created_at).toLocaleDateString("en-IN", { month: "short", day: "numeric" });
             const impactVotes = g.community_impact_count || 1;
+            const displayTitle = window.JanSetuI18n ? window.JanSetuI18n.translateTitle(g.title, lang) : g.title;
             return `
                 <div class="report-row">
                     <div class="report-category ${catInfo.cls}">
                         ${catInfo.icon}
                     </div>
                     <div class="report-details">
-                        <h3>${g.title}</h3>
+                        <h3 data-raw-title="${g.title}">${displayTitle}</h3>
                         <p>#${g.ticket_id} • ${dateStr} • ${g.ward || 'Ward 12'}</p>
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
