@@ -2,7 +2,7 @@
  * JanSetu Unified Multilingual Internationalization (i18n) Engine
  * Seamless regional language switching for Citizen and Officer Dashboards
  * Full localization for Karma XP, Civic Maps, Ward Bulletins, Budgeting,
- * AI Chatbot, Community Impact, Brand & Numeral Digits.
+ * AI Chatbot, Community Impact, Brand, User Profile, Location Pins & Numeral Digits.
  * Languages: EN, HI, OR, BN, GU, TA, TE, MR, KN
  */
 
@@ -11,7 +11,7 @@
         "en": ["0","1","2","3","4","5","6","7","8","9"],
         "or": ["୦","୧","୨","୩","୪","୫","୬","୭","୮","୯"], // Odia
         "hi": ["०","१","२","३","४","५","६","७","८","९"], // Hindi
-        "mr": ["०","१","२","३","४","५","६","୭","८","९"], // Marathi
+        "mr": ["०","१","२","३","४","५","६","७","८","९"], // Marathi
         "bn": ["০","১","২","৩","৪","৫","৬","৭","৮","৯"], // Bengali
         "gu": ["૦","૧","૨","૩","૪","૫","૬","૭","૮","૯"], // Gujarati
         "ta": ["௦","௧","௨","௩","௪","௫","௬","௭","௮","௯"], // Tamil
@@ -21,9 +21,13 @@
 
     const I18N_DICTIONARIES = {
         "en": {
-            // Brand
+            // Brand & User Profile
             "brand_title": "JanSetu",
             "brand_subtitle": "Civic Intelligence",
+            "user_citizen_role": "Citizen",
+            "user_ward_resident": "Ward 12 Resident",
+            "officer_role_label": "Officer Admin",
+            "officer_ward_label": "Ward 12",
 
             // General & Header
             "portal_citizen": "CITIZEN PORTAL",
@@ -73,7 +77,7 @@
             "official_bulletin_tag": "Official Ward Bulletin",
             "bulletin_ward_tag": "Ward 12 • Saheed Nagar",
             "bulletin_headline": "Scheduled Water Supply Maintenance (Sunday 8 AM - 2 PM)",
-            "bulletin_message": "Municipal PHED pipeline interconnection work in progress. Please store adequate water.",
+            "bulletin_message": "Municipal PHED pipeline interconnection work will take place in Ward 12 & Saheed Nagar on Sunday. Citizens are requested to store adequate water.",
             "btn_daily_briefing": "🔊 Daily Civic Briefing",
             "btn_read_notice": "📢 Read Notice",
             "btn_stop_audio": "⏹ Stop",
@@ -124,6 +128,7 @@
             "card_priority_queue_sub": "Grievances ranked by urgency and community impact.",
             "eyebrow_needs_attention": "NEEDS ATTENTION",
             "btn_review": "Review",
+            "btn_track": "Track →",
 
             // Community Impact Card
             "impact_title": "Community Impact",
@@ -198,6 +203,16 @@
             "prio_medium": "Medium",
             "prio_low": "Low",
 
+            // Locations
+            "loc_saheed_nagar": "Saheed Nagar",
+            "loc_unit_4_market": "Unit 4 Market",
+            "loc_unit_4_gate": "Near Unit 4 Main Gate",
+            "loc_community_park": "Opposite Community Park",
+            "loc_transformer": "Near Electrical Transformer",
+            "loc_reservoir": "Near Municipal Water Reservoir",
+            "loc_master_canteen": "Master Canteen",
+            "loc_ward_12": "Ward 12",
+
             // Sample Grievance Titles
             "title_waste_overflow": "Overflowing waste collection point",
             "title_road_damage": "Major road damage near Unit 4",
@@ -205,9 +220,13 @@
             "title_water_leak": "Water pipe leakage flooding footpath"
         },
         "or": {
-            // Brand
+            // Brand & User Profile
             "brand_title": "ଜନସେତୁ",
             "brand_subtitle": "ପୌର ସେବା ବ୍ୟବସ୍ଥା",
+            "user_citizen_role": "ନାଗରିକ",
+            "user_ward_resident": "ୱାର୍ଡ଼ ୧୨ ବାସିନ୍ଦା",
+            "officer_role_label": "ପୌର ଅଧିକାରୀ",
+            "officer_ward_label": "ୱାର୍ଡ଼ ୧୨",
 
             // General & Header
             "portal_citizen": "ନାଗରିକ ପୋର୍ଟାଲ୍",
@@ -256,8 +275,8 @@
             // Official Ward Bulletin
             "official_bulletin_tag": "ସରକାରୀ ୱାର୍ଡ଼ ବିଜ୍ଞପ୍ତି",
             "bulletin_ward_tag": "ୱାର୍ଡ଼ ୧୨ • ସହିଦ ନଗର",
-            "bulletin_headline": "ଜଳ ଯୋଗାଣ ମରାମତି ସୂଚନା (ରବିବାର ସକାଳ ୮ - ଅପରାହ୍ନ ୨)",
-            "bulletin_message": "ମ୍ୟୁନିସିପାଲ୍ ପାଇପଲାଇନ୍ ସଂଯୋଗ କାର୍ଯ୍ୟ ଚାଲୁଅଛି। ଦୟାକରି ଆବଶ୍ୟକ ଜଳ ସଂଗ୍ରହ କରି ରଖନ୍ତୁ।",
+            "bulletin_headline": "ଜଳ ଯୋଗାଣ ରକ୍ଷଣାବେକ୍ଷଣ ସୂଚନା (ରବିବାର ସକାଳ ୮ - ଅପରାହ୍ନ ୨)",
+            "bulletin_message": "ମ୍ୟୁନିସିପାଲ୍ PHED ପାଇପଲାଇନ୍ ସଂଯୋଗ କାର୍ଯ୍ୟ ରବିବାର ଦିନ ୱାର୍ଡ଼ ୧୨ ଓ ସହିଦ ନଗରରେ ଅନୁଷ୍ଠିତ ହେବ। ନାଗରିକମାନଙ୍କୁ ଆବଶ୍ୟକ ଜଳ ସଂଗ୍ରହ କରି ରଖିବାକୁ ଅନୁରୋଧ।",
             "btn_daily_briefing": "🔊 ଦୈନିକ ପୌର ବାର୍ତ୍ତା",
             "btn_read_notice": "📢 ନୋଟିସ୍ ଶୁଣନ୍ତୁ",
             "btn_stop_audio": "⏹ ବନ୍ଦ କରନ୍ତୁ",
@@ -308,6 +327,7 @@
             "card_priority_queue_sub": "ଜରୁରୀକାଳୀନ ଭିତ୍ତିରେ ସଜ୍ଜିତ ଅଭିଯୋଗ।",
             "eyebrow_needs_attention": "ତୁରନ୍ତ ଧ୍ୟାନ ଆବଶ୍ୟକ",
             "btn_review": "ସମୀକ୍ଷା",
+            "btn_track": "ଟ୍ରାକ୍ କରନ୍ତୁ →",
 
             // Community Impact Card
             "impact_title": "ସାମୂହିକ ପ୍ରଭାବ",
@@ -382,6 +402,16 @@
             "prio_medium": "ମଧ୍ୟମ",
             "prio_low": "ନିମ୍ନ",
 
+            // Locations
+            "loc_saheed_nagar": "ସହିଦ ନଗର",
+            "loc_unit_4_market": "ୟୁନିଟ୍ ୪ ମାର୍କେଟ୍",
+            "loc_unit_4_gate": "ୟୁନିଟ୍ ୪ ମୁଖ୍ୟ ଫାଟକ ନିକଟ",
+            "loc_community_park": "କମ୍ୟୁନିଟି ପାର୍କ ସମ୍ମୁଖ",
+            "loc_transformer": "ବିଦ୍ୟୁତ ଟ୍ରାନ୍ସଫର୍ମର ନିକଟ",
+            "loc_reservoir": "ପୌର ଜଳାଶୟ ନିକଟ",
+            "loc_master_canteen": "ମାଷ୍ଟର କ୍ୟାଣ୍ଟିନ୍",
+            "loc_ward_12": "ୱାର୍ଡ଼ ୧୨",
+
             // Sample Grievance Titles
             "title_waste_overflow": "ଆବର୍ଜନା ସଂଗ୍ରହ କେନ୍ଦ୍ରରୁ ଅଳିଆ ନିଷ୍କାସନ",
             "title_road_damage": "ୟୁନିଟ୍ ୪ ନିକଟରେ ମୁଖ୍ୟ ରାସ୍ତା ନଷ୍ଟ",
@@ -389,9 +419,13 @@
             "title_water_leak": "ପାଇପ୍ ଲିକେଜ୍ ଯୋଗୁଁ ଫୁଟପାଥରେ ପାଣି"
         },
         "hi": {
-            // Brand
+            // Brand & User Profile
             "brand_title": "जनसेतु",
             "brand_subtitle": "नागरिक सेवा प्रणाली",
+            "user_citizen_role": "नागरिक",
+            "user_ward_resident": "वार्ड 12 निवासी",
+            "officer_role_label": "अधिकारी एडमिन",
+            "officer_ward_label": "वार्ड 12",
 
             // General & Header
             "portal_citizen": "नागरिक पोर्टल",
@@ -441,7 +475,7 @@
             "official_bulletin_tag": "आधिकारिक वार्ड बुलेटिन",
             "bulletin_ward_tag": "वार्ड 12 • शहीद नगर",
             "bulletin_headline": "नियमित जल आपूर्ति रखरखाव सूचना (रविवार सुबह 8 - दोपहर 2)",
-            "bulletin_message": "नगर निगम पाइपलाइन इंटरकनेक्शन कार्य प्रगति पर है। कृपया पर्याप्त पानी का भंडारण करें।",
+            "bulletin_message": "नगर निगम PHED पाइपलाइन इंटरकनेक्शन कार्य रविवार को वार्ड 12 और शहीद नगर में होगा। नागरिकों से अनुरोध है कि पर्याप्त पानी का भंडारण करें।",
             "btn_daily_briefing": "🔊 दैनिक नागरिक ब्रीफिंग",
             "btn_read_notice": "📢 नोटिस सुनें",
             "btn_stop_audio": "⏹ रोकें",
@@ -481,7 +515,7 @@
             "stat_resolution_rate": "समाधान दर",
 
             // Filters & Recent Reports
-            "filter_all": "सभी (०८)",
+            "filter_all": "सभी (०୮)",
             "filter_in_progress": "⏳ प्रगति पर (०३)",
             "filter_resolved": "✅ समाधान पूर्ण (०४)",
             "filter_critical": "🔥 अति आवश्यक",
@@ -492,6 +526,7 @@
             "card_priority_queue_sub": "तात्कालिकता और सामुदायिक प्रभाव के आधार पर रैंक की गई शिकायतें।",
             "eyebrow_needs_attention": "तत्काल ध्यान आवश्यक",
             "btn_review": "समीक्षा",
+            "btn_track": "ट्रैक करें →",
 
             // Community Impact Card
             "impact_title": "सामुदायिक प्रभाव",
@@ -566,6 +601,16 @@
             "prio_medium": "मध्यम",
             "prio_low": "सामान्य",
 
+            // Locations
+            "loc_saheed_nagar": "शहीद नगर",
+            "loc_unit_4_market": "यूनिट 4 मार्केट",
+            "loc_unit_4_gate": "यूनिट 4 मेन गेट के पास",
+            "loc_community_park": "कम्युनिटी पार्क के सामने",
+            "loc_transformer": "इलेक्ट्रिकल ट्रांसफॉर्मर के पास",
+            "loc_reservoir": "नगर निगम जलाशय के पास",
+            "loc_master_canteen": "मास्टर कैंटीन",
+            "loc_ward_12": "वार्ड 12",
+
             // Sample Grievance Titles
             "title_waste_overflow": "कचरा संग्रह केंद्र में ओवरफ्लो",
             "title_road_damage": "यूनिट 4 के पास मुख्य सड़क क्षति",
@@ -591,6 +636,21 @@
             const current = lang || localStorage.getItem('jansetu_preferred_lang') || 'en';
             const langDict = this.dict[current] || this.dict['en'];
             return langDict[key] || this.dict['en'][key] || key;
+        },
+
+        translateLocation(rawLoc, lang = null) {
+            const current = lang || localStorage.getItem('jansetu_preferred_lang') || 'en';
+            if (current === 'en' || !rawLoc) return rawLoc;
+            const l = rawLoc.toLowerCase();
+            if (l.includes("saheed") || l.includes("ସହିଦ") || l.includes("शहीद")) return this.get("loc_saheed_nagar", current);
+            if (l.includes("market") || l.includes("ମାର୍କେଟ୍") || l.includes("मार्केट")) return this.get("loc_unit_4_market", current);
+            if (l.includes("gate") || l.includes("ଫାଟକ") || l.includes("गेट")) return this.get("loc_unit_4_gate", current);
+            if (l.includes("park") || l.includes("ପାର୍କ") || l.includes("पार्क")) return this.get("loc_community_park", current);
+            if (l.includes("transformer") || l.includes("ଟ୍ରାନ୍ସଫର୍ମର") || l.includes("ट्रांसफॉर्मर")) return this.get("loc_transformer", current);
+            if (l.includes("reservoir") || l.includes("water") || l.includes("ଜଳାଶୟ") || l.includes("जलाशय")) return this.get("loc_reservoir", current);
+            if (l.includes("master") || l.includes("canteen") || l.includes("କ୍ୟାଣ୍ଟିନ୍") || l.includes("कैंटीन")) return this.get("loc_master_canteen", current);
+            if (l.includes("ward 12") || l.includes("ୱାର୍ଡ଼ ୧୨") || l.includes("वार्ड 12")) return this.get("loc_ward_12", current);
+            return rawLoc;
         },
 
         translateTitle(rawTitle, lang = null) {
@@ -659,9 +719,23 @@
                 if (d[key]) el.placeholder = d[key];
             });
 
-            // 3. Brand & Logo
+            // 3. Brand & User Profile in Header
             const brandSpan = document.querySelector('.brand span, .brand-logo span');
             if (brandSpan) brandSpan.textContent = d.brand_subtitle || "Civic Intelligence";
+
+            const userName = document.getElementById('userName');
+            if (userName) userName.textContent = d.user_citizen_role || "Citizen";
+            const userSub = document.querySelector('.user-info span');
+            if (userSub) userSub.textContent = d.user_citizen_role || "Citizen";
+            const profileMenuName = document.getElementById('profileMenuName');
+            if (profileMenuName) profileMenuName.textContent = d.user_citizen_role || "Citizen";
+            const profileMenuSub = document.querySelector('.profile-menu-header span');
+            if (profileMenuSub) profileMenuSub.textContent = d.user_ward_resident || "Ward 12 Resident";
+
+            const officerProfileStrong = document.querySelector('.officer-info strong');
+            if (officerProfileStrong) officerProfileStrong.textContent = d.officer_role_label || "Officer Admin";
+            const officerProfileSmall = document.querySelector('.officer-info small, .officer-info span');
+            if (officerProfileSmall) officerProfileSmall.textContent = d.officer_ward_label || "Ward 12";
 
             // 4. Topbar Search & Status
             const searchInputs = document.querySelectorAll('#globalSearch, #searchInput, .global-search input, .search-bar input');
@@ -678,9 +752,7 @@
             // 5. Welcome Headers & Action Buttons
             const welcomeCitizenH1 = document.querySelector('.welcome-row h1');
             if (welcomeCitizenH1) {
-                const nameElem = document.getElementById('welcomeName') || document.getElementById('userName');
-                const userName = nameElem ? nameElem.textContent.trim() : 'Citizen';
-                welcomeCitizenH1.innerHTML = `${d.good_morning_citizen || "Good morning"}, <span id="welcomeName">${userName}</span> 👋`;
+                welcomeCitizenH1.innerHTML = `${d.good_morning_citizen || "Good morning"}, <span id="welcomeName">${d.user_citizen_role || "Citizen"}</span> 👋`;
             }
             const welcomeOfficerH1 = document.querySelector('.page-header h1');
             if (welcomeOfficerH1) {
@@ -709,7 +781,7 @@
             const bulletinHeadline = document.getElementById('bulletinHeadline');
             if (bulletinHeadline) bulletinHeadline.textContent = d.bulletin_headline || "Scheduled Water Supply Maintenance (Sunday 8 AM - 2 PM)";
             const bulletinMessage = document.getElementById('bulletinMessage');
-            if (bulletinMessage) bulletinMessage.textContent = d.bulletin_message || "Municipal PHED pipeline interconnection work in progress. Please store adequate water.";
+            if (bulletinMessage) bulletinMessage.textContent = d.bulletin_message || "Municipal PHED pipeline interconnection work will take place in Ward 12 & Saheed Nagar on Sunday. Citizens are requested to store adequate water.";
 
             const briefingBtn = document.getElementById('bulletinBriefingBtn');
             if (briefingBtn) briefingBtn.innerHTML = `<span>🔊</span> ${d.btn_daily_briefing ? d.btn_daily_briefing.replace('🔊 ', '') : 'Daily Civic Briefing'}`;
@@ -882,12 +954,20 @@
             pills.forEach(p => {
                 const text = p.textContent.toLowerCase();
                 if (text.includes('all') || text.includes('ସମସ୍ତ') || text.includes('सभी') || text.includes('બધા')) p.textContent = d.filter_all || "All (08)";
-                else if (text.includes('progress') || text.includes('ଚାଲୁଅଛି') || text.includes('प्रगति') || text.includes('કામ ଚાલુ')) p.textContent = d.filter_in_progress || "⏳ In Progress (03)";
+                else if (text.includes('progress') || text.includes('ଚାଲୁଅଛି') || text.includes('प्रगति') || text.includes('કામ ચાલુ')) p.textContent = d.filter_in_progress || "⏳ In Progress (03)";
                 else if (text.includes('resolved') || text.includes('ସମାଧାନ') || text.includes('समाधान')) p.textContent = d.filter_resolved || "✅ Resolved (04)";
                 else if (text.includes('critical') || text.includes('ବିପଦ') || text.includes('आवश्यक')) p.textContent = d.filter_critical || "🔥 Critical SLA";
             });
 
-            // 12. Community Impact Section
+            // 12. Recent Reports Card
+            const recentReportsH2 = document.querySelector('.reports-card h2, .reports-section h2');
+            if (recentReportsH2) recentReportsH2.textContent = d.card_recent_reports || "Recent Reports";
+            const recentReportsP = document.querySelector('.reports-card .card-header p, .reports-section p');
+            if (recentReportsP) recentReportsP.textContent = d.card_recent_reports_sub || "Track your latest civic issues";
+            const viewAllBtns = document.querySelectorAll('.reports-card .text-btn, .reports-card .text-button');
+            viewAllBtns.forEach(v => { v.textContent = d.btn_view_all || "View all →"; });
+
+            // 13. Community Impact Section
             const impactH2 = document.querySelector('#impact h2');
             if (impactH2) impactH2.textContent = d.impact_title || "Community Impact";
             const impactP = document.querySelector('#impact .card-header p');
@@ -901,7 +981,7 @@
             const impactMsg = document.querySelector('.impact-message');
             if (impactMsg) impactMsg.innerHTML = d.impact_message_full || "Together, citizens in your area have helped improve <strong>23 local issues</strong> this month.";
 
-            // 13. Civic Map Section
+            // 14. Civic Map Section
             const mapH2 = document.querySelector('#map h2');
             if (mapH2) mapH2.textContent = d.map_title || "Civic Map";
             const mapP = document.querySelector('#map .card-header p');
@@ -909,7 +989,7 @@
             const mapResetBtn = document.querySelector('#map .text-btn');
             if (mapResetBtn) mapResetBtn.textContent = d.btn_reset_view || "Reset View ⌖";
 
-            // 14. Participatory Budgeting Card & Section
+            // 15. Participatory Budgeting Card & Section
             const budgetEyebrow = document.querySelector('.budget-info .eyebrow');
             if (budgetEyebrow) budgetEyebrow.textContent = d.budget_eyebrow || "PARTICIPATORY BUDGETING";
             const budgetBannerH2 = document.querySelector('.budget-info h2');
@@ -926,7 +1006,12 @@
             const budgetSectionP = document.querySelector('#budgetSection p');
             if (budgetSectionP) budgetSectionP.textContent = d.budget_section_sub || "Vote on municipal fund allocations for local infrastructure projects in Ward 12.";
 
-            // 15. Quick Actions & Leaderboard
+            // 16. Quick Actions & Leaderboard
+            const quickCardsH2 = document.querySelector('.quick-actions h2, .quick-actions-card h2');
+            if (quickCardsH2) quickCardsH2.textContent = d.card_quick_actions || "Quick Actions";
+            const quickCardsP = document.querySelector('.quick-actions p, .quick-actions-card p');
+            if (quickCardsP) quickCardsP.textContent = d.sub_quick_actions || "Get things done faster";
+
             const quickActionButtons = document.querySelectorAll('.quick-action');
             quickActionButtons.forEach(btn => {
                 const strong = btn.querySelector('strong');
@@ -986,7 +1071,7 @@
                 }
             });
 
-            // 16. Ask JanSetu AI Chatbot Floating Trigger & Headers
+            // 17. Ask JanSetu AI Chatbot Floating Trigger & Headers
             const aiTriggerText = document.querySelector('.ai-chat-trigger-text');
             if (aiTriggerText) {
                 aiTriggerText.innerHTML = `<span>${d.chatbot_trigger_title || "Ask JanSetu AI"}</span><small>${d.chatbot_trigger_sub || "⚡ 24/7 Civic Assistant"}</small>`;
@@ -998,7 +1083,7 @@
             const aiInput = document.getElementById('aiInput');
             if (aiInput) aiInput.placeholder = d.chatbot_input_placeholder || "Ask AI or describe civic problem...";
 
-            // 17. Dynamic Grievance Rows
+            // 18. Dynamic Grievance Rows (Title, category, location, upvotes, status, review button)
             this.translateExistingGrievanceRows(lang);
         },
 
@@ -1022,6 +1107,13 @@
                         parts[1] = ` ${this.translateCategory(rawCat, lang)} `;
                         descP.textContent = parts.join('•');
                     }
+                }
+
+                const metaLoc = row.querySelector('.grievance-meta span:first-child');
+                if (metaLoc && metaLoc.textContent.includes('⌖')) {
+                    const rawLoc = metaLoc.getAttribute('data-raw-loc') || metaLoc.textContent.replace('⌖', '').trim();
+                    metaLoc.setAttribute('data-raw-loc', rawLoc);
+                    metaLoc.textContent = `⌖ ${this.translateLocation(rawLoc, lang)}`;
                 }
 
                 const upvoteBtn = row.querySelector('.support-vote-btn');

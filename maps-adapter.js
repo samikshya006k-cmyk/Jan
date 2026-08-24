@@ -210,17 +210,24 @@ const JanSetuMaps = {
                 }
             });
 
+            const lang = (typeof localStorage !== "undefined" ? localStorage.getItem("jansetu_preferred_lang") : "en") || "en";
+            const displayTitle = window.JanSetuI18n ? window.JanSetuI18n.translateTitle(properties.title, lang) : properties.title;
+            const displayCat = window.JanSetuI18n ? window.JanSetuI18n.translateCategory(properties.category, lang) : properties.category;
+            const displayLoc = window.JanSetuI18n ? window.JanSetuI18n.translateLocation(properties.landmark || properties.ward || 'Ward 12', lang) : (properties.landmark || properties.ward || 'Ward 12');
+            const displayStatus = window.JanSetuI18n ? window.JanSetuI18n.translateStatus(properties.status, lang) : properties.status;
+            const actionText = window.JanSetuI18n ? window.JanSetuI18n.get("btn_track", lang) : (properties.actionLabel || 'Track →');
+
             const popupHtml = `
                 <div style="font-family: inherit; font-size: 13px; line-height: 1.4; padding: 4px; min-width: 200px;">
                     <div style="font-weight: 700; color: #1e293b; margin-bottom: 2px;">#${properties.ticket_id}</div>
-                    <div style="font-size: 13px; color: #0f172a; font-weight: 600; margin-bottom: 4px;">${properties.title}</div>
+                    <div style="font-size: 13px; color: #0f172a; font-weight: 600; margin-bottom: 4px;">${displayTitle}</div>
                     <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">
-                        <span>${iconSymbol} ${properties.category}</span><br>
-                        <span>⌖ ${properties.landmark || properties.ward || 'Ward 12'}</span>
+                        <span>${iconSymbol} ${displayCat}</span><br>
+                        <span>⌖ ${displayLoc}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 6px;">
-                        <span style="font-size: 11px; font-weight: 700; color: ${properties.status === 'Resolved' ? '#16a34a' : '#ea580c'};">${properties.status}</span>
-                        ${properties.onActionClick ? `<button onclick="${properties.onActionClick}('${properties.ticket_id}')" style="background: #2563eb; color: #fff; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600;">${properties.actionLabel || 'Track →'}</button>` : ''}
+                        <span style="font-size: 11px; font-weight: 700; color: ${properties.status === 'Resolved' ? '#16a34a' : '#ea580c'};">${displayStatus}</span>
+                        ${properties.onActionClick ? `<button onclick="${properties.onActionClick}('${properties.ticket_id}')" style="background: #2563eb; color: #fff; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600;">${actionText}</button>` : ''}
                     </div>
                 </div>
             `;
@@ -244,17 +251,24 @@ const JanSetuMaps = {
                 fillOpacity: 0.92
             });
 
+            const lang = (typeof localStorage !== "undefined" ? localStorage.getItem("jansetu_preferred_lang") : "en") || "en";
+            const displayTitle = window.JanSetuI18n ? window.JanSetuI18n.translateTitle(properties.title, lang) : properties.title;
+            const displayCat = window.JanSetuI18n ? window.JanSetuI18n.translateCategory(properties.category, lang) : properties.category;
+            const displayLoc = window.JanSetuI18n ? window.JanSetuI18n.translateLocation(properties.landmark || properties.ward || 'Ward 12', lang) : (properties.landmark || properties.ward || 'Ward 12');
+            const displayStatus = window.JanSetuI18n ? window.JanSetuI18n.translateStatus(properties.status, lang) : properties.status;
+            const actionText = window.JanSetuI18n ? window.JanSetuI18n.get("btn_track", lang) : (properties.actionLabel || 'Track →');
+
             const popupHtml = `
                 <div style="font-family: inherit; font-size: 13px; line-height: 1.4; min-width: 190px;">
                     <div style="font-weight: 700; color: #1e293b; margin-bottom: 2px;">#${properties.ticket_id}</div>
-                    <div style="font-size: 13px; color: #0f172a; font-weight: 600; margin-bottom: 4px;">${properties.title}</div>
+                    <div style="font-size: 13px; color: #0f172a; font-weight: 600; margin-bottom: 4px;">${displayTitle}</div>
                     <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">
-                        <span>${iconSymbol} ${properties.category}</span><br>
-                        <span>⌖ ${properties.landmark || properties.ward || 'Ward 12'}</span>
+                        <span>${iconSymbol} ${displayCat}</span><br>
+                        <span>⌖ ${displayLoc}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 6px;">
-                        <span style="font-size: 11px; font-weight: 700; color: ${properties.status === 'Resolved' ? '#16a34a' : '#ea580c'};">${properties.status}</span>
-                        ${properties.onActionClick ? `<button onclick="${properties.onActionClick}('${properties.ticket_id}')" style="background: #2563eb; color: #fff; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600;">${properties.actionLabel || 'Track →'}</button>` : ''}
+                        <span style="font-size: 11px; font-weight: 700; color: ${properties.status === 'Resolved' ? '#16a34a' : '#ea580c'};">${displayStatus}</span>
+                        ${properties.onActionClick ? `<button onclick="${properties.onActionClick}('${properties.ticket_id}')" style="background: #2563eb; color: #fff; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600;">${actionText}</button>` : ''}
                     </div>
                 </div>
             `;
