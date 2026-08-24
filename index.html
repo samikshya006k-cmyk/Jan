@@ -1110,47 +1110,58 @@
             </div>
 
             <h2>
-                Welcome back
+                Welcome to JanSetu
             </h2>
 
             <p>
-                Sign in to manage your civic reports.
+                Sign in to access your civic dashboard.
             </p>
-            <div class="role-selection">
-    <label class="role-option">
-        <input type="radio" name="role" value="citizen" checked>
-        <span class="custom-radio"></span>
-        <span>Citizen</span>
-    </label>
 
-    <label class="role-option">
-        <input type="radio" name="role" value="officer">
-        <span class="custom-radio"></span>
-        <span>Officer</span>
-    </label>
-</div>
+            <div class="role-selection" style="margin-bottom: 15px;">
+                <label class="role-option">
+                    <input type="radio" name="role" value="citizen" checked onchange="setLoginRole('citizen')">
+                    <span class="custom-radio"></span>
+                    <span>Citizen</span>
+                </label>
 
-<!-- email -->
+                <label class="role-option">
+                    <input type="radio" name="role" value="officer" onchange="setLoginRole('officer')">
+                    <span class="custom-radio"></span>
+                    <span>Officer</span>
+                </label>
+            </div>
+
+            <!-- Email -->
             <input
                 type="email"
                 id="loginEmail"
-                placeholder="Email address">
-<!-- Password -->
+                placeholder="Email address"
+                value="citizen@jansetu.in">
+
+            <!-- Password -->
             <input
                 type="password"
-                id ="loginPassword"
-                placeholder="Password">
+                id="loginPassword"
+                placeholder="Password"
+                value="password123">
 
-            <button class="submit-report-btn"
-                onclick="loginDemo()">
-
-                Login →
+            <button class="submit-report-btn" onclick="loginDemo()" style="margin-top: 8px;">
+                Login to Dashboard →
             </button>
-            <h6 class ="signup-text">if you are new user please <a href="signup.html" class="s_up">sign up</a> first</h6>
 
-            <small class="demo-note">
-                Demo interface — authentication will be connected to the backend.
-            </small>
+            <!-- Quick 1-Click Access Buttons -->
+            <div style="display: flex; gap: 8px; margin-top: 14px;">
+                <button type="button" onclick="quickLogin('citizen')" style="flex: 1; padding: 7px 10px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; transition: all 0.2s;">
+                    👤 Citizen Demo
+                </button>
+                <button type="button" onclick="quickLogin('officer')" style="flex: 1; padding: 7px 10px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; transition: all 0.2s;">
+                    🏛️ Officer Demo
+                </button>
+            </div>
+
+            <h6 class="signup-text" style="margin-top: 14px;">
+                New to JanSetu? <a href="signup.html" class="s_up">Create an account</a>
+            </h6>
 
         </div>
 

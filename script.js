@@ -141,6 +141,25 @@ function closeReportModal() {
    LOGIN
 ===================================================== */
 
+function setLoginRole(role) {
+    const emailInput = document.getElementById("loginEmail");
+    const passwordInput = document.getElementById("loginPassword");
+    if (role === "officer") {
+        if (emailInput) emailInput.value = "officer@jansetu.in";
+        if (passwordInput) passwordInput.value = "password123";
+    } else {
+        if (emailInput) emailInput.value = "citizen@jansetu.in";
+        if (passwordInput) passwordInput.value = "password123";
+    }
+}
+
+async function quickLogin(role) {
+    setLoginRole(role);
+    const radio = document.querySelector(`input[name="role"][value="${role}"]`);
+    if (radio) radio.checked = true;
+    await loginDemo();
+}
+
 async function loginDemo() {
     const selectedRole = document.querySelector('input[name="role"]:checked');
     if (!selectedRole) {
