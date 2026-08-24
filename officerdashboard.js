@@ -54,6 +54,92 @@ async function initOfficerSession() {
     }
 }
 
+window.JanSetuBulletin = {
+    async speakCurrentBulletin() {
+        const head = document.getElementById("bulletinHeadline")?.textContent || "Ward notice";
+        const msg = document.getElementById("bulletinMessage")?.textContent || "";
+        const rawText = `Official Municipal Bulletin for Ward 12. ${head}. ${msg}`;
+        
+        const lang = document.getElementById("globalOfficerLangSelect")?.value || localStorage.getItem("jansetu_preferred_lang") || "en";
+        const statusBox = document.getElementById("bulletinAudioStatusBox");
+        const stopBtn = document.getElementById("bulletinStopAudioBtn");
+        const langLabel = document.getElementById("bulletinAudioLangLabel");
+        const transcriptText = document.getElementById("bulletinAudioTranscriptText");
+
+        if (statusBox) statusBox.style.display = "block";
+        if (stopBtn) stopBtn.style.display = "inline-flex";
+        if (langLabel) langLabel.textContent = `Translating to ${lang.toUpperCase()}...`;
+        if (transcriptText) transcriptText.textContent = "Loading neural translation...";
+
+        let spoken = rawText;
+        if (lang !== "en" && JanSetuAPI.translateText) {
+            const res = await JanSetuAPI.translateText(rawText, lang);
+            spoken = res.translated_text || rawText;
+        }
+
+        if (langLabel) langLabel.textContent = `Playing Notice (${lang.toUpperCase()})`;
+        if (transcriptText) transcriptText.textContent = spoken;
+
+        JanSetuAPI.speakText(
+            spoken, 
+            lang,
+            () => {},
+            () => {
+                if (statusBox) statusBox.style.display = "none";
+                if (stopBtn) stopBtn.style.display = "none";
+            }
+        );
+    },
+
+    async speakDashboardBriefing() {
+        const total = allOfficerGrievances.length || 128;
+        const pending = allOfficerGrievances.filter(g => !(g.status || '').toLowerCase().includes('resolve')).length || 24;
+        const rawBriefing = `JanSetu Officer Operational Briefing for Ward 12. You have ${total} total grievances assigned to your sector, with ${pending} active tickets requiring contractor follow-up within statutory ORTPS deadlines.`;
+
+        const lang = document.getElementById("globalOfficerLangSelect")?.value || localStorage.getItem("jansetu_preferred_lang") || "en";
+        const statusBox = document.getElementById("bulletinAudioStatusBox");
+        const stopBtn = document.getElementById("bulletinStopAudioBtn");
+        const langLabel = document.getElementById("bulletinAudioLangLabel");
+        const transcriptText = document.getElementById("bulletinAudioTranscriptText");
+
+        if (statusBox) statusBox.style.display = "block";
+        if (stopBtn) stopBtn.style.display = "inline-flex";
+        if (langLabel) langLabel.textContent = `Translating to ${lang.toUpperCase()}...`;
+        if (transcriptText) transcriptText.textContent = "Preparing operational briefing...";
+
+        let spoken = rawBriefing;
+        if (lang !== "en" && JanSetuAPI.translateText) {
+            const res = await JanSetuAPI.translateText(rawBriefing, lang);
+            spoken = res.translated_text || rawBriefing;
+        }
+
+        if (langLabel) langLabel.textContent = `Officer Briefing (${lang.toUpperCase()})`;
+        if (transcriptText) transcriptText.textContent = spoken;
+
+        showToast("🔊 Playing Operational Audio Briefing...");
+        JanSetuAPI.speakText(
+            spoken, 
+            lang,
+            () => {},
+            () => {
+                if (statusBox) statusBox.style.display = "none";
+                if (stopBtn) stopBtn.style.display = "none";
+            }
+        );
+    },
+
+    stopAudio() {
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        const statusBox = document.getElementById("bulletinAudioStatusBox");
+        const stopBtn = document.getElementById("bulletinStopAudioBtn");
+        if (statusBox) statusBox.style.display = "none";
+        if (stopBtn) stopBtn.style.display = "none";
+        showToast("⏹ Stopped audio playback.");
+    }
+};
+
 async function loadOfficerDashboardData() {
     // 1. Fetch live officer analytics
     try {

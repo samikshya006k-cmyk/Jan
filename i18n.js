@@ -80,7 +80,7 @@
             "bulletin_message": "Municipal PHED pipeline interconnection work will take place in Ward 12 & Saheed Nagar on Sunday. Citizens are requested to store adequate water.",
             "btn_daily_briefing": "🔊 Daily Civic Briefing",
             "btn_read_notice": "📢 Read Notice",
-            "btn_stop_audio": "⏹ Stop",
+            "btn_stop_audio": "⏹ Stop Listening",
 
             // Civic Karma Bar & Badges
             "label_civic_karma": "Civic Karma",
@@ -279,7 +279,7 @@
             "bulletin_message": "ମ୍ୟୁନିସିପାଲ୍ PHED ପାଇପଲାଇନ୍ ସଂଯୋଗ କାର୍ଯ୍ୟ ରବିବାର ଦିନ ୱାର୍ଡ଼ ୧୨ ଓ ସହିଦ ନଗରରେ ଅନୁଷ୍ଠିତ ହେବ। ନାଗରିକମାନଙ୍କୁ ଆବଶ୍ୟକ ଜଳ ସଂଗ୍ରହ କରି ରଖିବାକୁ ଅନୁରୋଧ।",
             "btn_daily_briefing": "🔊 ଦୈନିକ ପୌର ବାର୍ତ୍ତା",
             "btn_read_notice": "📢 ନୋଟିସ୍ ଶୁଣନ୍ତୁ",
-            "btn_stop_audio": "⏹ ବନ୍ଦ କରନ୍ତୁ",
+            "btn_stop_audio": "⏹ ଶୁଣିବା ବନ୍ଦ କରନ୍ତୁ",
 
             // Civic Karma Bar & Badges
             "label_civic_karma": "ପୌର କର୍ମ",
@@ -478,7 +478,7 @@
             "bulletin_message": "नगर निगम PHED पाइपलाइन इंटरकनेक्शन कार्य रविवार को वार्ड 12 और शहीद नगर में होगा। नागरिकों से अनुरोध है कि पर्याप्त पानी का भंडारण करें।",
             "btn_daily_briefing": "🔊 दैनिक नागरिक ब्रीफिंग",
             "btn_read_notice": "📢 नोटिस सुनें",
-            "btn_stop_audio": "⏹ रोकें",
+            "btn_stop_audio": "⏹ सुनना बंद करें",
 
             // Civic Karma Bar & Badges
             "label_civic_karma": "नागरिक कर्म",
