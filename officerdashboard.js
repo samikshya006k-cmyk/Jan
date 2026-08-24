@@ -399,17 +399,29 @@ function filterOfficerMap(type, button) {
 
 function updateOfficerStatsUI(analytics) {
     if (!analytics) return;
+    const lang = localStorage.getItem("jansetu_preferred_lang") || "en";
 
     const statNumbers = document.querySelectorAll(".stat-number");
     if (statNumbers.length >= 4) {
-        // Total
-        statNumbers[0].textContent = String(analytics.total_grievances || 0);
-        // Pending
-        statNumbers[1].textContent = String(analytics.pending_review || 0);
-        // High Priority
-        statNumbers[2].textContent = String(analytics.urgent_critical || 0).padStart(2, "0");
-        // Resolved
-        statNumbers[3].textContent = `${Math.round(analytics.resolution_rate_percent || 92)}%`;
+        const val0 = String(analytics.total_grievances || 0);
+        statNumbers[0].setAttribute('data-raw-val', val0);
+        statNumbers[0].textContent = window.JanSetuI18n ? window.JanSetuI18n.formatDigits(val0, lang) : val0;
+
+        const val1 = String(analytics.pending_review || 0);
+        statNumbers[1].setAttribute('data-raw-val', val1);
+        statNumbers[1].textContent = window.JanSetuI18n ? window.JanSetuI18n.formatDigits(val1, lang) : val1;
+
+        const val2 = String(analytics.urgent_critical || 0).padStart(2, "0");
+        statNumbers[2].setAttribute('data-raw-val', val2);
+        statNumbers[2].textContent = window.JanSetuI18n ? window.JanSetuI18n.formatDigits(val2, lang) : val2;
+
+        const val3 = `${Math.round(analytics.resolution_rate_percent || 92)}%`;
+        statNumbers[3].setAttribute('data-raw-val', val3);
+        statNumbers[3].textContent = window.JanSetuI18n ? window.JanSetuI18n.formatDigits(val3, lang) : val3;
+    }
+
+    if (window.JanSetuI18n && window.JanSetuI18n.applyLanguage) {
+        window.JanSetuI18n.applyLanguage(lang);
     }
 }
 

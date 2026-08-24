@@ -683,29 +683,50 @@ async function initCitizenMap() {
 
 function updateStatsUI(analytics) {
     if (!analytics) return;
+    const lang = localStorage.getItem("jansetu_preferred_lang") || "en";
 
     const statCards = document.querySelectorAll(".stat-card");
     if (statCards.length >= 4) {
         // Reports submitted
         const num0 = statCards[0].querySelector("h2");
-        if (num0) num0.textContent = String(analytics.reports_submitted || 0).padStart(2, "0");
+        const val0 = String(analytics.reports_submitted || 0).padStart(2, "0");
+        if (num0) {
+            num0.setAttribute('data-raw-val', val0);
+            num0.textContent = window.JanSetuI18n ? window.JanSetuI18n.formatDigits(val0, lang) : val0;
+        }
 
         // In Progress
         const num1 = statCards[1].querySelector("h2");
-        if (num1) num1.textContent = String(analytics.in_progress || 0).padStart(2, "0");
+        const val1 = String(analytics.in_progress || 0).padStart(2, "0");
+        if (num1) {
+            num1.setAttribute('data-raw-val', val1);
+            num1.textContent = window.JanSetuI18n ? window.JanSetuI18n.formatDigits(val1, lang) : val1;
+        }
 
         // Resolved
         const num2 = statCards[2].querySelector("h2");
-        if (num2) num2.textContent = String(analytics.resolved || 0).padStart(2, "0");
+        const val2 = String(analytics.resolved || 0).padStart(2, "0");
+        if (num2) {
+            num2.setAttribute('data-raw-val', val2);
+            num2.textContent = window.JanSetuI18n ? window.JanSetuI18n.formatDigits(val2, lang) : val2;
+        }
 
         // Community impact
         const num3 = statCards[3].querySelector("h2");
-        if (num3) num3.textContent = String(analytics.community_impact || 17);
+        const val3 = String(analytics.community_impact || 359);
+        if (num3) {
+            num3.setAttribute('data-raw-val', val3);
+            num3.textContent = window.JanSetuI18n ? window.JanSetuI18n.formatDigits(val3, lang) : val3;
+        }
     }
 
     // Update impact card
     const impactNum = document.querySelector(".impact-number strong");
-    if (impactNum) impactNum.textContent = String(analytics.community_impact || 17);
+    if (impactNum) impactNum.textContent = window.JanSetuI18n ? window.JanSetuI18n.formatDigits(String(analytics.community_impact || 359), lang) : String(analytics.community_impact || 359);
+
+    if (window.JanSetuI18n && window.JanSetuI18n.applyLanguage) {
+        window.JanSetuI18n.applyLanguage(lang);
+    }
 }
 
 /* =========================================

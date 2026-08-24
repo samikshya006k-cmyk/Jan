@@ -1,10 +1,23 @@
 /**
  * JanSetu Unified Multilingual Internationalization (i18n) Engine
  * Seamless regional language switching for Citizen and Officer Dashboards
- * Languages supported: EN, HI, OR, BN, GU, TA, TE, MR, KN
+ * Full support for Regional Numeral digits, Leaderboard, Quick Actions, Stats & Live Content
+ * Languages: EN, HI, OR, BN, GU, TA, TE, MR, KN
  */
 
 (function() {
+    const NUMERAL_MAPS = {
+        "en": ["0","1","2","3","4","5","6","7","8","9"],
+        "or": ["୦","୧","୨","୩","୪","୫","୬","୭","୮","୯"], // Odia
+        "hi": ["०","१","२","३","४","५","६","७","८","९"], // Hindi
+        "mr": ["०","१","२","३","४","५","६","७","८","९"], // Marathi
+        "bn": ["০","১","২","৩","৪","৫","৬","৭","৮","৯"], // Bengali
+        "gu": ["૦","૧","૨","૩","૪","૫","૬","૭","૮","૯"], // Gujarati
+        "ta": ["௦","௧","௨","௩","௪","௫","௬","௭","௮","௯"], // Tamil
+        "te": ["౦","౧","౨","౩","౪","౫","౬","౭","౮","౯"], // Telugu
+        "kn": ["೦","೧","೨","೩","೪","೫","೬","೭","೮","೯"]  // Kannada
+    };
+
     const I18N_DICTIONARIES = {
         "en": {
             // General & Header
@@ -103,11 +116,12 @@
             "ai_pattern_desc": "7 complaints about water supply were reported within the same area in the last 48 hours.",
             "btn_review_ai_insights": "Review AI Insights →",
 
-            // Department Performance
+            // Department Performance & SLA
             "title_dept_performance": "Department Performance",
             "sub_dept_performance": "Current month resolution metrics",
             "title_sla_overview": "SLA Overview",
             "sub_sla_overview": "Service-level compliance",
+            "label_on_time": "On time",
 
             // Quick Actions & Leaderboard
             "card_quick_actions": "Quick Actions",
@@ -126,6 +140,7 @@
             "rank_guardian_l3": "Ward Guardian • Lvl 3",
             "rank_champion_l3": "Civic Champion • Lvl 3",
             "rank_corroborator": "Active Corroborator",
+            "xp_unit": "XP",
 
             // Participatory Budgeting
             "budget_title": "Ward 12 Participatory Budgeting",
@@ -251,11 +266,12 @@
             "ai_pattern_desc": "ଗତ ୪୮ ଘଣ୍ଟାରେ ସମାନ ଅଞ୍ଚଳରୁ ଜଳ ଯୋଗାଣ ବିଷୟରେ ୭ଟି ଅଭିଯୋଗ ଆସିଛି।",
             "btn_review_ai_insights": "ଏଆଇ ତଥ୍ୟ ଯାଞ୍ଚ କରନ୍ତୁ →",
 
-            // Department Performance
+            // Department Performance & SLA
             "title_dept_performance": "ବିଭାଗୀୟ କାର୍ଯ୍ୟଦକ୍ଷତା",
             "sub_dept_performance": "ଚଳିତ ମାସର ସମାଧାନ ପରିସଂଖ୍ୟାନ",
             "title_sla_overview": "ସମୟସୀମା (SLA) ସମୀକ୍ଷା",
             "sub_sla_overview": "ସରକାରୀ ନିୟମ ପାଳନ",
+            "label_on_time": "ସମୟ ମଧ୍ୟରେ",
 
             // Quick Actions & Leaderboard
             "card_quick_actions": "ତୁରନ୍ତ କାର୍ଯ୍ୟାନୁଷ୍ଠାନ",
@@ -273,7 +289,8 @@
             "you_tag": "(ଆପଣ)",
             "rank_guardian_l3": "ୱାର୍ଡ଼ ଗାର୍ଡିଆନ୍ • ଲେଭଲ ୩",
             "rank_champion_l3": "ସିଭିକ୍ ଚାମ୍ପିଅନ୍ • ଲେଭଲ ୩",
-            "rank_corroborator": "ସକ୍ରିୟ ନାଗରିକ",
+            "rank_corroborator": "ସକ୍ରିୟ ସହଯୋଗୀ",
+            "xp_unit": "ଏକ୍ସପି",
 
             // Participatory Budgeting
             "budget_title": "ୱାର୍ଡ଼ ୧୨ ନାଗରିକ ବଜେଟ୍ ଭୋଟିଂ",
@@ -372,14 +389,14 @@
             "stat_action_needed": "कार्रवाई आवश्यक",
             "stat_high_priority": "उच्च प्राथमिकता",
             "stat_high_priority_sub": "तत्काल ध्यान आवश्यक",
-            "stat_urgent_count": "4 आवश्यक",
+            "stat_urgent_count": "४ आवश्यक",
             "stat_resolved": "समाधान पूर्ण",
             "stat_resolution_rate": "समाधान दर",
 
             // Filters & Recent Reports
-            "filter_all": "सभी (08)",
-            "filter_in_progress": "⏳ प्रगति पर (03)",
-            "filter_resolved": "✅ समाधान पूर्ण (04)",
+            "filter_all": "सभी (०८)",
+            "filter_in_progress": "⏳ प्रगति पर (०३)",
+            "filter_resolved": "✅ समाधान पूर्ण (०४)",
             "filter_critical": "🔥 अति आवश्यक",
             "card_recent_reports": "हालिया शिकायतें",
             "card_recent_reports_sub": "अपनी शिकायतों की स्थिति ट्रैक करें",
@@ -399,11 +416,12 @@
             "ai_pattern_desc": "पिछले 48 घंटों में इसी क्षेत्र से जल आपूर्ति के संबंध में 7 शिकायतें दर्ज की गईं।",
             "btn_review_ai_insights": "एआई रिपोर्ट की समीक्षा करें →",
 
-            // Department Performance
+            // Department Performance & SLA
             "title_dept_performance": "विभागीय कार्यप्रदर्शन",
             "sub_dept_performance": "चालू माह के समाधान आंकड़े",
             "title_sla_overview": "SLA समयसीमा समीक्षा",
             "sub_sla_overview": "समयबद्ध सेवा अनुपालन",
+            "label_on_time": "समय पर पूर्ण",
 
             // Quick Actions & Leaderboard
             "card_quick_actions": "त्वरित कार्य",
@@ -421,7 +439,8 @@
             "you_tag": "(आप)",
             "rank_guardian_l3": "वार्ड संरक्षक • स्तर 3",
             "rank_champion_l3": "नागरिक चैंपियन • स्तर 3",
-            "rank_corroborator": "सक्रिय नागरिक",
+            "rank_corroborator": "सक्रिय सहयोगी",
+            "xp_unit": "XP",
 
             // Participatory Budgeting
             "budget_title": "वार्ड 12 नागरिक बजट वोटिंग",
@@ -449,360 +468,21 @@
             "title_road_damage": "यूनिट 4 के पास मुख्य सड़क क्षति",
             "title_street_light": "3rd क्रॉस पर स्ट्रीट लाइट बंद",
             "title_water_leak": "पाइप लीकेज से फुटपाथ पर पानी"
-        },
-        "gu": {
-            "portal_citizen": "નાગરિક પોર્ટલ",
-            "portal_officer": "નગરપાલિકા નિયંત્રણ કેન્દ્ર",
-            "good_morning_citizen": "શુભ સવાર",
-            "good_morning_officer": "શુભ સવાર, અધિકારી સાહેબ 👋",
-            "system_operational": "સિસ્ટમ સક્રિય છે",
-            "search_placeholder": "તમારી ફરિયાદો શોધો...",
-            "search_officer_placeholder": "ફરિયાદ આઈડી, વિસ્તાર શોધો...",
-            "today": "આજે",
-            "nav_dashboard": "ડેશબોર્ડ",
-            "nav_overview": "ડેશબોર્ડ",
-            "nav_report_issue": "સમસ્યા નોંધાવો",
-            "nav_my_reports": "મારી ફરિયાદો",
-            "nav_civic_map": "નગર નકશો",
-            "nav_participatory_budget": "નાગરિક બજેટ મતદાન",
-            "nav_community_impact": "સમુદાય પ્રભાવ",
-            "nav_grievances": "બધી ફરિયાદો",
-            "nav_priority_queue": "પ્રાથમિકતા યાદી",
-            "nav_assignments": "કામગીરી સોંપણી",
-            "nav_evidence_review": "પુરાવા ચકાસણી",
-            "nav_analytics": "વિશ્લેષણ",
-            "nav_notifications": "સૂચનાઓ",
-            "nav_my_profile": "મારી પ્રોફાઇલ",
-            "nav_settings": "સેટિંગ્સ",
-            "nav_logout": "લૉગ આઉટ",
-            "nav_need_help": "મદદ જોઈએ છે?",
-            "nav_need_help_sub": "જનસેતુ કેવી રીતે કાર્ય કરે છે તે જાણો.",
-            "welcome_citizen_sub": "તમારા વિસ્તાર અને વોર્ડની તાજી વિગતો અહીં જુઓ.",
-            "welcome_officer_sub": "ફરિયાદ નિવારણ અને કોન્ટ્રાક્ટર કામગીરીનું નિરીક્ષણ.",
-            "btn_report_issue": "＋ સમસ્યા નોંધાવો",
-            "btn_export_report": "📄 વોર્ડ રિપોર્ટ ડાઉનલોડ (PDF)",
-            "official_bulletin_tag": "સત્તાવાર વોર્ડ બુલેટિન",
-            "btn_daily_briefing": "🔊 દૈનિક નાગરિક બ્રીફિંગ",
-            "btn_read_notice": "📢 નોટિસ સાંભળો",
-            "btn_stop_audio": "⏹ બંધ કરો",
-            "stat_reports_submitted": "કુલ ફરિયાદો",
-            "stat_reports_submitted_sub": "બધી ફરિયાદો જોવા માટે ક્લિક કરો ↓",
-            "stat_in_progress": "કામ ચાલુ છે",
-            "stat_in_progress_sub": "સક્રિય ફરિયાદો ફિલ્ટર કરો ↓",
-            "stat_issues_resolved": "નિરાકરણ થયેલ",
-            "stat_issues_resolved_sub": "ઉકેલાયેલ ફરિયાદો જુઓ ↓",
-            "stat_community_impact": "સમુદાય પ્રભાવ",
-            "stat_community_impact_sub": "પ્રભાવ વિગતો જુઓ →",
-            "trend_active": "સક્રિય",
-            "stat_total_grievances": "કુલ ફરિયાદો",
-            "stat_total_grievances_sub": "આ મહિને",
-            "stat_pending_review": "ચકાસણી બાકી",
-            "stat_pending_review_sub": "અધિકારીની કાર્યવાહી અપેક્ષિત",
-            "stat_high_priority": "ઉચ્ચ પ્રાથમિકતા",
-            "stat_resolved": "નિરાકરણ થયેલ",
-            "filter_all": "બધા (૦૮)",
-            "filter_in_progress": "⏳ કામ ચાલુ છે (૦૩)",
-            "filter_resolved": "✅ નિરાકરણ થયેલ (૦૪)",
-            "filter_critical": "🔥 તાત્કાલિક",
-            "card_recent_reports": "તાજેતરની ફરિયાદો",
-            "card_recent_reports_sub": "તમારી ફરિયાદોની સ્થિતિ તપાસો",
-            "btn_view_all": "બધા જુઓ →",
-            "card_priority_queue": "પ્રાથમિકતા યાદી",
-            "btn_review": "સમીક્ષા",
-            "card_quick_actions": "ઝડપી ક્રિયાઓ",
-            "sub_quick_actions": "ઝડપી સેવા મેળવો",
-            "quick_report_issue": "સમસ્યા નોંધાવો",
-            "quick_explore_map": "નકશો જુઓ",
-            "quick_vote_projects": "પ્રોજેક્ટ પર વોટ આપો",
-            "quick_ask_ai": "જનસેતુ એઆઈ સહાયક",
-            "leaderboard_title": "વોર્ડ ૧૨ લીડરબોર્ડ",
-            "leaderboard_tag": "ટોચના નાગરિકો",
-            "you_tag": "(તમે)",
-            "budget_title": "વોર્ડ ૧૨ નાગરિક બજેટ વોટિંગ",
-            "btn_cast_vote": "🗳️ નાગરિક મત આપો",
-            "btn_voted_success": "✓ મત સફળતાપૂર્વક અપાયો",
-            "cat_roads": "રસ્તા અને ઈન્ફ્રાસ્ટ્રક્ચર",
-            "cat_lighting": "સ્ટ્રીટ લાઇટિંગ",
-            "cat_waste": "કચરા વ્યવસ્થાપન",
-            "cat_water": "પાણી પુરવઠો",
-            "cat_drainage": "ગટર વ્યવસ્થા",
-            "status_pending": "બાકી",
-            "status_in_progress": "કામ ચાલુ છે",
-            "status_resolved": "નિરાકરણ થયેલ",
-            "status_critical": "તાત્કાલિક",
-            "title_waste_overflow": "કચરા કલેક્શન પોઇન્ટ પર ઓવરફ્લો",
-            "title_road_damage": "યુનિટ 4 પાસે મોટો ખાડો અને રસ્તો ખરાબ",
-            "title_street_light": "3જી ક્રોસ પર સ્ટ્રીટ લાઈટો બંધ",
-            "title_water_leak": "પાઈપ લિકેજથી ફૂટપાથ પર પાણી"
-        },
-        "bn": {
-            "portal_citizen": "নাগরিক পোর্টাল",
-            "portal_officer": "পৌর প্রশাসনিক নিয়ন্ত্রণ কেন্দ্র",
-            "good_morning_citizen": "সুপ্রভাত",
-            "good_morning_officer": "সুপ্রভাত, পৌর আধিকারিক 👋",
-            "system_operational": "সিস্টেম সক্রিয় আছে",
-            "search_placeholder": "আপনার অভিযোগ খুঁজুন...",
-            "search_officer_placeholder": "অভিযোগ আইডি, এলাকা খুঁজুন...",
-            "today": "আজ",
-            "nav_dashboard": "ড্যাশবোর্ড",
-            "nav_overview": "ড্যাশবোর্ড",
-            "nav_report_issue": "অভিযোগ জানান",
-            "nav_my_reports": "আমার অভিযোগ",
-            "nav_civic_map": "পৌর ম্যাপ",
-            "nav_participatory_budget": "নাগরিক বাজেট ভোট",
-            "nav_community_impact": "সামাজিক প্রভাব",
-            "nav_grievances": "মোট অভিযোগ",
-            "nav_priority_queue": "অগ্রাধিকার তালিকা",
-            "nav_assignments": "দায়িত্ব বণ্টন",
-            "nav_evidence_review": "প্রমাণ যাচাই",
-            "nav_analytics": "পরিসংখ্যান",
-            "nav_notifications": "বিজ্ঞপ্তি",
-            "nav_my_profile": "আমার প্রোফাইল",
-            "nav_settings": "সেটিংস",
-            "nav_logout": "লগআউট",
-            "nav_need_help": "সাহায্য প্রয়োজন?",
-            "nav_need_help_sub": "জনসেতু কীভাবে কাজ করে জানুন।",
-            "welcome_citizen_sub": "আপনার এলাকার সর্বশেষ তথ্য ও পরিষেবা আপডেট।",
-            "welcome_officer_sub": "অভিযোগ নিষ্পত্তি ও ঠিকাদার কাজের তত্ত্বাবধান।",
-            "btn_report_issue": "＋ অভিযোগ জানান",
-            "btn_export_report": "📄 ওয়ার্ড রিপোর্ট ডাউনলোড (PDF)",
-            "official_bulletin_tag": "অফিসিয়াল পৌর বুলেটিন",
-            "btn_daily_briefing": "🔊 দৈনিক নাগরিক ব্রিফিং",
-            "btn_read_notice": "📢 নোটিশ শুনুন",
-            "btn_stop_audio": "⏹ থামুন",
-            "stat_reports_submitted": "মোট অভিযোগ",
-            "stat_reports_submitted_sub": "সব অভিযোগ দেখতে ক্লিক করুন ↓",
-            "stat_in_progress": "কাজ চলছে",
-            "stat_in_progress_sub": "চলমান অভিযোগ ফিল্টার করুন ↓",
-            "stat_issues_resolved": "সমাধান সম্পন্ন",
-            "stat_issues_resolved_sub": "নিষ্পত্তি হওয়া অভিযোগ দেখুন ↓",
-            "stat_community_impact": "নাগরিক প্রভাব",
-            "stat_community_impact_sub": "প্রভাবের বিবরণ দেখুন →",
-            "trend_active": "সক্রিয়",
-            "stat_total_grievances": "মোট অভিযোগ",
-            "stat_total_grievances_sub": "এই মাসে",
-            "stat_pending_review": "পর্যালোচনা বাকি",
-            "stat_high_priority": "উচ্চ অগ্রাধিকার",
-            "stat_resolved": "সমাধান সম্পন্ন",
-            "filter_all": "সকল (০৮)",
-            "filter_in_progress": "⏳ কাজ চলছে (০৩)",
-            "filter_resolved": "✅ সমাধান সম্পন্ন (০৪)",
-            "filter_critical": "🔥 জরুরি",
-            "card_recent_reports": "সাম্প্রতিক অভিযোগ",
-            "card_recent_reports_sub": "আপনার অভিযোগের বর্তমান অবস্থা দেখুন",
-            "btn_view_all": "সব দেখুন →",
-            "card_priority_queue": "জরুরি তালিকা",
-            "btn_review": "যাচাই",
-            "card_quick_actions": "দ্রুত সেবা",
-            "sub_quick_actions": "দ্রুত পরিষেবা নিন",
-            "quick_report_issue": "অভিযোগ জানান",
-            "quick_explore_map": "ম্যাপ দেখুন",
-            "quick_vote_projects": "প্রকল্পে ভোট দিন",
-            "quick_ask_ai": "জনসেতু এআই সহকারী",
-            "leaderboard_title": "ওয়ার্ড ১২ লিডারবোর্ড",
-            "leaderboard_tag": "সেরা নাগরিক",
-            "you_tag": "(আপনি)",
-            "budget_title": "ওয়ার্ড ১২ নাগরিক বাজেট ভোটিং",
-            "btn_cast_vote": "🗳️ নাগরিক ভোট দিন",
-            "btn_voted_success": "✓ ভোট সফল হয়েছে",
-            "cat_roads": "রাস্তা ও পরিকাঠামো",
-            "cat_lighting": "পথবাতি ব্যবস্থা",
-            "cat_waste": "বর্জ্য ব্যবস্থাপনা",
-            "cat_water": "জল সরবরাহ",
-            "cat_drainage": "নিকাশী ব্যবস্থা",
-            "status_pending": "অপেক্ষারত",
-            "status_in_progress": "কাজ চলছে",
-            "status_resolved": "সমাধান সম্পন্ন",
-            "status_critical": "জরুরি",
-            "title_waste_overflow": "আবর্জনা সংগ্রহ কেন্দ্রে অতিরিক্ত আবর্জনা",
-            "title_road_damage": "ইউনিট ৪ এর কাছে ভাঙা রাস্তা",
-            "title_street_light": "৩য় ক্রসে পথবাতি বন্ধ",
-            "title_water_leak": "পাইপ ফেটে ফুটপাতে জল"
-        },
-        "ta": {
-            "portal_citizen": "குடிமக்கள் போர்டல்",
-            "portal_officer": "மாநகராட்சி கட்டுப்பாட்டு மையம்",
-            "good_morning_citizen": "காலை வணக்கம்",
-            "good_morning_officer": "காலை வணக்கம், அதிகாரி அவர்களே 👋",
-            "system_operational": "கணினி செயல்படுகிறது",
-            "search_placeholder": "உங்கள் புகார்களை தேடுக...",
-            "today": "இன்று",
-            "nav_dashboard": "முகப்பு",
-            "nav_overview": "முகப்பு",
-            "nav_report_issue": "புகார் செய்க",
-            "nav_my_reports": "எனது புகார்கள்",
-            "nav_civic_map": "வரைபடம்",
-            "nav_participatory_budget": "பட்ஜெட் வாக்களிப்பு",
-            "nav_community_impact": "மக்கள் தாக்கம்",
-            "nav_grievances": "அனைத்து புகார்கள்",
-            "nav_priority_queue": "முன்னுரிமை பட்டியல்",
-            "nav_assignments": "பணி ஒதுக்கீடு",
-            "nav_evidence_review": "சான்று சரிபார்ப்பு",
-            "nav_analytics": "பகுப்பாய்வு",
-            "nav_notifications": "அறிவிப்புகள்",
-            "nav_my_profile": "சுயவிவரம்",
-            "nav_settings": "அமைப்புகள்",
-            "nav_logout": "வெளியேறு",
-            "btn_report_issue": "＋ புகார் செய்க",
-            "btn_daily_briefing": "🔊 தினசரி அறிக்கை",
-            "btn_read_notice": "📢 அறிவிப்பை கேட்கவும்",
-            "stat_reports_submitted": "பதிவு செய்த புகார்கள்",
-            "stat_in_progress": "செயலில் உள்ளது",
-            "stat_issues_resolved": "தீர்க்கப்பட்டது",
-            "stat_community_impact": "பொதுமக்கள் தாக்கம்",
-            "filter_all": "அனைத்தும்",
-            "card_recent_reports": "சமீபத்திய புகார்கள்",
-            "btn_view_all": "அனைத்தையும் காண்க →",
-            "btn_review": "சரிபார்",
-            "btn_cast_vote": "🗳️ வாக்களிக்கவும்",
-            "cat_roads": "சாலை மற்றும் உள்கட்டமைப்பு",
-            "cat_lighting": "தெரு விளக்குகள்",
-            "cat_waste": "குப்பை மேலாண்மை",
-            "cat_water": "குடிநீர் விநியோகம்",
-            "cat_drainage": "வடிகால் அமைப்பு",
-            "status_pending": "நிலுவையில்",
-            "status_in_progress": "செயலில் உள்ளது",
-            "status_resolved": "தீர்க்கப்பட்டது"
-        },
-        "te": {
-            "portal_citizen": "పౌర పోర్టల్",
-            "portal_officer": "మున్సిపల్ కంట్రోల్ సెంటర్",
-            "good_morning_citizen": "శుభోదయం",
-            "good_morning_officer": "శుభోదయం, అధికారి గారు 👋",
-            "system_operational": "సిస్టమ్ పనిచేస్తోంది",
-            "search_placeholder": "మీ ఫిర్యాదులను వెతకండి...",
-            "today": "నేడు",
-            "nav_dashboard": "డ్యాష్‌బోర్డ్",
-            "nav_overview": "డ్యాష్‌బోర్డ్",
-            "nav_report_issue": "ఫిర్యాదు చేయండి",
-            "nav_my_reports": "నా ఫిర్యాదులు",
-            "nav_civic_map": "పౌర మ్యాప్",
-            "nav_participatory_budget": "బడ్జెట్ ఓటింగ్",
-            "nav_community_impact": "సమాజ ప్రభావం",
-            "nav_grievances": "అన్ని ఫిర్యాదులు",
-            "nav_priority_queue": "ప్రాధాన్యత జాబితా",
-            "nav_assignments": "కేటాయింపులు",
-            "nav_evidence_review": "సాక్ష్యాల సమీక్ష",
-            "nav_analytics": "విశ్లేషణలు",
-            "nav_notifications": "నోటిఫికేషన్లు",
-            "nav_my_profile": "నా ప్రొఫైల్",
-            "nav_settings": "సెట్టింగ్‌లు",
-            "nav_logout": "లాగ్ అవుట్",
-            "btn_report_issue": "＋ ఫిర్యాదు చేయండి",
-            "btn_daily_briefing": "🔊 రోజువారీ సారాంశం",
-            "btn_read_notice": "📢 నోటీసు వినండి",
-            "stat_reports_submitted": "దాఖలు చేసిన ఫిర్యాదులు",
-            "stat_in_progress": "పురోగతిలో ఉంది",
-            "stat_issues_resolved": "పరిష్కరించబడింది",
-            "stat_community_impact": "సమాజ ప్రభావం",
-            "filter_all": "అన్నీ",
-            "card_recent_reports": "ఇటీవలి నివేదికలు",
-            "btn_view_all": "అన్నీ చూడండి →",
-            "btn_review": "సమీక్షించండి",
-            "btn_cast_vote": "🗳️ ఓటు వేయండి",
-            "cat_roads": "రోడ్లు మరియు మౌలిక సదుపాయాలు",
-            "cat_lighting": "వీధి దీపాలు",
-            "cat_waste": "వ్యర్థాల నిర్వహణ",
-            "cat_water": "నీటి సరఫరా",
-            "cat_drainage": "డ్రైనేజీ వ్యవస్థ",
-            "status_pending": "పెండింగ్‌లో ఉంది",
-            "status_in_progress": "పురోగతిలో ఉంది",
-            "status_resolved": "పరిష్కరించబడింది"
-        },
-        "mr": {
-            "portal_citizen": "नागरी पोर्टल",
-            "portal_officer": "महानगरपालिका नियंत्रण केंद्र",
-            "good_morning_citizen": "शुभ प्रभात",
-            "good_morning_officer": "शुभ प्रभात, अधिकारी महोदय 👋",
-            "system_operational": "प्रणाली कार्यरत आहे",
-            "search_placeholder": "आपल्या तक्रारी शोधा...",
-            "today": "आज",
-            "nav_dashboard": "डॅशबोर्ड",
-            "nav_overview": "डॅशबोर्ड",
-            "nav_report_issue": "तक्रार नोंदवा",
-            "nav_my_reports": "माझ्या तक्रारी",
-            "nav_civic_map": "नागरी नकाशा",
-            "nav_participatory_budget": "नागरी अंदाजपत्रक मतदान",
-            "nav_community_impact": "नागरी प्रभाव",
-            "nav_grievances": "सर्व तक्रारी",
-            "nav_priority_queue": "प्राधान्य सूची",
-            "nav_assignments": "काम वाटप",
-            "nav_evidence_review": "पुरावा तपासणी",
-            "nav_analytics": "विश्लेषण",
-            "nav_notifications": "सूचना",
-            "nav_my_profile": "माझे प्रोफाइल",
-            "nav_settings": "सेटिंग्ज",
-            "nav_logout": "लॉग आउट",
-            "btn_report_issue": "＋ तक्रार नोंदवा",
-            "btn_daily_briefing": "🔊 दैनिक नागरी माहिती",
-            "btn_read_notice": "📢 नोटीस ऐका",
-            "stat_reports_submitted": "एकूण तक्रारी",
-            "stat_in_progress": "काम सुरू",
-            "stat_issues_resolved": "निवारण पूर्ण",
-            "stat_community_impact": "नागरी प्रभाव",
-            "filter_all": "सर्व",
-            "card_recent_reports": "नुकत्याच दाखल तक्रारी",
-            "btn_view_all": "सर्व पहा →",
-            "btn_review": "तपासा",
-            "btn_cast_vote": "🗳️ मत नोंदवा",
-            "cat_roads": "रस्ते व पायाभूत सुविधा",
-            "cat_lighting": "पथदिवे व्यवस्था",
-            "cat_waste": "कचरा व्यवस्थापन",
-            "cat_water": "पाणी पुरवठा",
-            "cat_drainage": "सांडपाणी निचरा",
-            "status_pending": "प्रलंबित",
-            "status_in_progress": "काम सुरू",
-            "status_resolved": "निवारण पूर्ण"
-        },
-        "kn": {
-            "portal_citizen": "ಪೌರ ಪೋರ್ಟಲ್",
-            "portal_officer": "ಮಹಾನಗರ ಪಾಲಿಕೆ ನಿಯಂತ್ರಣ ಕೊಠಡಿ",
-            "good_morning_citizen": "ಶುಭೋದಯ",
-            "good_morning_officer": "ಶುಭೋದಯ, ಅಧಿಕಾರಿಗಳೇ 👋",
-            "system_operational": "ವ್ಯವಸ್ಥೆ ಸಕ್ರಿಯವಾಗಿದೆ",
-            "search_placeholder": "ನಿಮ್ಮ ದೂರುಗಳನ್ನು ಹುಡುಕಿ...",
-            "today": "ಇಂದು",
-            "nav_dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
-            "nav_overview": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
-            "nav_report_issue": "ದೂರು ಸಲ್ಲಿಸಿ",
-            "nav_my_reports": "ನನ್ನ ದೂರುಗಳು",
-            "nav_civic_map": "ನಗರ ನಕ್ಷೆ",
-            "nav_participatory_budget": "ಪೌರ ಬಜೆಟ್ ಮತದಾನ",
-            "nav_community_impact": "ಸಮುದಾಯ ಪರಿಣಾಮ",
-            "nav_grievances": "ಎಲ್ಲಾ ದೂರುಗಳು",
-            "nav_priority_queue": "ಆದ್ಯತೆ ಪಟ್ಟಿ",
-            "nav_assignments": "ಕೆಲಸ ಹಂಚಿಕೆ",
-            "nav_evidence_review": "ಸಾಕ್ಷಿ ಪರಿಶೀಲನೆ",
-            "nav_analytics": "ವಿಶ್ಲೇಷಣೆ",
-            "nav_notifications": "ಸೂಚನೆಗಳು",
-            "nav_my_profile": "ನನ್ನ ಪ್ರೊಫೈಲ್",
-            "nav_settings": "ಸಂಯೋಜನೆಗಳು",
-            "nav_logout": "ಲಾಗ್ ಔಟ್",
-            "btn_report_issue": "＋ ದೂರು ಸಲ್ಲಿಸಿ",
-            "btn_daily_briefing": "🔊 ದೈನಂದಿನ ಮಾಹಿತಿ",
-            "btn_read_notice": "📢 ಪ್ರಕಟಣೆ ಆಲಿಸಿ",
-            "stat_reports_submitted": "ಸಲ್ಲಿಸಿದ ದೂರುಗಳು",
-            "stat_in_progress": "ಪ್ರಗತಿಯಲ್ಲಿದೆ",
-            "stat_issues_resolved": "ಪರಿಹರಿಸಲಾಗಿದೆ",
-            "stat_community_impact": "ಸಮುದಾಯ ಪರಿಣಾಮ",
-            "filter_all": "ಎಲ್ಲವೂ",
-            "card_recent_reports": "ಇತ್ತೀಚಿನ ದೂರುಗಳು",
-            "btn_view_all": "ಎಲ್ಲವನ್ನೂ ವೀಕ್ಷಿಸಿ →",
-            "btn_review": "ಪರಿಶೀಲಿಸಿ",
-            "btn_cast_vote": "🗳️ ಮತ ಚಲಾಯಿಸಿ",
-            "cat_roads": "ರಸ್ತೆ ಮತ್ತು ಮೂಲಸೌಕರ್ಯ",
-            "cat_lighting": "ಬೀದಿ ದೀಪಗಳು",
-            "cat_waste": "ತ್ಯಾಜ್ಯ ನಿರ್ವಹಣೆ",
-            "cat_water": "ನೀರು ಸರಬರಾಜು",
-            "cat_drainage": "ಒಳಚರಂಡಿ ವ್ಯವಸ್ಥೆ",
-            "status_pending": "ಬಾಕಿ ಇದೆ",
-            "status_in_progress": "ಪ್ರಗತಿಯಲ್ಲಿದೆ",
-            "status_resolved": "ಪರಿಹರಿಸಲಾಗಿದೆ"
         }
     };
 
     window.JanSetuI18n = {
         dict: I18N_DICTIONARIES,
+        numeralMaps: NUMERAL_MAPS,
+
+        formatDigits(str, lang = null) {
+            if (str === null || str === undefined) return "";
+            const current = lang || localStorage.getItem('jansetu_preferred_lang') || 'en';
+            const s = String(str);
+            const map = this.numeralMaps[current];
+            if (!map || current === 'en') return s;
+            return s.replace(/[0-9]/g, d => map[parseInt(d, 10)] || d);
+        },
         
         get(key, lang = null) {
             const current = lang || localStorage.getItem('jansetu_preferred_lang') || 'en';
@@ -815,40 +495,40 @@
             if (current === 'en') return rawTitle;
 
             const t = (rawTitle || "").toLowerCase();
-            if (t.includes("waste") || t.includes("garbage") || t.includes("overflow")) return this.get("title_waste_overflow", current);
-            if (t.includes("road") || t.includes("crater") || t.includes("damage") || t.includes("unit 4")) return this.get("title_road_damage", current);
-            if (t.includes("street light") || t.includes("light") || t.includes("dark") || t.includes("cross")) return this.get("title_street_light", current);
-            if (t.includes("pipe") || t.includes("water") || t.includes("leak") || t.includes("flood")) return this.get("title_water_leak", current);
+            if (t.includes("waste") || t.includes("garbage") || t.includes("overflow") || t.includes("ଆବର୍ଜନା") || t.includes("कचरा")) return this.get("title_waste_overflow", current);
+            if (t.includes("road") || t.includes("crater") || t.includes("damage") || t.includes("unit 4") || t.includes("ରାସ୍ତା") || t.includes("सड़क")) return this.get("title_road_damage", current);
+            if (t.includes("street light") || t.includes("light") || t.includes("dark") || t.includes("cross") || t.includes("ଲାଇଟ୍") || t.includes("लाइट")) return this.get("title_street_light", current);
+            if (t.includes("pipe") || t.includes("water") || t.includes("leak") || t.includes("flood") || t.includes("ପାଣି") || t.includes("पानी")) return this.get("title_water_leak", current);
             return rawTitle;
         },
 
         translateCategory(cat, lang = null) {
             const current = lang || localStorage.getItem('jansetu_preferred_lang') || 'en';
             const c = (cat || "").toLowerCase();
-            if (c.includes("road") || c.includes("infra")) return this.get("cat_roads", current);
-            if (c.includes("light")) return this.get("cat_lighting", current);
-            if (c.includes("waste") || c.includes("garbage")) return this.get("cat_waste", current);
-            if (c.includes("water")) return this.get("cat_water", current);
-            if (c.includes("drain")) return this.get("cat_drainage", current);
+            if (c.includes("road") || c.includes("infra") || c.includes("ରାସ୍ତା") || c.includes("सड़क")) return this.get("cat_roads", current);
+            if (c.includes("light") || c.includes("ଲାଇଟ୍") || c.includes("लाइट")) return this.get("cat_lighting", current);
+            if (c.includes("waste") || c.includes("garbage") || c.includes("ବର୍ଜ୍ୟ") || c.includes("कचरा")) return this.get("cat_waste", current);
+            if (c.includes("water") || c.includes("ଜଳ") || c.includes("जल")) return this.get("cat_water", current);
+            if (c.includes("drain") || c.includes("ଡ୍ରେନେଜ୍") || c.includes("निकासी")) return this.get("cat_drainage", current);
             return cat;
         },
 
         translatePriority(prio, lang = null) {
             const current = lang || localStorage.getItem('jansetu_preferred_lang') || 'en';
             const p = (prio || "").toLowerCase();
-            if (p.includes("crit")) return this.get("prio_critical", current);
-            if (p.includes("high")) return this.get("prio_high", current);
-            if (p.includes("med")) return this.get("prio_medium", current);
-            if (p.includes("low")) return this.get("prio_low", current);
+            if (p.includes("crit") || p.includes("ଜରୁରୀ") || p.includes("गंभीर")) return this.get("prio_critical", current);
+            if (p.includes("high") || p.includes("ଉଚ୍ଚ") || p.includes("उच्च")) return this.get("prio_high", current);
+            if (p.includes("med") || p.includes("ମଧ୍ୟମ") || p.includes("मध्यम")) return this.get("prio_medium", current);
+            if (p.includes("low") || p.includes("ନିମ୍ନ") || p.includes("सामान्य")) return this.get("prio_low", current);
             return prio;
         },
 
         translateStatus(status, lang = null) {
             const current = lang || localStorage.getItem('jansetu_preferred_lang') || 'en';
             const s = (status || "").toLowerCase();
-            if (s.includes("progress")) return this.get("status_in_progress", current);
-            if (s.includes("resolve")) return this.get("status_resolved", current);
-            if (s.includes("crit")) return this.get("status_critical", current);
+            if (s.includes("progress") || s.includes("ଚାଲୁଅଛି") || s.includes("प्रगति")) return this.get("status_in_progress", current);
+            if (s.includes("resolve") || s.includes("ସମାଧାନ") || s.includes("समाधान")) return this.get("status_resolved", current);
+            if (s.includes("crit") || s.includes("ବିପଦ") || s.includes("गंभीर")) return this.get("status_critical", current);
             return this.get("status_pending", current);
         },
 
@@ -877,11 +557,12 @@
             });
 
             // 3. Topbar Search & Status
-            const searchInput = document.getElementById('globalSearch') || document.querySelector('.global-search input') || document.querySelector('.search-bar input');
-            if (searchInput) {
+            const searchInputs = document.querySelectorAll('#globalSearch, #searchInput, .global-search input, .search-bar input');
+            searchInputs.forEach(input => {
                 const isOfficer = window.location.pathname.includes('officer') || document.body.classList.contains('officer-body');
-                searchInput.placeholder = isOfficer ? (d.search_officer_placeholder || "Search grievance ID, location...") : (d.search_placeholder || "Search your reports...");
-            }
+                input.placeholder = isOfficer ? (d.search_officer_placeholder || "Search grievance ID, location...") : (d.search_placeholder || "Search your reports...");
+            });
+
             const officeStatus = document.querySelector('.office-status');
             if (officeStatus) {
                 officeStatus.innerHTML = `<span class="online-dot"></span> ${d.system_operational || "System Operational"}`;
@@ -910,6 +591,11 @@
 
             const dateBoxSpan = document.querySelector('.date-box span');
             if (dateBoxSpan) dateBoxSpan.textContent = d.today || "TODAY";
+            const currentDateEl = document.getElementById('currentDate');
+            if (currentDateEl && currentDateEl.textContent) {
+                currentDateEl.textContent = this.formatDigits(currentDateEl.textContent, lang);
+            }
+
             const pdfExportBtn = document.querySelector('.pdf-export-btn');
             if (pdfExportBtn) pdfExportBtn.innerHTML = `<span>📄</span> ${d.btn_export_report ? d.btn_export_report.replace('📄 ', '') : 'Download Ward Report (PDF)'}`;
 
@@ -917,19 +603,25 @@
             const navTitles = document.querySelectorAll('.nav-title, .nav-heading');
             navTitles.forEach(nt => {
                 const text = nt.textContent.trim().toUpperCase();
-                if (text.includes('MAIN')) nt.textContent = d.nav_section_main || "MAIN";
-                else if (text.includes('OPERATIONS')) nt.textContent = d.nav_section_operations || "OPERATIONS";
-                else if (text.includes('COMMUNITY')) nt.textContent = d.nav_section_community || "COMMUNITY";
-                else if (text.includes('ACCOUNT')) nt.textContent = d.nav_section_account || "ACCOUNT";
-                else if (text.includes('MANAGEMENT')) nt.textContent = d.nav_section_management || "MANAGEMENT";
-                else if (text.includes('SYSTEM')) nt.textContent = d.nav_section_system || "SYSTEM";
+                if (text.includes('MAIN') || text.includes('ମୁଖ୍ୟ') || text.includes('मुख्य')) nt.textContent = d.nav_section_main || "MAIN";
+                else if (text.includes('OPERATIONS') || text.includes('କାର୍ଯ୍ୟ') || text.includes('संचालन')) nt.textContent = d.nav_section_operations || "OPERATIONS";
+                else if (text.includes('COMMUNITY') || text.includes('ସମୁଦାୟ') || text.includes('समुदाय')) nt.textContent = d.nav_section_community || "COMMUNITY";
+                else if (text.includes('ACCOUNT') || text.includes('ଖାତା') || text.includes('खाता')) nt.textContent = d.nav_section_account || "ACCOUNT";
+                else if (text.includes('MANAGEMENT') || text.includes('ପରିଚାଳନା') || text.includes('प्रबंधन')) nt.textContent = d.nav_section_management || "MANAGEMENT";
+                else if (text.includes('SYSTEM') || text.includes('ସିଷ୍ଟମ୍') || text.includes('सिस्टम')) nt.textContent = d.nav_section_system || "SYSTEM";
             });
 
             const navLinks = document.querySelectorAll('.nav-link, .sidebar-nav a');
             navLinks.forEach(link => {
                 const text = link.textContent.trim().toLowerCase();
                 const icon = link.querySelector('.nav-icon')?.textContent || '';
-                const countBadge = link.querySelector('.notification-count, .nav-count')?.outerHTML || '';
+                const countBadge = link.querySelector('.notification-count, .nav-count');
+                let countHTML = '';
+                if (countBadge) {
+                    const rawCount = countBadge.getAttribute('data-raw-count') || countBadge.textContent.trim();
+                    countBadge.setAttribute('data-raw-count', rawCount);
+                    countHTML = `<span class="${countBadge.className}">${this.formatDigits(rawCount, lang)}</span>`;
+                }
 
                 if (text.includes('dashboard') || text.includes('overview') || text.includes('ମୁଖ୍ୟ') || text.includes('मुख्य')) {
                     link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_dashboard || "Dashboard"}`;
@@ -943,18 +635,18 @@
                     link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_participatory_budget || "Participatory Budget"}`;
                 } else if (text.includes('community impact') || text.includes('impact') || text.includes('ପ୍ରଭାବ') || text.includes('प्रभाव')) {
                     link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_community_impact || "Community Impact"}`;
-                } else if (text.includes('grievances') || text.includes('ମୋଟ ଅଭିଯୋଗ') || text.includes('कुल शिकायतें')) {
-                    link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_grievances || "Grievances"} ${countBadge}`;
-                } else if (text.includes('priority queue') || text.includes('priority') || text.includes('ଜରୁରୀ') || text.includes('प्राथमिकता')) {
-                    link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_priority_queue || "Priority Queue"} ${countBadge}`;
+                } else if (text.includes('grievances') || text.includes('ସମସ୍ତ ଅଭିଯୋଗ') || text.includes('कुल शिकायतें')) {
+                    link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_grievances || "Grievances"} ${countHTML}`;
+                } else if (text.includes('priority queue') || text.includes('priority') || text.includes('ଜରୁରୀ ଅଭିଯୋଗ') || text.includes('प्राथमिकता सूची')) {
+                    link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_priority_queue || "Priority Queue"} ${countHTML}`;
                 } else if (text.includes('assignment') || text.includes('ବଣ୍ଟନ') || text.includes('आवंटन')) {
-                    link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_assignments || "Assignments"} ${countBadge}`;
+                    link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_assignments || "Assignments"} ${countHTML}`;
                 } else if (text.includes('evidence') || text.includes('ପ୍ରମାଣ') || text.includes('साक्ष्य')) {
-                    link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_evidence_review || "Evidence Review"} ${countBadge}`;
+                    link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_evidence_review || "Evidence Review"} ${countHTML}`;
                 } else if (text.includes('analytics') || text.includes('ତଥ୍ୟ') || text.includes('विश्लेषण')) {
                     link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_analytics || "Analytics"}`;
                 } else if (text.includes('notification') || text.includes('ସୂଚନା') || text.includes('सूचनाएं')) {
-                    link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_notifications || "Notifications"} ${countBadge}`;
+                    link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_notifications || "Notifications"} ${countHTML}`;
                 } else if (text.includes('profile') || text.includes('ପ୍ରୋଫାଇଲ୍') || text.includes('प्रोफ़ाइल')) {
                     link.innerHTML = `<span class="nav-icon">${icon}</span> ${d.nav_my_profile || "My Profile"}`;
                 } else if (text.includes('settings') || text.includes('ସେଟିଂସ୍') || text.includes('सेटिंग्स')) {
@@ -967,22 +659,41 @@
             // 6. Help Card (Sidebar Bottom)
             const helpCardStrong = document.querySelector('.help-card strong');
             if (helpCardStrong) helpCardStrong.textContent = d.nav_need_help || "Need help?";
-            const helpCardSpan = document.querySelector('.help-card span');
+            const helpCardSpan = document.querySelector('.help-card span, .help-card p');
             if (helpCardSpan) helpCardSpan.textContent = d.nav_need_help_sub || "Learn how JanSetu works.";
 
             const officerCardRole = document.querySelector('.officer-sidebar-card span');
             if (officerCardRole) officerCardRole.textContent = d.sidebar_officer_role || "Municipal Administration";
 
-            // 7. Stat Cards (Citizen & Officer)
-            // Citizen Stats:
+            // 7. Stat Cards & Numbers (Citizen & Officer)
+            const statNumbers = document.querySelectorAll('.stat-card h2, .stat-number, .stat-card strong.stat-number');
+            statNumbers.forEach(sn => {
+                const raw = sn.getAttribute('data-raw-val') || sn.textContent.trim();
+                sn.setAttribute('data-raw-val', raw);
+                sn.textContent = this.formatDigits(raw, lang);
+            });
+
             const citizenStatCards = document.querySelectorAll('.stats-grid .stat-card');
             citizenStatCards.forEach(sc => {
                 const p = sc.querySelector('p');
                 const desc = sc.querySelector('.stat-description');
-                const trend = sc.querySelector('.trend');
+                const trend = sc.querySelector('.trend, .stat-trend');
                 const titleSpan = sc.querySelector('.stat-title');
                 const subSpan = sc.querySelector('.stat-subtitle');
-                const trendSpan = sc.querySelector('.stat-trend');
+
+                if (trend) {
+                    const rawTrend = trend.getAttribute('data-raw-trend') || trend.textContent.trim();
+                    trend.setAttribute('data-raw-trend', rawTrend);
+                    if (rawTrend.toLowerCase().includes('active') || rawTrend.includes('ସକ୍ରିୟ') || rawTrend.includes('सक्रिय')) {
+                        trend.textContent = d.trend_active || "Active";
+                    } else if (rawTrend.toLowerCase().includes('action') || rawTrend.includes('ପଦକ୍ଷେପ') || rawTrend.includes('कार्रवाई')) {
+                        trend.textContent = d.stat_action_needed || "Action needed";
+                    } else if (rawTrend.toLowerCase().includes('urgent') || rawTrend.includes('ଜରୁରୀ') || rawTrend.includes('आवश्यक')) {
+                        trend.textContent = d.stat_urgent_count || "4 urgent";
+                    } else {
+                        trend.textContent = this.formatDigits(rawTrend, lang);
+                    }
+                }
 
                 if (p) {
                     const text = p.textContent.toLowerCase();
@@ -992,7 +703,6 @@
                     } else if (text.includes('progress') || text.includes('ଚାଲୁଅଛି') || text.includes('प्रगति')) {
                         p.textContent = d.stat_in_progress || "In Progress";
                         if (desc) desc.textContent = d.stat_in_progress_sub || "Click to filter active issues ↓";
-                        if (trend) trend.textContent = d.trend_active || "Active";
                     } else if (text.includes('resolved') || text.includes('ସମାଧାନ') || text.includes('समाधान')) {
                         p.textContent = d.stat_issues_resolved || "Issues Resolved";
                         if (desc) desc.textContent = d.stat_issues_resolved_sub || "Click to filter resolved issues ↓";
@@ -1002,7 +712,6 @@
                     }
                 }
 
-                // Officer Stats:
                 if (titleSpan) {
                     const text = titleSpan.textContent.toLowerCase();
                     if (text.includes('total grievances') || text.includes('ମୋଟ') || text.includes('कुल')) {
@@ -1011,11 +720,9 @@
                     } else if (text.includes('pending') || text.includes('ଯାଞ୍ଚ') || text.includes('लंबित')) {
                         titleSpan.textContent = d.stat_pending_review || "Pending Review";
                         if (subSpan) subSpan.textContent = d.stat_pending_review_sub || "Awaiting officer action";
-                        if (trendSpan) trendSpan.textContent = d.stat_action_needed || "Action needed";
                     } else if (text.includes('priority') || text.includes('ଜରୁରୀ') || text.includes('प्राथमिकता')) {
                         titleSpan.textContent = d.stat_high_priority || "High Priority";
                         if (subSpan) subSpan.textContent = d.stat_high_priority_sub || "Require immediate attention";
-                        if (trendSpan) trendSpan.textContent = d.stat_urgent_count || "4 urgent";
                     } else if (text.includes('resolved') || text.includes('ସମାଧାନ') || text.includes('समाधान')) {
                         titleSpan.textContent = d.stat_resolved || "Resolved";
                         if (subSpan) subSpan.textContent = d.stat_resolution_rate || "Resolution rate";
@@ -1036,9 +743,9 @@
             // 9. Quick Actions (Citizen Right Column)
             const quickCards = document.querySelectorAll('.quick-actions-card, .quick-actions');
             quickCards.forEach(qc => {
-                const h2 = qc.querySelector('h2');
+                const h2 = qc.querySelector('h2, .card-header h2');
                 if (h2) h2.textContent = d.card_quick_actions || "Quick Actions";
-                const p = qc.querySelector('p');
+                const p = qc.querySelector('p, .card-header p');
                 if (p) p.textContent = d.sub_quick_actions || "Get things done faster";
             });
 
@@ -1051,7 +758,7 @@
                     if (t.includes('report') || t.includes('ଅଭିଯୋଗ') || t.includes('शिकायत') || t.includes('સમસ્યા')) {
                         strong.textContent = d.quick_report_issue || "Report an issue";
                         if (span) span.textContent = d.quick_report_issue_sub || "Submit a new grievance";
-                    } else if (t.includes('map') || t.includes('ମ୍ୟାପ୍') || textContains(t, ['मानचित्र', 'નકશો', 'வரைபடம்'])) {
+                    } else if (t.includes('map') || t.includes('ମ୍ୟାପ୍') || t.includes('मानचित्र') || t.includes('નકશો')) {
                         strong.textContent = d.quick_explore_map || "Explore civic map";
                         if (span) span.textContent = d.quick_explore_map_sub || "See issues near you";
                     } else if (t.includes('project') || t.includes('vote') || t.includes('ଭୋଟ୍') || t.includes('वोट') || t.includes('વોટ')) {
@@ -1069,11 +776,38 @@
             if (lbH3 && (lbH3.textContent.includes('Leaderboard') || lbH3.textContent.includes('ଲିଡରବୋର୍ଡ଼') || lbH3.textContent.includes('लीडरबोर्ड'))) {
                 lbH3.textContent = d.leaderboard_title || "Ward 12 Leaderboard";
             }
-            const lbTag = document.querySelector('.card span[style*="background: #fef3c7"]');
+            const lbTag = document.querySelector('.card span[style*="background: #fef3c7"], .card span[style*="color: #b45309"]');
             if (lbTag) lbTag.textContent = d.leaderboard_tag || "Top Guardians";
 
             const lbSelf = document.getElementById('leaderboardSelfName');
             if (lbSelf) lbSelf.textContent = `Sourav P. ${d.you_tag || "(You)"}`;
+
+            const lbSelfScore = document.getElementById('leaderboardSelfScore');
+            if (lbSelfScore) lbSelfScore.textContent = `${this.formatDigits("340", lang)} ${d.xp_unit || "XP"}`;
+
+            const lbRanks = document.querySelectorAll('.card [style*="border-radius: 8px"]');
+            lbRanks.forEach(r => {
+                const subtitle = r.querySelector('span[style*="display: block"]');
+                const scoreStrong = r.querySelector('strong:last-child');
+
+                if (subtitle) {
+                    const st = subtitle.textContent.toLowerCase();
+                    if (st.includes('guardian') || st.includes('ଗାର୍ଡିଆନ୍') || st.includes('संरक्षक')) {
+                        subtitle.textContent = d.rank_guardian_l3 || "Ward Guardian • Lvl 3";
+                    } else if (st.includes('champion') || st.includes('ଚାମ୍ପିଅନ୍') || st.includes('चैंपियन')) {
+                        subtitle.textContent = d.rank_champion_l3 || "Civic Champion • Lvl 3";
+                    } else if (st.includes('corroborator') || st.includes('ସହଯୋଗୀ') || st.includes('सहयोगी')) {
+                        subtitle.textContent = d.rank_corroborator || "Active Corroborator";
+                    }
+                }
+
+                if (scoreStrong && scoreStrong.textContent.includes('XP')) {
+                    const digits = scoreStrong.textContent.replace(/[^0-9]/g, '');
+                    if (digits) {
+                        scoreStrong.textContent = `${this.formatDigits(digits, lang)} ${d.xp_unit || "XP"}`;
+                    }
+                }
+            });
 
             // 11. Priority Queue & AI Triage Insights (Officer)
             const prioCardH2 = document.querySelector('.priority-card h2');
@@ -1087,11 +821,25 @@
             if (aiCardEyebrow) aiCardEyebrow.textContent = d.eyebrow_ai_assistant || "AI ASSISTANT";
             const aiCardH2 = document.querySelector('.ai-card h2');
             if (aiCardH2) aiCardH2.textContent = d.title_triage_insights || "Triage Insights";
+            
+            const aiReadyStrong = document.querySelector('.ai-highlight strong');
+            if (aiReadyStrong) aiReadyStrong.textContent = this.formatDigits(aiReadyStrong.textContent.trim(), lang);
             const aiReadySpan = document.querySelector('.ai-highlight span');
             if (aiReadySpan) aiReadySpan.textContent = d.ai_ready_review || "grievances ready for review";
-            const aiDupSpan = document.querySelectorAll('.ai-stat span');
-            if (aiDupSpan[0]) aiDupSpan[0].textContent = d.ai_duplicate_detected || "Duplicate detected";
-            if (aiDupSpan[1]) aiDupSpan[1].textContent = d.ai_misrouted || "Misrouted";
+
+            const aiStats = document.querySelectorAll('.ai-stat > div');
+            if (aiStats.length >= 2) {
+                const s0 = aiStats[0].querySelector('span');
+                const st0 = aiStats[0].querySelector('strong');
+                if (s0) s0.textContent = d.ai_duplicate_detected || "Duplicate detected";
+                if (st0) st0.textContent = this.formatDigits(st0.textContent.trim(), lang);
+
+                const s1 = aiStats[1].querySelector('span');
+                const st1 = aiStats[1].querySelector('strong');
+                if (s1) s1.textContent = d.ai_misrouted || "Misrouted";
+                if (st1) st1.textContent = this.formatDigits(st1.textContent.trim(), lang);
+            }
+
             const aiInsightP = document.querySelector('.ai-insight-box p');
             if (aiInsightP) {
                 aiInsightP.innerHTML = `<strong>${d.ai_pattern_detected || "Pattern detected"}</strong> ${d.ai_pattern_desc || "7 complaints about water supply were reported within the same area in the last 48 hours."}`;
@@ -1099,22 +847,33 @@
             const aiBtn = document.querySelector('.ai-button');
             if (aiBtn) aiBtn.textContent = d.btn_review_ai_insights || "Review AI Insights →";
 
-            // Department Performance section
-            const deptH2 = document.querySelectorAll('.metrics-card h2, .performance-card h2');
-            deptH2.forEach(h => {
-                if (h.textContent.includes('Performance') || h.textContent.includes('ଦକ୍ଷତା') || h.textContent.includes('प्रदर्शन')) {
-                    h.textContent = d.title_dept_performance || "Department Performance";
-                }
+            // Department Performance & SLA overview section (Officer)
+            const deptCardH2 = document.querySelector('.metrics-card h2, .performance-card h2');
+            if (deptCardH2) deptCardH2.textContent = d.title_dept_performance || "Department Performance";
+            const deptCardP = document.querySelector('.metrics-card p, .performance-card p');
+            if (deptCardP) deptCardP.textContent = d.sub_dept_performance || "Current month resolution metrics";
+
+            const slaCardH2 = document.querySelector('.sla-card h2, .sla-section h2');
+            if (slaCardH2) slaCardH2.textContent = d.title_sla_overview || "SLA Overview";
+            const slaCardP = document.querySelector('.sla-card p, .sla-section p');
+            if (slaCardP) slaCardP.textContent = d.sub_sla_overview || "Service-level compliance";
+
+            const gaugeLabel = document.querySelector('.gauge-label span, .sla-card .gauge-label');
+            if (gaugeLabel) gaugeLabel.textContent = d.label_on_time || "On time";
+
+            const viewAllButtons = document.querySelectorAll('.text-button, .view-all-btn');
+            viewAllButtons.forEach(v => {
+                v.textContent = d.btn_view_all || "View all →";
             });
 
-            // 12. Dynamic Content Translator: Update Grievance Rows
+            // 12. Dynamic Grievance Rows (Titles, Statuses, Upvotes, Review buttons)
             this.translateExistingGrievanceRows(lang);
         },
 
         translateExistingGrievanceRows(lang) {
             const d = this.dict[lang] || this.dict['en'];
 
-            // Citizen recent reports rows
+            // Citizen recent reports rows & Officer Priority list
             const rows = document.querySelectorAll('.report-row, .grievance-item, tr[data-status]');
             rows.forEach(row => {
                 const h3 = row.querySelector('h3, td:nth-child(2)');
@@ -1122,6 +881,25 @@
                     const raw = h3.getAttribute('data-raw-title') || h3.textContent.trim();
                     h3.setAttribute('data-raw-title', raw);
                     h3.textContent = this.translateTitle(raw, lang);
+                }
+
+                // Category in description
+                const descP = row.querySelector('.grievance-main p, .report-details p');
+                if (descP && descP.textContent.includes('•')) {
+                    const parts = descP.textContent.split('•');
+                    if (parts.length >= 2) {
+                        const rawCat = parts[1].trim();
+                        parts[1] = ` ${this.translateCategory(rawCat, lang)} `;
+                        descP.textContent = parts.join('•');
+                    }
+                }
+
+                // Upvotes
+                const upvoteBtn = row.querySelector('.support-vote-btn');
+                if (upvoteBtn) {
+                    const rawVotes = upvoteBtn.getAttribute('data-raw-votes') || upvoteBtn.textContent.replace(/[^0-9]/g, '');
+                    upvoteBtn.setAttribute('data-raw-votes', rawVotes);
+                    upvoteBtn.textContent = `▲ ${this.formatDigits(rawVotes, lang)}`;
                 }
 
                 // Status spans
@@ -1149,16 +927,12 @@
         }
     };
 
-    function textContains(str, arr) {
-        return arr.some(a => str.includes(a));
-    }
-
     // Auto-initialize on load
     document.addEventListener('DOMContentLoaded', () => {
         const savedLang = localStorage.getItem('jansetu_preferred_lang') || 'en';
         setTimeout(() => {
             window.JanSetuI18n.applyLanguage(savedLang);
-        }, 100);
+        }, 150);
     });
 
     // Global aliases for dashboard scripts
