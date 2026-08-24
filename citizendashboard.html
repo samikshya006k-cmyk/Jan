@@ -877,6 +877,34 @@
 
                         </button>
 
+                        <button
+                            class="quick-action"
+                            onclick="if(window.JanSetuAIChatbot && window.JanSetuAIChatbot.open) { window.JanSetuAIChatbot.open(); } else if (document.getElementById('aiChatWindow')) { document.getElementById('aiChatWindow').classList.add('active'); document.getElementById('aiInput')?.focus(); }"
+                            style="background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%); border: 1px solid #bfdbfe;"
+                        >
+
+                            <div class="quick-icon" style="background: #2563eb; color: #ffffff; font-size: 16px;">
+                                🤖
+                            </div>
+
+                            <div>
+
+                                <strong style="color: #1e40af;">
+                                    Ask JanSetu AI Assistant
+                                </strong>
+
+                                <span>
+                                    24/7 Voice & Grievance AI Help
+                                </span>
+
+                            </div>
+
+                            <span style="color: #2563eb; font-weight: bold;">
+                                →
+                            </span>
+
+                        </button>
+
 
                     </div>
 
@@ -1694,16 +1722,16 @@
                 <!-- Translated spoken text shown here -->
             </div>
 
-            <!-- WhatsApp Live Updates Subscription Box -->
-            <div style="margin-bottom: 14px; padding: 10px 14px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+            <!-- JanSetu AI Live Updates Subscription Box -->
+            <div style="margin-bottom: 14px; padding: 10px 14px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 18px;">📱</span>
+                    <span style="font-size: 18px;">🤖</span>
                     <div>
-                        <strong style="font-size: 11px; color: #14532d; display: block;">WhatsApp Live Progress Alerts</strong>
-                        <span style="font-size: 10px; color: #166534;">Receive dispatch & photo verification updates</span>
+                        <strong style="font-size: 11px; color: #1e40af; display: block;">JanSetu AI Live Progress Alerts</strong>
+                        <span style="font-size: 10px; color: #2563eb;">Receive AI contractor dispatch & photo verification updates</span>
                     </div>
                 </div>
-                <button type="button" id="modalWhatsAppSubscribeBtn" onclick="toggleWhatsAppSubscription()" style="padding: 4px 10px; background: #25D366; color: #fff; border: none; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                <button type="button" id="modalWhatsAppSubscribeBtn" onclick="toggleWhatsAppSubscription()" style="padding: 4px 10px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">
                     ✓ Subscribed
                 </button>
             </div>
@@ -1845,7 +1873,7 @@
                 <!-- Notification Alert Toggles -->
                 <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed #cbd5e1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                     <label style="font-size: 11px; color: #334155; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                        <input type="checkbox" id="profileNotifyWhatsApp" checked> 📱 WhatsApp Live Alerts
+                        <input type="checkbox" id="profileNotifyWhatsApp" checked> 🤖 JanSetu AI Live Alerts
                     </label>
                     <label style="font-size: 11px; color: #334155; display: flex; align-items: center; gap: 6px; cursor: pointer;">
                         <input type="checkbox" id="profileNotifySMS" checked> ✉️ SMS Emergency Alerts
